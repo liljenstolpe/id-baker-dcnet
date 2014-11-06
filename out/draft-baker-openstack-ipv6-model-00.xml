@@ -1,0 +1,1989 @@
+<?xml version="1.0" encoding="UTF-8"?>
+  <?xml-stylesheet type="text/xsl" href="rfc2629.xslt" ?>
+
+<!DOCTYPE rfc SYSTEM "rfc2629.dtd" [
+]>
+
+<rfc ipr="trust200902" docName="draft-baker-openstack-ipv6-model-00" category="info">
+
+<?rfc strict="yes"?>
+<?rfc comments="no"?>
+<?rfc inline="no"?>
+<?rfc editing="no"?>
+<?rfc toc="yes"?>
+<?rfc tocompact="yes"?>
+<?rfc tocdepth="3"?>
+<?rfc symrefs="yes"?>
+<?rfc sortrefs="yes"?>
+<?rfc compact="yes"?>
+<?rfc subcompact="no"?>
+
+  <front>
+    <title abbrev="">A Model for IPv6 Operation in OpenStack</title>
+
+    <author initials="F." surname="Baker" fullname="Fred Baker">
+      <organization>Cisco Systems</organization>
+      <address>
+        <postal>
+          <street></street>
+          <city>Santa Barbara</city>
+          <region>California</region>
+          <code>93117</code>
+          <country>USA</country>
+        </postal>
+        <email>fred@cisco.com</email>
+      </address>
+    </author>
+    <author initials="C." surname="Marino" fullname="Chris Marino">
+      <organization>Cisco Systems</organization>
+      <address>
+        <postal>
+          <street></street>
+          <city>San Jose</city>
+          <region>California</region>
+          <code>95134</code>
+          <country>USA</country>
+        </postal>
+        <email>chrmarin@cisco.com</email>
+      </address>
+    </author>
+    <author initials="I." surname="Wells" fullname="Ian Wells">
+      <organization>Cisco Systems</organization>
+      <address>
+        <postal>
+          <street></street>
+          <city>San Jose</city>
+          <region>California</region>
+          <code>95134</code>
+          <country>USA</country>
+        </postal>
+        <email>iawells@cisco.com</email>
+      </address>
+    </author>
+
+    <date year="2014" month="November" day="06"/>
+
+    <area></area>
+    <workgroup></workgroup>
+    
+
+    <abstract>
+
+
+<t>This is an overview of a network model for OpenStack, designed to
+dramatically simplify scalable network deployment and operations.</t>
+
+
+
+    </abstract>
+
+
+  </front>
+
+  <middle>
+
+
+<section anchor="introduction" title="Introduction">
+
+<t>OpenStack, and its issues.</t>
+
+<section anchor="projects" title="What is OpenStack?">
+
+<t>OpenStack is a cloud computing orchestration solution developed
+using an open source community process. It consists of a collection of
+‘projects’, each implementing the creation, control and administration
+of tenant resources. There are separate OpenStack projects for
+managing compute, storage and network resources.</t>
+
+<t>Neutron is the project that manages OpenStack networking. It
+exposes a northbound API to the other OpenStack projects for
+programmatic control over tenant network connectivity. The southbound
+interface is implemented as one or more device driver plugins that are
+built to interact with specific devices in the network. This approach
+provides the flexibility to deploy OpenStack networking using a range
+of alternative techniques.</t>
+
+<t>An OpenStack tenant is required to create what OpenStack identifies
+as a ‘Network’ connecting their virtual machines. This Network is
+instantiated via the plugins as either a layer 2 network, a layer 3
+network, or as an overlay network. The actual implementation is
+unknown to the tenant. The technology used to provide these networks
+is selected by the OpenStack operator based upon the requirements of
+the cloud deployment.</t>
+
+<t>The tenant also is required to specify a ‘Subnet’ for each Network.
+This specification is made by providing a CIDR prefix for IPv4 address
+allocation via DHCP and for IPv6 address allocation via DHCP or SLAAC.
+This address range may be from within the address range of the
+datacenter (non-overlapping), or overlapping RFC 1918 addresses.
+Tenants may create multiple Networks, each with its own Subnet.</t>
+
+<t>An OpenStack Subnet is a logical layer 2 network and requires layer
+3 routing for packets to exit the Subnet. This is achieved by
+attaching the Subnet to a Neutron Router. The Neutron router
+implements Network Address Translation for external traffic from
+tenant networks as well for providing connectivity to tenant networks
+from the outside. Using Linux utilities, OpenStack can support
+overlapping RFC 1918 addresses between tenants.</t>
+
+<t>OpenStack Subnets are typically implemented as VLANs in a
+datacenter. When tenant scalability requirement grow large, an overlay
+approach is typically used. Because of the difficulties in scaling and
+administering large layer 2 and/or overlay networks, some OpenStack
+integrations chose not to provide isolated Subnets and simply offer
+tenants a layer 3 based network alternative.</t>
+
+<t>OpenStack uses Layer 3 and Layer 2 Linux utilities on hosts to
+provide protection against IP/MAC spoofing and ARP poisoning.</t>
+
+</section>
+<section anchor="openstack-issues" title="OpenStack Scaling Issues">
+
+<t>One of the fundamental requirements of OpenStack Networking
+(Neutron) is to provide scalable, isolated tenant networks. Today this
+is achieved via L2 segmentation using either a) standard 802.1Q VLANs
+or b) an overlay approach based on one of several L2 over L3
+encapsulation techniques available today such as 802.1ad, VXLAN, STT
+or NVGRE.</t>
+
+<t>However, these approaches still struggle to provide scalable,
+transparent, manageable, high performing isolated tenant networks.
+VLAN’s don’t scale beyond 4096 (2^12) networks and have complex
+trunking requirements when tenants span host and racks. IEEE 802.1ad
+(QinQ) partially solves that, but adds another limit - at most 2^12
+tenants, each of which may have 2^12 VLANs. IP Encapsulation
+introduces additional complexity on host computers running hypervisors
+as well as impact performance of tenant applications running on
+virtual machines. Overlay based isolation techniques may also impair
+traditional network monitoring and performance management tools.
+Moreover, when these isolated (L2) networks require external access to
+other networks or the public Internet, they require even more complex
+solutions to accommodate overlapping IP prefixes and network address
+translation (NAT).</t>
+
+<t>As more capabilities are built on to these layer 2 based‘virtual’networks, complexity continues to grow.</t>
+
+<t>This draft presents a new Layer 3 based approach to OpenStack
+networking using IPv6 that can be deployed natively on IPv6 networks.
+It will be shown that this approach can provide tenant isolation
+without the limitations of existing L2 based alternatives, as well as
+deliver high performance networks transparently using a simplified
+tenant network connectivity model without the overhead of
+encapsulation or managing overlapping IP addresses and address
+translations. We note that some large content providers, notably
+Google and <eref target="#FaceBook-IPv6">Facebook</eref>, are going in
+exactly this direction.</t>
+
+</section>
+</section>
+<section anchor="require" title="Requirements">
+
+<t>In this section, we attempt to list critical requirements.</t>
+
+<section anchor="approach" title="Design approach">
+
+<t>As a design approach, we presume an IPv6-only data center in a
+world that might have IPv4 clients outside of it. This design
+explicitly does not depend on VLANs, QinQ, VXLAN, MPLS, Segment
+Routing, IP/IP or GRE tunnels, or anything else. Data center operators
+remain free to use any of those tools, but they are not required. If
+we can do everything required for OpenStack networking with IPv6
+alone, these other networking technologies may be used as
+optimizations. If we are unable to satisfy the OpenStack requirements
+that also is something we wish to know and understand.</t>
+
+<t>OpenStack is designed to be used by many cloud users or tenants.
+Scalable, secure and isolated tenant networks are a requirement for
+building a multi-tenant cloud datacenter. The OpenStack
+administrator/operator can design and configure a cloud environment to
+provide network isolation using the approach described in this
+document, alone, or in combination with any of the above network
+technologies . However, all the details of the underlying technology
+and implementation details are completely transparent to the tenant
+itself.</t>
+
+</section>
+<section anchor="requirements-language" title="Requirements Language">
+
+<t>The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”,
+“SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this
+document are to be interpreted as described in <xref target="RFC2119"/>.</t>
+
+</section>
+<section anchor="multicenter" title="Multiple Data Centers">
+
+<t>A common requirement in network and data center operations is
+reliability, serviceability, and maintainability of their operations
+in the presence of an outage. At minimum, this implies multihoming in
+the sense of having multiple upstream ISPs; in many cases, it also
+implies multiple and at times duplicate data centers, and tenants
+stretched or able to be readily moved or recreated across multiple
+data centers.</t>
+
+</section>
+<section anchor="large" title="Large Data Centers">
+
+<t><eref target="#Microsoft-Azure">Microsoft Azure</eref> has purchased
+a 100 acre piece of land for the construction of a single data center.
+In terms of physical space, that is enough for a data center with
+about half a million 19” RETMA racks.</t>
+
+<t>With even modest virtual machine density, infrastructure at this
+scale easily exhausts the 16M available RFC 1918 private addresses
+(i.e. 10.0.0.0/8) and explains the recent efforts by webscale cloud
+providers to deploy IPv6 throughout their new datacenters.</t>
+
+</section>
+<section anchor="multitenant" title="Multi-tenancy">
+
+<t>While it is possible that a single tenant would require a 100 acre
+data center, it would be unusual. In most such data centers, one would
+expect a large number of tenants.</t>
+
+</section>
+<section anchor="isolation" title="Isolation">
+
+<t>Isolation is required between tenants, and at times between
+components of a single tenant.</t>
+
+<section anchor="interisolation" title="Inter-tenant isolation">
+
+<t>A “tenant” is defined as a set of resources under common
+administrative control. It may be appropriate for tenants to
+communicate with each other within the context of an application or
+relationships among their owners or operators. However, unless
+specified otherwise, tenants are intended to operate as if they were
+on their own company’s premises and be isolated from one
+another.</t>
+
+</section>
+<section anchor="intraisolation" title="Intra-tenant isolation">
+
+<t>There are often security compartments within a corporate network,
+just as there are security barriers between companies. As a result,
+there is a recursive isolation requirement: it must be possible to
+isolate an identified part of a tenant from another part of the same
+tenant.</t>
+
+</section>
+</section>
+<section anchor="requirement5" title="Operational Simplicity">
+
+<t>To the extent possible (and, for operators, the concept will bring
+a smile), operation of a multi-location multi-tenant data center, and
+the design of an application that runs in one, should be simple and
+uncoupled.</t>
+
+<t>As discussed in <xref target="RFC3439"/>, this requires that the
+operational model required to support a tenant with only two physical
+machines, or virtual machines in the same physical chassis, should be
+the same as that required to support a tenant running a million
+machines in a multiple data center application. Additionally, this
+same operational model should scale from running a single tenant up to
+many thousands of tenants.</t>
+
+</section>
+<section anchor="requirement8" title="Address space">
+
+<t>As described in <xref target="projects"/>, currently, an OpenStack
+tenant is required to specify a Subnet’s CIDR prefix for IP address
+allocation. With this proposal, this is no longer required.</t>
+
+</section>
+<section anchor="requirement9" title="Data Center Federation">
+
+<t>It must be possible to extend the architecture across multiple data
+centers. These data centers may be operated by distinct entities, with
+security policies that apply to their interconnection.</t>
+
+</section>
+</section>
+<section anchor="models" title="Models">
+
+<section anchor="configuration" title="Configuration Model">
+
+<t>In the OpenStack model, the cloud computing user, or tenant, is
+building something Edward Yourdon might call a “structured design” for
+the application they are building. In the 1960’s, when Yourdon started
+specifying process and data flow diagrams, these were job steps in a
+deck of Job Control Language cards; in OpenStack, they are multiple,
+individual machines, virtual or physical, running parts of a
+structured application.</t>
+
+<t>In these, one might find a load balancer that receives and
+distributes requests to request processors, a set of stored data
+processing applications, and the storage they depend on. What is
+important to the OpenStack tenant is that “this” and “that”
+communicate, potentially using or not using multicast communications,
+and don’t communicate with “the other”. Typically unnecessary is any
+and all information regarding how this communication actually needs to
+occur (i.e. placement of routers, switches, and IP subnets, prefixes,
+etc.).</t>
+
+<t>An IPv6 based networking model simplifies the configuration of
+tenant connectivity requirements. Global reachability eliminates the
+need for network address translation devices as well as
+tenant-specified Subnet prefixes (<xref target="requirement8"/>),
+although tenant-specified ULA prefixes or prefixes from the owner of
+the tenant’s address space are usable with it. With the exception of
+network security functions, no network devices need to be specified or
+configured to provide connectivity.</t>
+
+</section>
+<section anchor="addressing" title="Data Center Model">
+
+<t>The premises of the routing and addressing models are that</t>
+
+<t><list style="symbols">
+  <t>The address tells the routing system what topological location
+to deliver a packet to, and within that, what interface to deliver
+it to, and</t>
+  <t>The routing system should deliver traffic to a resource if and
+only if the sender is authorized to communicate with that
+resource.</t>
+  <t>Contrary to the OpenStack Neutron Networking Model, tunnels are
+not necessary to provide tenant network isolation; we include
+resources in a tenant network by a Role-based Access Control
+model, but address the tenant resources within the data center in
+a manner that scales for the data center.</t>
+</list></t>
+
+<t>We expect to find the data center to be composed of some minimal
+unit of connectivity and maintenance, such as a rack or row, and
+equipped with one or more Top-of-Rack or End-of-Row switch(es); each
+configured with at least one subnet prefix, perhaps one per such
+switch. For the purposes of this note, these will be called Racks and
+Top-of-Rack switches, and when applied to other architectures the
+appropriate translation needs to be imposed.</t>
+
+<t><xref target="zynga"/> describes a relatively typical rack design.
+It is a simple fat-tree architecture, with every device in a pair, so
+that any failure has an immediate hot backup. There are other common
+designs, such as those that consider each rack to be in a “row” and in
+a “column”, with a distribution switch in each.</t>
+
+<figure title="Typical Rack Design" anchor="zynga"><artwork><![CDATA[
+       Distribution   Switches connecting
+       / Layer /      racks in a pod, and
+      /       /       connecting pods
+     /       /
+  +-+-+   +-+-+       Mutual backup TOR
++-+TOR+---+TOR+-+     switches
+| +---+   +---+ |
+| +-----------+ |
++-+    host   +-+     Each host has two
+| +-----------+ |     Ethernet interfaces
++-+    host   +-+     with separate subnets
+| +-----------+ |
+| .           . |
+| .           . |
+| .           . |     Design premise: complete
+| +-----------+ |     redundancy, with every
++-+    host   +-+     switch and every cable
+| +-----------+ |     backed up by a doppelganger
++-+    host   +-+
+  +-----------+
+]]></artwork></figure>
+
+<section anchor="tenant" title="Tenant Address Model">
+
+<t>Tenant resources need to be told, by configuration or naming, the
+addresses of resources they communicate with. This is true
+regardless of their location or relationship to a given tenant. In
+environments with well-known addresses, this gets complex and
+unscalable. This was learned very early with Internet hostnames; a
+single “hostfile” was maintained by a central entity and updated
+daily, which quickly became unmanageable. The result was the
+development of the Domain Name System; the level of indirection
+between names and addresses made the system more scalable. It also
+facilitated ongoing maintenance. If a service needed multiple
+servers, or a server needed to change its address, that was
+trivially solved by changing the DNS Resource Record; every resource
+that needed the new address would obtain it the next time it queried
+the DNS. It has also facilitated the IPv4/IPv6 transition; a
+resource that has an IPv6 address is given a AAAA record in addition
+to, or to replace, its IPv4 A record.</t>
+
+<t>Similarly, today’s reliance on NAPT technology frequently limits
+the capabilities of an application. It works reasonably well for
+client accessing a client/server application when the protocol does
+not carry addressing information. If there is an expectation that
+one resource’s private address will be meaningful to a peer, such as
+when an SIP client presents its address in SDP or an HTTP server
+presents an address in a redirection, either the resource needs to
+understand the difference between an “inside” and an “outside”
+address and know which is which, or it needs a traversal algorithm
+that changes the addresses. For peer-to-peer applications, this
+ultimately means providing a network design in which those issues
+don’t apply.</t>
+
+<t>IPv6 provides global addresses, enough of them that there is no
+real expectation of running out any time soon, making these issues
+go away. In addition, with the IPv4 address space running out, both
+globally and within today’s large datacenters, there aren’t
+necessarily addresses available for an IPv4 application to use, even
+as a floating IP address.</t>
+
+<t>Hence, the model we propose is that a resource in a tenant is
+told the addresses of the other resources with which it
+communicates. They are IPv6 addresses, and the data center takes
+care to ensure that inappropriate communications do not take
+place.</t>
+
+<section anchor="gua-tenant" title="Use of Global Unicast Addresses by Tenants">
+
+<t>A unicast address in an IP network identifies a topological
+location, by association with an IP prefix (which might be for a
+subnet or any aggregate of subnets). It also identifies a single
+interface located within that subnet, which may or may not be
+instantiated at the time. We assume that there is a subnet
+associated with a top-of-rack switch or whatever its counterpart
+would be in a given network design, and that the physical and
+virtual machines located in that rack have addresses in that
+subnet. This is the same prefix that is used by the datacenter
+administrator.</t>
+
+</section>
+<section anchor="ula" title="Unique Local Addresses">
+
+<t>A common requirement is that tenants have the use of some form
+of private address space. In an IPv6 network, a <eref target="#RFC4193">Unique Local IPv6 Unicast Address</eref> may be
+used to accomplish this. In this case, however, the addresses will
+need to be explicitly assigned to physical or virtual machines
+used by the tenant, perhaps using DHCP or YANG, where a standard
+IPv6 address could be allocated using SLAAC or other
+technologies.</t>
+
+<t>The value of this is that Are we suggesting 2.8 address model
+is for GUA and that ULAs are a corner case in the data center.
+Tenants have no routing information or other awareness of the
+prefix. This is not intended for use behind a NAPT; resources that
+need accessibility to or from resources outside the tenant, and
+especially outside the data center, need global addresses.</t>
+
+</section>
+<section anchor="multicast" title="Multicast Domains">
+
+<t>Multicast capability is a capability enjoyed by some groups of
+resources, that they can send a single message and have it
+delivered to multiple destinations roughly simultaneously. At the
+link layer, this means sending a message once that is received by
+a specified set of recipient resources using hardware
+capabilities. IP multicast can be implemented on a LAN as
+specified in <xref target="RFC4291"/>, and can also cross multiple
+subnets directly, using routing protocols such as <eref target="#RFC4601">Protocol Independent Multicast</eref>  <xref target="RFC4602"/>  <xref target="RFC4604"/>  <xref target="RFC4605"/>  <xref target="RFC4607"/>. In IPv6, the model
+would be that when a group of resources is created with a
+multicast capability, it is allocated one or more source-specific
+transient group addresses as defined in section 2.7 of that
+RFC.</t>
+
+</section>
+<section anchor="ipv4" title="IPv4 Interaction Model">
+
+<t>OpenStack IPv4 Neutron uses“floating IPv4
+addresses”–global or public IPv4 addresses - to
+enable remote resources to connect to tenant private network
+endpoints. Tenant end points can connect out to remote resources
+through an“External Default Gateway”. Both of these
+depend on NAPT (DNAT/SNAT) to ensure that IPv4 end points are able
+communicate and at the same time ensure tenant isolation.</t>
+
+<t>If IPv6 is deployed in a data center, there are fundamentally
+two ways a tenant can interact with IPv4 peers:</t>
+
+<t><list style="symbols">
+  <t>it can run existing IPv4 OpenStack technology in parallel
+with the IPv6 deployment, or</t>
+  <t>It can have a translator at the data center edge (such as
+described in <xref target="I-D.anderson-v6ops-siit-dc"/>) that
+associates an IPv4 address or address plus port with an IPv6
+address or address plus port. The IPv4 address, in this model,
+becomes a floating IPv4 address attached to an internal IPv6
+address. The “data center edge” is, by definition, a system
+that has IPv4 reachability to at least the data center’s
+upstream ISP and all IPv4 systems in the data center, IPv6
+connectivity to all of the IPv6 systems in the data center,
+and (if the upstream offers IPv6 service) IPv6 connectivity to
+the upstream as well.</t>
+</list></t>
+
+<t>The first model is complex, if for no other reason than that
+there are two fundamental models in use, one with various
+encapsulations hiding overlapping address space and one with
+non-overlapping address space.</t>
+
+<t>To simplify the network, as noted in <xref target="approach"/>,
+we suggest that the data center be internally IPv6-only, and IPv4
+be translated to IPv6 at the data center edge. The advantage is
+that it enables IPv4 access while that remains in use, and as IPv6
+takes over, it reduces the impact of vestigial support for
+IPv4.</t>
+
+<t>The SIIT Translation model in <xref target="I-D.anderson-v6ops-siit-dc"/> has IPv4 traffic come to an <eref target="#RFC6145">translator</eref><xref target="RFC6146"/> having a pre-configured translation, resulting in an IPv6 packet
+indistinguishable from the packet the remote resource might have
+sent had it been IPv6-capable, with one exception. The IPv6
+destination address is that of the endpoint (the same address
+advertised in a AAAA record), but the source address is an <eref target="#RFC6052">IPv4-Embedded IPv6 Address</eref> with the IPv4
+address of the sender embedded in a prefix used by the
+translator.</t>
+
+<t>Access to external IPv4 resources is provided in the same way:
+an <eref target="#RFC6147">DNS64</eref> server is implemented that
+contains AAAA records with an <eref target="#RFC6052">IPv4-Embedded IPv6 Address</eref> with the IPv4 address of the remote resource
+embedded in a prefix used by the translator.</t>
+
+<t>This follows the <eref target="#RFC6144">Framework for IPv4/IPv6 Translation</eref>, making the internal IPv4 address a floating IP
+address attached to an internal IPv6 address, and the external
+“dial-out” address indistinguishable from a native IPv6
+address.</t>
+
+</section>
+<section anchor="legacy-ipv4-openstack" title="Legacy IPv4 OpenStack">
+
+<t>The other possible mdel, applicable to IPv4-only devices, is to
+run a legacy OpenStack environment inside IPv6 tunnels. This
+preserves the data center IPv6-only, and enables IPv4-only
+applications, notably those whose licenses tie them to IPv4
+addresses, to run. However, it adds significant overhead in terms
+of encapsulation size and network management complexity.</t>
+
+</section>
+</section>
+<section anchor="dc" title="Use of Global Addresses by the Data Center">
+
+<t>Every rack and physical host requires an IP prefix that is
+reachable by the OpenStack operator. This will normally be a global
+IPv6 unicast address. For scalability purposes, as isolation is
+handled separately, this is normally the same prefix as is used by
+tenants in the rack.</t>
+
+</section>
+</section>
+<section anchor="security-isolation" title="Inter-tenant security services">
+
+<t>In this model, the a label is used to identify a project/tenant or
+part of a project/tenant, and is used to facilitate access control
+based on the label value. In <xref target="introduction"/>, we noted
+the limitation of 802.11ad QinQ, in that with Metro Ethernet networks
+it assigns a VLAN ID to a customer and a second VLAN id to a VLAN used
+by that customer, and is in that sense limited to 2^12 customers.
+Alternatively, it could be considered to be 2^12 geographies, with
+2^12 tenant VLANs in each, meaning that the data center operator has
+to think about placement of tenant VMs in places their VLANs reach.
+Labels manage that space with different limits.</t>
+
+<section anchor="label" title="Label Definition">
+
+<t>Three different types of labels are in view here: the IPv6 Flow
+Label, a federated identity in the IPv6 Destination Header, or a
+federated identity in the IPv6 Hop-by-Hop Header. These have
+different capabilities and implications.</t>
+
+<section anchor="ipv6label" title="Flow Label">
+
+<t>The IPv6 flow label may be used to identify a tenant or part of
+a tenant, and to facilitate access control based on the flow label
+value. The flow label is a flat 20 bits, facilitating the
+designation of 2^20 (1,048,576) tenants without regard to their
+location. 1,048,576 is less than infinity, but compared to current
+data centers is large, and much simpler to manage.</t>
+
+<t>Note that this usage differs from the current <eref target="#RFC6437">IPv6 Flow Label Specification</eref>. It also
+differs from the use of a flow label recommended by the <eref target="#RFC2460">IPv6 Specification</eref>, and the respective
+usages of the flow label in the <eref target="#RFC2205">Resource ReSerVation Protocol</eref> and the previous <eref target="#RFC3697">IPv6 Flow Label Specification</eref>, and the
+projected usage in <eref target="#RFC5548">Low-Power and Lossy Networks</eref><xref target="RFC5673"/>. Within a target domain,
+the usage may be specified by the domain. That is the viewpoint
+taken in this specification.</t>
+
+</section>
+<section anchor="optlabel" title="Federated Identity">
+
+<t>Alternatively, <xref target="I-D.baker-openstack-rbac-federated-identity"/> defines a
+numeric label usable in network layer Role-based Access Control.
+The syntax is a sequence of positive integers; the semantics of
+the integers are defined by the administration(s) using them. A
+single integer may be used in the same way as the Flow Label in <xref target="ipv6label"/>, but without the 20 bit limitation. A
+pair of integers might, for example, signify a data center and its
+tenants, or a company and its departments. Three integers might,
+again as an example, signify one data center operator among a set
+of data center operators, the second the clients of those
+operators, and the third subsets of those clients. In any event,
+as in <xref target="ipv6label"/>, it identifies a set of machines,
+physical or virtual, that are authorized to communicate freely
+among themselves, but may or may not be authorized to communicate
+with other equipment.</t>
+
+<t>Carried in the Destination Options Extension Header, this
+option is visible to Neutron in the originating and terminating
+chassis. This limits overheads in intermediate switches, and
+enables filtering in the destination system.</t>
+
+<t>Carried in the Hop-by-Hop Extension Header, this option is
+visible to routers en route in addition to Neutron in the
+originating and terminating chassis, at the possible cost of some
+processing overhead. This facilitates filtering at any system.</t>
+
+</section>
+</section>
+<section anchor="ipv6-isolation" title="IPv6 Tenant Isolation using the Label">
+
+<t>Neutron today already implements a form of <eref target="#RFC2827">Network Ingress Filtering</eref>. It prevents the
+VM from emitting traffic with an unauthorized MAC, IPv4, or IPv6
+source address.</t>
+
+<t>In addition to this, in this model Neutron prevents the VM from
+transmitting a network packet with an unauthorized label value. The
+VM MAY be configured with and authorized to use one of a short list
+of authorized label values, as opposed to simply having its choice
+overridden; in that case, Neutron verifies the value and overwrites
+one not in the list.</t>
+
+<t>When a hypervisor is about to deliver an IPv6 packet to a VM, it
+checks the label value against a list of values that the VM is
+permitted to receive. If it contains an unauthorized value, the
+hypervisor discards the packet rather than deliver it. If the Flow
+Label is in use, Neutron zeros the label prior to delivery.</t>
+
+<t>The intention is to hide the label value from malware potentially
+found in the VM, and enable the label to be used as a form of first
+and last hop security. This provides basic tenant isolation, if the
+label is assigned as a tenant identifier, and may be used more
+creatively such as to identify a network management application as
+separate from a managed resource.</t>
+
+</section>
+<section anchor="routing" title="Isolation in Routing">
+
+<t>This concept has the weakness that if a packet is not dropped at
+its source, it is dropped at its destination. It would be preferable
+for the packet to be dropped in flight, such as at the top-of-rack
+switch or an aggregation router.</t>
+
+<t>Concepts discussed in <eref target="#I-D.baker-ipv6-isis-dst-flowlabel-routing">IS-IS LSP Extendibility</eref><xref target="RFC5120"/><xref target="RFC5308"/> and <eref target="#I-D.baker-ipv6-ospf-dst-flowlabel-routing">OSPFv3 LSA Extendibility</eref>  <xref target="I-D.ietf-ospf-ospfv3-lsa-extend"/><xref target="RFC5340"/> may be used to isolate tenants in the routing of the data center
+backbone. This is not strictly necessary, if <xref target="ipv6-isolation"/> is uniformly and correctly implemented. It
+does, however, present a second defense against misconfiguration, as
+the filter becomes ubiquitous in the data center and as scalable as
+routing.</t>
+
+</section>
+</section>
+<section anchor="bcp38" title="BCP 38 Ingress Filtering">
+
+<t>As noted in <xref target="ipv6-isolation"/>, Neutron today
+implements a form of <eref target="#RFC2827">Network Ingress Filtering</eref>. It prevents the VM from emitting traffic with an
+unauthorized MAC, IPv4, or IPv6 source address.</t>
+
+<t>In IPv6, this is readily handled when the address or addresses used
+by a VM are selected by the OpenStack operator. It may then configure
+a per-VM filter with the addresses it has chosen, following logic
+similar to the <eref target="#I-D.ietf-savi-dhcp">Source Address Validation Solution for DHCP</eref> or <eref target="#RFC7219">SEND</eref>. This is also true of <eref target="#RFC4862">IPv6 Stateless Address Autoconfiguration (SLAAC)</eref> when the MAC address is known and not shared.</t>
+
+<t>However, when SLAAC is in use and either the MAC address is unknown
+or SLAAC’s <eref target="#RFC4941">Privacy Extensions</eref><xref target="RFC7217"/>, are in use, Neutron will need to implement the
+provisions of <eref target="#RFC6620">FCFS SAVI: First-Come, First-Served Source Address Validation</eref> in order to learn the
+addresses that a VM is using and include them in the per-VM
+filter.</t>
+
+</section>
+<section anchor="moving-virtual-machines" title="Moving virtual machines">
+
+<t>This design supports these kinds of required layer 2 networks with
+the additional use of a layer 2 over layer 3 encapsulation and
+tunneling protocol, such as <eref target="#I-D.mahalingam-dutt-dcops-vxlan">VXLAN</eref>. The important
+point here being that these overlays are used to address specific
+tenant network requirements and NOT deployed to remove the scalability
+limitations of OpenStack networking.</t>
+
+<t>There are at least three ways VM movement can be accomplished:</t>
+
+<t><list style="symbols">
+  <t>Recreation of the VM</t>
+  <t>VLAN Modification</t>
+  <t>Live Migration of a Running Virtual Machine</t>
+</list></t>
+
+<section anchor="motion-new-vm" title="Recreation of the VM">
+
+<t>The simplest and most reliable is to</t>
+
+<t><list style="numbers">
+  <t>Create a new VM in the new location,</t>
+  <t>Add its address to the DNS Resource Record for the name,
+  allowing new references to the name to send transactions
+  there,</t>
+  <t>Remove the old address from the DNS Resource Record
+  (including the SIIT translation, if one exists), ending the use
+  of the old VM for new transactions,</t>
+  <t>Wait for the period of the DNS Resource Record’s lifetime
+  (including the SIIT translation, if one exists), as it will get
+  new requests throughout that interval,</t>
+  <t>Wait for the for the old VM to finish any outstanding
+  transactions, and then</t>
+  <t>Kill the old VM.</t>
+</list></t>
+
+<t>This is obviously not movement of an existing VM, but
+preservation of the same number and function of VMs by creation of a
+new VM and killing the old.</t>
+
+</section>
+<section anchor="vmotion" title="Live Migration of a Running Virtual Machine">
+
+<t>At
+http://blogs.vmware.com/vsphere/2011/02/vmotion-whats-going-on-under-the-covers.html,
+VMWare describes its capability, called vMotion, in the following
+terms:</t>
+
+<t><list style="numbers">
+  <t>Shadow VM created on the destination host.</t>
+  <t>Copy each memory page from the source to the destination via
+  the vMotion network. This is known as preCopy.</t>
+  <t>Perform another pass over the VM’s memory, copying any pages
+  that changed during the last preCopy iteration.</t>
+  <t>Continue this iterative memory copying until no changed pages
+  (outstanding to be-copied pages) remain or 100 seconds
+  elapse.</t>
+  <t>Stun the VM on the source and resume it on the
+  destination.</t>
+</list></t>
+
+<t>In a native-address environment, we add three steps:</t>
+
+<t><list style="numbers">
+  <t>Shadow VM created on the destination host.</t>
+  <t>Copy each memory page from the source to the destination via
+  the vMotion network. This is known as preCopy.</t>
+  <t>Perform another pass over the VM’s memory, copying any pages
+  that changed during the last preCopy iteration.</t>
+  <t>Continue this iterative memory copying until no changed pages
+  (outstanding to be-copied pages) remain or 100 seconds
+  elapse.</t>
+  <t>Stitch routing for the old address.</t>
+  <t>Stun the VM on the source and resume it on the
+  destination.</t>
+  <t>Renumber the VM as instructed in <xref target="RFC4192"/>.</t>
+  <t>Unstitch routing for the old address.</t>
+</list></t>
+
+<t>If the VM is moved within the same subnet (which usually implies
+the same rack), there is no stitching or renumbering apart from
+ensuring that the MAC address moves with the VM. When the VM moves
+to a different subnet, however, we need to restitch routing, at
+least temporarily. This obviously calls for some definitions.</t>
+
+<t><list style="hanging">
+  <t hangText='Stitching Routing:'>
+  The VM is potentially in
+communication with two sets of peers: VMs in the same subnet,
+and VMs in different subnets.</t>
+</list></t>
+
+<t><list style="symbols">
+  <t>The router in the new subnet is instructed to advertise a
+host route (/128) to the moved VM, and to install a static
+route to the old address with the VM’s address in the new
+subnet as its next hop address. Traffic from VMs from other
+subnets will now follow the host route to the VM in its new
+location.</t>
+  <t>The router in the old subnet is instructed to direct LAN
+traffic to the VM’s MAC Address to its IPv6 forwarding
+logic. Traffic from other VMs in the old subnet will now
+follow the host route to the moved VM.</t>
+</list></t>
+
+<t><list style="hanging">
+  <t hangText='Renumbering:'><vspace blankLines='0'/>
+  This step is optional, but is good
+hygiene if the VM will be there a while. If the VM will reside
+in its new location only temporarily, it can be skipped.  Note that every IPv6 address, unlike an IPv4
+address, has a lifetime. At least in theory, when the lifetime
+expires, neighbor relationships with the address must be
+extended or the address removed from the system. The <eref target="#RFC4861">Neighbor Discovery</eref>   process in the subnet
+router will periodically emit a Router Advertisement; the VM
+will gain an IPv6 address in the new subnet at that time if not
+earlier. As described in <xref target="RFC4192"/>, DNS should be
+changed to report the new address instead of the old. The DNS
+lifetime and any ambient sessions using the old address are now
+allowed to expire. That this point, any new sessions will be
+using the new address, and the old is vestigial.  Waiting for sessions using the address to
+expire can take an arbitrarily long interval, because the
+session generally has no knowledge of the lifetime of the IPv6
+address.</t>
+</list></t>
+
+<t><list style="hanging">
+  <t hangText='Unstitching Routing:'><vspace blankLines='0'/>
+  This is the reverse process
+of stitching. If the VM is renumbered, when the old address
+becomes vestigial, the address will be discarded by the VM; if
+the VM is subsequently taken out of service, it has the same
+effect. At that point, the host route is withdrawn, and the MAC
+address in the old subnet router’s tables is removed.</t>
+</list></t>
+
+</section>
+</section>
+</section>
+<section anchor="implications" title="OpenStack implications">
+
+<section anchor="config-implications" title="Configuration implications">
+
+<t><list style="numbers">
+  <t>Neutron MUST be configured with a pre-determined default label
+  value for each tenant virtual network <xref target="ipv6-isolation"/>.</t>
+  <t>Neutron MAY be configured with a set of authorized label values
+  for each tenant virtual network <xref target="ipv6-isolation"/>.</t>
+  <t>A virtual tenant network MAY be configured with a set of
+  authorized label values <xref target="ipv6-isolation"/>.</t>
+  <t>Neutron MUST be configured with one or more label values per
+  virtual tenant network that the network is permitted to receive <xref target="ipv6-isolation"/>.</t>
+</list></t>
+
+</section>
+<section anchor="vSwitch-implications" title="vSwitch implications">
+
+<t>On messages transmitted by a virtual machine</t>
+
+<t><list style="hanging">
+  <t hangText='Label Correctness:'><vspace blankLines='0'/>
+  As described in <xref target="ipv6label"/>   or <xref target="optlabel"/>, ensure that the
+label in the packet is one that the VM is authorized to use.
+Depending on configuration, it may be in the IPv6 Flow Label, an
+option in the Hop-by_hop header, or an option in the Destination
+Header. Again depending on configuratoin, the vSwitch may
+overwrite whatever value is there, or may ratify that the value
+there is as specified in a VM-specific list.</t>
+</list></t>
+
+<t><list style="hanging">
+  <t hangText='Source Address Validation:'><vspace blankLines='0'/>
+  As described in <xref target="bcp38"/>, force the source address to be among those the
+VM is authorized to use. The VM may simultaneously be authorized
+to use several addresses.</t>
+</list></t>
+
+<t><list style="hanging">
+  <t hangText='Destination Address Validation:'><vspace blankLines='0'/>
+  OpenStack for IPv4
+permits a NAT translation, called a “floating IP address”, to
+enable a VM to comunicate outside the domain; without that, it
+cannot. For IPv6, the destination address should be permitted by
+some acces list, which may permit all addresses, or addresses
+matching one or more CIDR prefixes such as permitted multicast
+addresses, and the prefix of the data center.</t>
+</list></t>
+
+<t>On messages received for delivery to a virtual machine</t>
+
+<t><list style="hanging">
+  <t hangText='Label Authorization:'><vspace blankLines='0'/>
+  As described in <xref target="ipv6-isolation"/>, the vSwitch only delivers a packet to a
+VM if the VM is authorized to receive it. The VM may have been
+authorized to receive several such labels.</t>
+</list></t>
+
+</section>
+</section>
+<section anchor="IANA" title="IANA Considerations">
+
+<t>This document does not ask IANA to do anything.</t>
+
+</section>
+<section anchor="Security" title="Security Considerations">
+
+<t>In <xref target="isolation"/> and <xref target="security-isolation"/>, this specification considers inter-tenant
+and intra-tenant network isolation. It is intended to contribute to the
+security of a network, much like encapsulation in a maze of tunnels or
+VLANs might, but without the complexities and overhead of the management
+of such resources. This does not replace the use of IPsec, SSH, or TLS
+encryption or the use authentication technologies; if these would be
+appropriate in an on-premises corporate data center, they remain
+appropriate in a multi-tenant data center regardless of the isolation
+technology. However, one can think of this as a simple inter-tenant
+firewall based on the concepts of role-based access control; if it can
+be readily determined that a sender is not authorized to communicate
+with a receiver, such a transmission is prevented.</t>
+
+</section>
+<section anchor="Privacy" title="Privacy Considerations">
+
+<t>This specification places no personally identifying information in an
+unencrypted part of a packet, unless a person is explicitly represented
+by an IPv6 address or label value, which is beyond its scope. That said,
+if the RBAC Identifier in <xref target="I-D.baker-openstack-rbac-federated-identity"/> is used, the
+security and privacy considerations of that document are relevant
+here.</t>
+
+</section>
+<section anchor="Acknowledgements" title="Acknowledgements">
+
+<t>This document grew out of a discussion among the authors and
+contributors.</t>
+
+</section>
+<section anchor="Contributors" title="Contributors">
+
+<figure anchor="a"><artwork><![CDATA[
+   Puneet Konghot
+   Cisco Systems
+   San Jose, California  95134
+   USA
+   Email: pkonghot@cisco.com
+   Rohit Agarwalla
+   Cisco Systems
+   San Jose, California  95134
+   USA
+   Email: roagarwa@cisco.com
+   Shannon McFarland
+   Cisco Systems
+   Boulder, Colorado  80301
+   USA
+   Email: shmcfarl@cisco.com
+]]></artwork></figure>
+
+</section>
+
+
+  </middle>
+
+  <back>
+
+    <references title='Normative References'>
+
+
+
+
+
+<reference anchor='RFC2119'>
+
+<front>
+<title abbrev='RFC Key Words'>Key words for use in RFCs to Indicate Requirement Levels</title>
+<author initials='S.' surname='Bradner' fullname='Scott Bradner'>
+<organization>Harvard University</organization>
+<address>
+<postal>
+<street>1350 Mass. Ave.</street>
+<street>Cambridge</street>
+<street>MA 02138</street></postal>
+<phone>- +1 617 495 3864</phone>
+<email>sob@harvard.edu</email></address></author>
+<date year='1997' month='March' />
+<area>General</area>
+<keyword>keyword</keyword>
+<abstract>
+<t>
+   In many standards track documents several words are used to signify
+   the requirements in the specification.  These words are often
+   capitalized.  This document defines these words as they should be
+   interpreted in IETF documents.  Authors who follow these guidelines
+   should incorporate this phrase near the beginning of their document:
+
+<list>
+<t>
+      The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL
+      NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED",  "MAY", and
+      "OPTIONAL" in this document are to be interpreted as described in
+      RFC 2119.
+</t></list></t>
+<t>
+   Note that the force of these words is modified by the requirement
+   level of the document in which they are used.
+</t></abstract></front>
+
+<seriesInfo name='BCP' value='14' />
+<seriesInfo name='RFC' value='2119' />
+<format type='TXT' octets='4723' target='http://www.rfc-editor.org/rfc/rfc2119.txt' />
+<format type='HTML' octets='17970' target='http://xml.resource.org/public/rfc/html/rfc2119.html' />
+<format type='XML' octets='5777' target='http://xml.resource.org/public/rfc/xml/rfc2119.xml' />
+</reference>
+
+
+
+<reference anchor='RFC2460'>
+
+<front>
+<title abbrev='IPv6 Specification'>Internet Protocol, Version 6 (IPv6) Specification</title>
+<author initials='S.E.' surname='Deering' fullname='Stephen E. Deering'>
+<organization>Cisco Systems, Inc.</organization>
+<address>
+<postal>
+<street>170 West Tasman Drive</street>
+<street>San Jose</street>
+<region>CA</region>
+<code>95134-1706</code>
+<country>USA</country></postal>
+<phone>+1 408 527 8213</phone>
+<facsimile>+1 408 527 8254</facsimile>
+<email>deering@cisco.com</email></address></author>
+<author initials='R.M.' surname='Hinden' fullname='Robert M. Hinden'>
+<organization>Nokia</organization>
+<address>
+<postal>
+<street>232 Java Drive</street>
+<street>Sunnyvale</street>
+<region>CA</region>
+<code>94089</code>
+<country>USA</country></postal>
+<phone>+1 408 990 2004</phone>
+<facsimile>+1 408 743 5677</facsimile>
+<email>hinden@iprg.nokia.com</email></address></author>
+<date year='1998' month='December' />
+<area>Internet</area>
+<keyword>internet protocol version 6</keyword>
+<keyword>IPv6</keyword>
+<abstract>
+<t>
+   This document specifies version 6 of the Internet Protocol (IPv6),
+   also sometimes referred to as IP Next Generation or IPng.
+</t></abstract></front>
+
+<seriesInfo name='RFC' value='2460' />
+<format type='TXT' octets='85490' target='http://www.rfc-editor.org/rfc/rfc2460.txt' />
+<format type='HTML' octets='107357' target='http://xml.resource.org/public/rfc/html/rfc2460.html' />
+<format type='XML' octets='94163' target='http://xml.resource.org/public/rfc/xml/rfc2460.xml' />
+</reference>
+
+
+
+
+    </references>
+
+    <references title='Informative References'>
+
+
+
+
+
+<reference anchor='I-D.anderson-v6ops-siit-dc'>
+<front>
+<title>SIIT-DC: Stateless IP/ICMP Translation for IPv6 Data Centre Environments</title>
+
+<author initials='t' surname='tore' fullname='tore'>
+    <organization />
+</author>
+
+<date month='October' day='5' year='2014' />
+
+<abstract><t>This document describes SIIT-DC, an extension to Stateless IP/ICMP Translation (SIIT) [RFC6145] that makes it ideally suited for use in IPv6 data centre environments.  SIIT-DC simultaneously facilitates IPv6 deployment and IPv4 address conservation.  The overall SIIT-DC architecture is described, as well as guidelines for operators. Finally, the normative implementation requirements are described, as a list of additions and changes to SIIT [RFC6145].</t></abstract>
+
+</front>
+
+<seriesInfo name='Internet-Draft' value='draft-anderson-v6ops-siit-dc-01' />
+<format type='TXT'
+        target='http://www.ietf.org/internet-drafts/draft-anderson-v6ops-siit-dc-01.txt' />
+</reference>
+
+
+
+<reference anchor='I-D.ietf-savi-dhcp'>
+<front>
+<title>SAVI Solution for DHCP</title>
+
+<author initials='J' surname='Bi' fullname='Jun Bi'>
+    <organization />
+</author>
+
+<author initials='J' surname='Wu' fullname='Jianping Wu'>
+    <organization />
+</author>
+
+<author initials='G' surname='Yao' fullname='Guang Yao'>
+    <organization />
+</author>
+
+<author initials='F' surname='Baker' fullname='Fred Baker'>
+    <organization />
+</author>
+
+<date month='July' day='21' year='2014' />
+
+<abstract><t>This document specifies the procedure for creating a binding between a DHCPv4/DHCPv6 assigned IP address and a binding anchor on a SAVI (Source Address Validation Improvements) device.  The bindings set up by this procedure is used to filter out packets with forged source IP address in DHCP scenario.  This mechanism is proposed as a complement to ingress filtering to provide finer-grained source IP address validation.</t></abstract>
+
+</front>
+
+<seriesInfo name='Internet-Draft' value='draft-ietf-savi-dhcp-29' />
+<format type='TXT'
+        target='http://www.ietf.org/internet-drafts/draft-ietf-savi-dhcp-29.txt' />
+</reference>
+
+
+
+<reference anchor='I-D.mahalingam-dutt-dcops-vxlan'>
+<front>
+<title>VXLAN: A Framework for Overlaying Virtualized Layer 2 Networks over Layer 3 Networks</title>
+
+<author initials='M' surname='Mahalingam' fullname='Mallik Mahalingam'>
+    <organization />
+</author>
+
+<author initials='D' surname='Dutt' fullname='Dinesh Dutt'>
+    <organization />
+</author>
+
+<author initials='K' surname='Duda' fullname='Kenneth Duda'>
+    <organization />
+</author>
+
+<author initials='P' surname='Agarwal' fullname='Puneet Agarwal'>
+    <organization />
+</author>
+
+<author initials='L' surname='Kreeger' fullname='Lawrence Kreeger'>
+    <organization />
+</author>
+
+<author initials='T' surname='Sridhar' fullname='T. Sridhar'>
+    <organization />
+</author>
+
+<author initials='M' surname='Bursell' fullname='Mike Bursell'>
+    <organization />
+</author>
+
+<author initials='C' surname='Wright' fullname='Chris Wright'>
+    <organization />
+</author>
+
+<date month='April' day='10' year='2014' />
+
+<abstract><t>This document describes Virtual eXtensible Local Area Network (VXLAN), which is used to address the need for overlay networks within virtualized data centers accommodating multiple tenants. The scheme and the related protocols can be used in cloud service provider and enterprise data center networks. This memo documents the deployed VXLAN protocol for the benefit of the IETF community.</t></abstract>
+
+</front>
+
+<seriesInfo name='Internet-Draft' value='draft-mahalingam-dutt-dcops-vxlan-09' />
+<format type='TXT'
+        target='http://www.ietf.org/internet-drafts/draft-mahalingam-dutt-dcops-vxlan-09.txt' />
+</reference>
+
+
+
+<reference anchor='I-D.baker-ipv6-isis-dst-flowlabel-routing'>
+<front>
+<title>Using IS-IS with Token-based Access Control</title>
+
+<author initials='F' surname='Baker' fullname='Fred Baker'>
+    <organization />
+</author>
+
+<date month='August' day='28' year='2013' />
+
+<abstract><t>This note describes the changes necessary for IS-IS to route IPv6 traffic specified prefix if and only if the packet contains an authorization token.</t></abstract>
+
+</front>
+
+<seriesInfo name='Internet-Draft' value='draft-baker-ipv6-isis-dst-flowlabel-routing-01' />
+<format type='TXT'
+        target='http://www.ietf.org/internet-drafts/draft-baker-ipv6-isis-dst-flowlabel-routing-01.txt' />
+</reference>
+
+
+
+<reference anchor='I-D.baker-ipv6-ospf-dst-flowlabel-routing'>
+<front>
+<title>Using OSPFv3 with Token-based Access Control</title>
+
+<author initials='F' surname='Baker' fullname='Fred Baker'>
+    <organization />
+</author>
+
+<date month='August' day='28' year='2013' />
+
+<abstract><t>This note describes the changes necessary for OSPF to route IPv6 traffic specified prefix if and only if the packet contains an authorization token.</t></abstract>
+
+</front>
+
+<seriesInfo name='Internet-Draft' value='draft-baker-ipv6-ospf-dst-flowlabel-routing-03' />
+<format type='TXT'
+        target='http://www.ietf.org/internet-drafts/draft-baker-ipv6-ospf-dst-flowlabel-routing-03.txt' />
+</reference>
+
+
+
+<reference anchor='I-D.ietf-ospf-ospfv3-lsa-extend'>
+<front>
+<title>OSPFv3 LSA Extendibility</title>
+
+<author initials='A' surname='Lindem' fullname='Acee Lindem'>
+    <organization />
+</author>
+
+<author initials='S' surname='Mirtorabi' fullname='Sina Mirtorabi'>
+    <organization />
+</author>
+
+<author initials='A' surname='Roy' fullname='Abhay Roy'>
+    <organization />
+</author>
+
+<author initials='F' surname='Baker' fullname='Fred Baker'>
+    <organization />
+</author>
+
+<date month='September' day='18' year='2014' />
+
+<abstract><t>OSPFv3 requires functional extension beyond what can readily be done with the fixed-format Link State Advertisement (LSA) as described in RFC 5340.  Without LSA extension, attributes associated with OSPFv3 links and advertised IPv6 prefixes must be advertised in separate LSAs and correlated to the fixed-format LSAs.  This document extends the LSA format by encoding the existing OSPFv3 LSA information in Type-Length-Value (TLV) tuples and allowing advertisement of additional information with additional TLVs.  Backward compatibility mechanisms are also described.</t></abstract>
+
+</front>
+
+<seriesInfo name='Internet-Draft' value='draft-ietf-ospf-ospfv3-lsa-extend-04' />
+<format type='TXT'
+        target='http://www.ietf.org/internet-drafts/draft-ietf-ospf-ospfv3-lsa-extend-04.txt' />
+</reference>
+
+
+
+<reference anchor='RFC2205'>
+
+<front>
+<title abbrev='RSVP'>Resource ReSerVation Protocol (RSVP) -- Version 1 Functional Specification</title>
+<author initials='B.' surname='Braden' fullname='Bob Braden'>
+<organization>USC Information Sciences Institute</organization>
+<address>
+<postal>
+<street>4676 Admiralty Way</street>
+<street>Marina del Rey</street>
+<street>CA 90292</street></postal>
+<phone>(310) 822-1511</phone>
+<email>Braden@ISI.EDU</email></address></author>
+<author initials='L.' surname='Zhang' fullname='Lixia Zhang'>
+<organization>UCLA Computer Science Department</organization>
+<address>
+<postal>
+<street>4531G Boelter Hall</street>
+<street>Los Angeles</street>
+<street>CA 90095-1596</street>
+<country>USA</country></postal>
+<phone>310-825-2695</phone>
+<email>lixia@cs.ucla.edu</email></address></author>
+<author initials='S.' surname='Berson' fullname='Steve Berson'>
+<organization>USC Information Sciences Institute</organization>
+<address>
+<postal>
+<street>4676 Admiralty Way</street>
+<street>Marina del Rey</street>
+<street>CA 90292</street></postal>
+<phone>(310) 822-1511</phone>
+<email>Berson@ISI.EDU</email></address></author>
+<author initials='S.' surname='Herzog' fullname='Shai Herzog'>
+<organization>IBM T. J. Watson Research Center</organization>
+<address>
+<postal>
+<street>P.O Box 704</street>
+<street>Yorktown Heights</street>
+<street>NY 10598</street></postal>
+<phone>(914) 784-6059</phone>
+<email>Herzog@WATSON.IBM.COM</email></address></author>
+<author initials='S.' surname='Jamin' fullname='Sugih Jamin'>
+<organization>University of Michigan</organization>
+<address>
+<postal>
+<street>CSE/EECS</street>
+<street>1301 Beal Ave.</street>
+<street>Ann Arbor</street>
+<street>MI 48109-2122</street></postal>
+<phone>(313) 763-1583</phone>
+<email>jamin@EECS.UMICH.EDU</email></address></author>
+<date year='1997' month='September' />
+<area>Transport</area>
+<keyword>multicast</keyword>
+<keyword>resource reservation protocol</keyword>
+<keyword>RSVP</keyword>
+<abstract>
+<t>
+   This memo describes version 1 of RSVP, a resource reservation setup
+   protocol designed for an integrated services Internet.  RSVP provides
+   receiver-initiated setup of resource reservations for multicast or
+   unicast data flows, with good scaling and robustness properties.
+   What&apos;s Changed
+</t>
+<t>
+   This revision contains the following very minor changes from the ID14
+   version.
+
+<list>
+<t>
+      o    For clarity, each message type is now defined separately in
+           Section 3.1.
+</t>
+<t>
+      o    We added more precise and complete rules for accepting Path
+           messages for unicast and multicast destinations (Section
+           3.1.3).
+</t>
+<t>
+      o    We added more precise and complete rules for processing and
+           forwarding PathTear messages (Section 3.1.5).
+</t>
+<t>
+      o    A note was added that a SCOPE object will be ignored if it
+           appears in a ResvTear message (Section 3.1.6).
+</t>
+<t>
+      o    A note was added that a SENDER_TSPEC or ADSPEC object will be
+           ignored if it appears in a PathTear message (Section 3.1.5).
+</t>
+<t>
+      o    The obsolete error code Ambiguous Filter Spec (09) was
+           removed, and a new (and more consistent) name was given to
+           error code 08 (Appendix B).
+</t>
+<t>
+      o    In the generic interface to traffic control, the Adspec was
+           added as a parameter to the AddFlow and ModFlow calls
+           (3.11.2).  This is needed to accommodate a node that updates
+           the slack term (S) of Guaranteed service.
+</t>
+<t>
+      o    An error subtype was added for an Adspec error (Appendix B).
+</t>
+<t>
+      o    Additional explanation was added for handling a CONFIRM
+           object (Section 3.1.4).
+</t>
+<t>
+      o    The rules for forwarding objects with unknown class type were
+           clarified.
+</t>
+<t>
+      o    Additional discussion was added to the Introduction and to
+           Section 3.11.2 about the relationship of RSVP to the link
+           layer.  (Section 3.10).
+</t>
+<t>
+      o    Section 2.7 on Policy and Security was split into two
+           sections, and some additional discussion of security was
+           included.
+</t>
+<t>
+      o    There were some minor editorial improvements.
+</t></list></t></abstract></front>
+
+<seriesInfo name='RFC' value='2205' />
+<format type='TXT' octets='223974' target='http://www.rfc-editor.org/rfc/rfc2205.txt' />
+<format type='XML' octets='225955' target='http://xml.resource.org/public/rfc/xml/rfc2205.xml' />
+</reference>
+
+
+
+<reference anchor='RFC2827'>
+
+<front>
+<title>Network Ingress Filtering: Defeating Denial of Service Attacks which employ IP Source Address Spoofing</title>
+<author initials='P.' surname='Ferguson' fullname='P. Ferguson'>
+<organization /></author>
+<author initials='D.' surname='Senie' fullname='D. Senie'>
+<organization /></author>
+<date year='2000' month='May' />
+<abstract>
+<t>This paper discusses a simple, effective, and straightforward method for using ingress traffic filtering to prohibit DoS (Denial of Service) attacks which use forged IP addresses to be propagated from 'behind' an Internet Service Provider's (ISP) aggregation point.  This document specifies an Internet Best Current Practices for the Internet Community, and requests discussion and suggestions for improvements.</t></abstract></front>
+
+<seriesInfo name='BCP' value='38' />
+<seriesInfo name='RFC' value='2827' />
+<format type='TXT' octets='21258' target='http://www.rfc-editor.org/rfc/rfc2827.txt' />
+</reference>
+
+
+
+<reference anchor='RFC3439'>
+
+<front>
+<title>Some Internet Architectural Guidelines and Philosophy</title>
+<author initials='R.' surname='Bush' fullname='R. Bush'>
+<organization /></author>
+<author initials='D.' surname='Meyer' fullname='D. Meyer'>
+<organization /></author>
+<date year='2002' month='December' />
+<abstract>
+<t>This document extends RFC 1958 by outlining some of the philosophical guidelines to which architects and designers of Internet backbone networks should adhere.  We describe the Simplicity Principle, which states that complexity is the primary mechanism that impedes efficient scaling, and discuss its implications on the architecture, design and engineering issues found in large scale Internet backbones.  This memo provides information for the Internet community.</t></abstract></front>
+
+<seriesInfo name='RFC' value='3439' />
+<format type='TXT' octets='70333' target='http://www.rfc-editor.org/rfc/rfc3439.txt' />
+</reference>
+
+
+
+<reference anchor='RFC4192'>
+
+<front>
+<title>Procedures for Renumbering an IPv6 Network without a Flag Day</title>
+<author initials='F.' surname='Baker' fullname='F. Baker'>
+<organization /></author>
+<author initials='E.' surname='Lear' fullname='E. Lear'>
+<organization /></author>
+<author initials='R.' surname='Droms' fullname='R. Droms'>
+<organization /></author>
+<date year='2005' month='September' />
+<abstract>
+<t>This document describes a procedure that can be used to renumber a network from one prefix to another.  It uses IPv6's intrinsic ability to assign multiple addresses to a network interface to provide continuity of network service through a "make-before-break" transition, as well as addresses naming and configuration management issues.  It also uses other IPv6 features to minimize the effort and time required to complete the transition from the old prefix to the new prefix.  This memo provides information for the Internet community.</t></abstract></front>
+
+<seriesInfo name='RFC' value='4192' />
+<format type='TXT' octets='52110' target='http://www.rfc-editor.org/rfc/rfc4192.txt' />
+</reference>
+
+
+
+<reference anchor='RFC4601'>
+
+<front>
+<title>Protocol Independent Multicast - Sparse Mode (PIM-SM): Protocol Specification (Revised)</title>
+<author initials='B.' surname='Fenner' fullname='B. Fenner'>
+<organization /></author>
+<author initials='M.' surname='Handley' fullname='M. Handley'>
+<organization /></author>
+<author initials='H.' surname='Holbrook' fullname='H. Holbrook'>
+<organization /></author>
+<author initials='I.' surname='Kouvelas' fullname='I. Kouvelas'>
+<organization /></author>
+<date year='2006' month='August' />
+<abstract>
+<t>This document specifies Protocol Independent Multicast - Sparse Mode (PIM-SM). PIM-SM is a multicast routing protocol that can use the underlying unicast routing information base or a separate multicast-capable routing information base. It builds unidirectional shared trees rooted at a Rendezvous Point (RP) per group, and optionally creates shortest-path trees per source.&lt;/t>&lt;t> This document obsoletes RFC 2362, an Experimental version of PIM-SM. [STANDARDS-TRACK]</t></abstract></front>
+
+<seriesInfo name='RFC' value='4601' />
+<format type='TXT' octets='340632' target='http://www.rfc-editor.org/rfc/rfc4601.txt' />
+<format type='PDF' octets='304538' target='http://www.rfc-editor.org/rfc/rfc4601.pdf' />
+</reference>
+
+
+
+<reference anchor='RFC4602'>
+
+<front>
+<title>Protocol Independent Multicast - Sparse Mode (PIM-SM) IETF Proposed Standard Requirements Analysis</title>
+<author initials='T.' surname='Pusateri' fullname='T. Pusateri'>
+<organization /></author>
+<date year='2006' month='August' />
+<abstract>
+<t>This document provides supporting documentation to advance the Protocol Independent Multicast - Sparse Mode (PIM-SM) routing protocol from IETF Experimental status to Proposed Standard.  This memo provides information for the Internet community.</t></abstract></front>
+
+<seriesInfo name='RFC' value='4602' />
+<format type='TXT' octets='15310' target='http://www.rfc-editor.org/rfc/rfc4602.txt' />
+</reference>
+
+
+
+<reference anchor='RFC4604'>
+
+<front>
+<title>Using Internet Group Management Protocol Version 3 (IGMPv3) and Multicast Listener Discovery Protocol Version 2 (MLDv2) for Source-Specific Multicast</title>
+<author initials='H.' surname='Holbrook' fullname='H. Holbrook'>
+<organization /></author>
+<author initials='B.' surname='Cain' fullname='B. Cain'>
+<organization /></author>
+<author initials='B.' surname='Haberman' fullname='B. Haberman'>
+<organization /></author>
+<date year='2006' month='August' />
+<abstract>
+<t>The Internet Group Management Protocol Version 3 (IGMPv3) and the Multicast Listener Discovery Protocol Version 2 (MLDv2) are protocols that allow a host to inform its neighboring routers of its desire to receive IPv4 and IPv6 multicast transmissions, respectively.  Source-specific multicast (SSM) is a form of multicast in which a receiver is required to specify both the network-layer address of the source and the multicast destination address in order to receive the multicast transmission.  This document defines the notion of an "SSM-aware" router and host, and clarifies and (in some cases) modifies the behavior of IGMPv3 and MLDv2 on SSM-aware routers and hosts to accommodate source-specific multicast.  This document updates the IGMPv3 and MLDv2 specifications. [STANDARDS-TRACK]</t></abstract></front>
+
+<seriesInfo name='RFC' value='4604' />
+<format type='TXT' octets='23370' target='http://www.rfc-editor.org/rfc/rfc4604.txt' />
+</reference>
+
+
+
+<reference anchor='RFC4605'>
+
+<front>
+<title>Internet Group Management Protocol (IGMP) / Multicast Listener Discovery (MLD)-Based Multicast Forwarding ("IGMP/MLD Proxying")</title>
+<author initials='B.' surname='Fenner' fullname='B. Fenner'>
+<organization /></author>
+<author initials='H.' surname='He' fullname='H. He'>
+<organization /></author>
+<author initials='B.' surname='Haberman' fullname='B. Haberman'>
+<organization /></author>
+<author initials='H.' surname='Sandick' fullname='H. Sandick'>
+<organization /></author>
+<date year='2006' month='August' />
+<abstract>
+<t>In certain topologies, it is not necessary to run a multicast routing protocol.  It is sufficient for a device to learn and proxy group membership information and simply forward multicast packets based upon that information.  This document describes a mechanism for forwarding based solely upon Internet Group Management Protocol (IGMP) or Multicast Listener Discovery (MLD) membership information. [STANDARDS-TRACK]</t></abstract></front>
+
+<seriesInfo name='RFC' value='4605' />
+<format type='TXT' octets='25558' target='http://www.rfc-editor.org/rfc/rfc4605.txt' />
+</reference>
+
+
+
+<reference anchor='RFC4607'>
+
+<front>
+<title>Source-Specific Multicast for IP</title>
+<author initials='H.' surname='Holbrook' fullname='H. Holbrook'>
+<organization /></author>
+<author initials='B.' surname='Cain' fullname='B. Cain'>
+<organization /></author>
+<date year='2006' month='August' />
+<abstract>
+<t>IP version 4 (IPv4) addresses in the 232/8 (232.0.0.0 to 232.255.255.255) range are designated as source-specific multicast (SSM) destination addresses and are reserved for use by source-specific applications and protocols.  For IP version 6 (IPv6), the address prefix FF3x::/32 is reserved for source-specific multicast use.  This document defines an extension to the Internet network service that applies to datagrams sent to SSM addresses and defines the host and router requirements to support this extension. [STANDARDS-TRACK]</t></abstract></front>
+
+<seriesInfo name='RFC' value='4607' />
+<format type='TXT' octets='42990' target='http://www.rfc-editor.org/rfc/rfc4607.txt' />
+</reference>
+
+
+
+<reference anchor='RFC5548'>
+
+<front>
+<title>Routing Requirements for Urban Low-Power and Lossy Networks</title>
+<author initials='M.' surname='Dohler' fullname='M. Dohler'>
+<organization /></author>
+<author initials='T.' surname='Watteyne' fullname='T. Watteyne'>
+<organization /></author>
+<author initials='T.' surname='Winter' fullname='T. Winter'>
+<organization /></author>
+<author initials='D.' surname='Barthel' fullname='D. Barthel'>
+<organization /></author>
+<date year='2009' month='May' />
+<abstract>
+<t>The application-specific routing requirements for Urban Low-Power and Lossy Networks (U-LLNs) are presented in this document.  In the near future, sensing and actuating nodes will be placed outdoors in urban environments so as to improve people's living conditions as well as to monitor compliance with increasingly strict environmental laws.  These field nodes are expected to measure and report a wide gamut of data (for example, the data required by applications that perform smart-metering or that monitor meteorological, pollution, and allergy conditions).  The majority of these nodes are expected to communicate wirelessly over a variety of links such as IEEE 802.15.4, low-power IEEE 802.11, or IEEE 802.15.1 (Bluetooth), which given the limited radio range and the large number of nodes requires the use of suitable routing protocols.  The design of such protocols will be mainly impacted by the limited resources of the nodes (memory, processing power, battery, etc.) and the particularities of the outdoor urban application scenarios.  As such, for a wireless solution for Routing Over Low-Power and Lossy (ROLL) networks to be useful, the protocol(s) ought to be energy-efficient, scalable, and autonomous.  This documents aims to specify a set of IPv6 routing requirements reflecting these and further U-LLNs' tailored characteristics.  This memo provides information for the Internet community.</t></abstract></front>
+
+<seriesInfo name='RFC' value='5548' />
+<format type='TXT' octets='47759' target='http://www.rfc-editor.org/rfc/rfc5548.txt' />
+</reference>
+
+
+
+<reference anchor='RFC5673'>
+
+<front>
+<title>Industrial Routing Requirements in Low-Power and Lossy Networks</title>
+<author initials='K.' surname='Pister' fullname='K. Pister'>
+<organization /></author>
+<author initials='P.' surname='Thubert' fullname='P. Thubert'>
+<organization /></author>
+<author initials='S.' surname='Dwars' fullname='S. Dwars'>
+<organization /></author>
+<author initials='T.' surname='Phinney' fullname='T. Phinney'>
+<organization /></author>
+<date year='2009' month='October' />
+<abstract>
+<t>The wide deployment of lower-cost wireless devices will significantly improve the productivity and safety of industrial plants while increasing the efficiency of plant workers by extending the information set available about the plant operations.  The aim of this document is to analyze the functional requirements for a routing protocol used in industrial Low-power and Lossy Networks (LLNs) of field devices.  This memo provides information for the Internet community.</t></abstract></front>
+
+<seriesInfo name='RFC' value='5673' />
+<format type='TXT' octets='67934' target='http://www.rfc-editor.org/rfc/rfc5673.txt' />
+</reference>
+
+
+
+<reference anchor='RFC3697'>
+
+<front>
+<title>IPv6 Flow Label Specification</title>
+<author initials='J.' surname='Rajahalme' fullname='J. Rajahalme'>
+<organization /></author>
+<author initials='A.' surname='Conta' fullname='A. Conta'>
+<organization /></author>
+<author initials='B.' surname='Carpenter' fullname='B. Carpenter'>
+<organization /></author>
+<author initials='S.' surname='Deering' fullname='S. Deering'>
+<organization /></author>
+<date year='2004' month='March' />
+<abstract>
+<t>This document specifies the IPv6 Flow Label field and the minimum requirements for IPv6 source nodes labeling flows, IPv6 nodes forwarding labeled packets, and flow state establishment methods.  Even when mentioned as examples of possible uses of the flow labeling, more detailed requirements for specific use cases are out of scope for this document.  The usage of the Flow Label field enables efficient IPv6 flow classification based only on IPv6 main header fields in fixed positions. [STANDARDS-TRACK]</t></abstract></front>
+
+<seriesInfo name='RFC' value='3697' />
+<format type='TXT' octets='21296' target='http://www.rfc-editor.org/rfc/rfc3697.txt' />
+</reference>
+
+
+
+<reference anchor='RFC4193'>
+
+<front>
+<title>Unique Local IPv6 Unicast Addresses</title>
+<author initials='R.' surname='Hinden' fullname='R. Hinden'>
+<organization /></author>
+<author initials='B.' surname='Haberman' fullname='B. Haberman'>
+<organization /></author>
+<date year='2005' month='October' />
+<abstract>
+<t>This document defines an IPv6 unicast address format that is globally unique and is intended for local communications, usually inside of a site.  These addresses are not expected to be routable on the global Internet. [STANDARDS-TRACK]</t></abstract></front>
+
+<seriesInfo name='RFC' value='4193' />
+<format type='TXT' octets='35908' target='http://www.rfc-editor.org/rfc/rfc4193.txt' />
+</reference>
+
+
+
+<reference anchor='RFC4291'>
+
+<front>
+<title>IP Version 6 Addressing Architecture</title>
+<author initials='R.' surname='Hinden' fullname='R. Hinden'>
+<organization /></author>
+<author initials='S.' surname='Deering' fullname='S. Deering'>
+<organization /></author>
+<date year='2006' month='February' />
+<abstract>
+<t>This specification defines the addressing architecture of the IP Version 6 (IPv6) protocol. The document includes the IPv6 addressing model, text representations of IPv6 addresses, definition of IPv6 unicast addresses, anycast addresses, and multicast addresses, and an IPv6 node's required addresses.&lt;/t>&lt;t> This document obsoletes RFC 3513, "IP Version 6 Addressing Architecture". [STANDARDS-TRACK]</t></abstract></front>
+
+<seriesInfo name='RFC' value='4291' />
+<format type='TXT' octets='52897' target='http://www.rfc-editor.org/rfc/rfc4291.txt' />
+</reference>
+
+
+
+<reference anchor='RFC4861'>
+
+<front>
+<title>Neighbor Discovery for IP version 6 (IPv6)</title>
+<author initials='T.' surname='Narten' fullname='T. Narten'>
+<organization /></author>
+<author initials='E.' surname='Nordmark' fullname='E. Nordmark'>
+<organization /></author>
+<author initials='W.' surname='Simpson' fullname='W. Simpson'>
+<organization /></author>
+<author initials='H.' surname='Soliman' fullname='H. Soliman'>
+<organization /></author>
+<date year='2007' month='September' />
+<abstract>
+<t>This document specifies the Neighbor Discovery protocol for IP Version 6.  IPv6 nodes on the same link use Neighbor Discovery to discover each other's presence, to determine each other's link-layer addresses, to find routers, and to maintain reachability information about the paths to active neighbors. [STANDARDS-TRACK]</t></abstract></front>
+
+<seriesInfo name='RFC' value='4861' />
+<format type='TXT' octets='235106' target='http://www.rfc-editor.org/rfc/rfc4861.txt' />
+</reference>
+
+
+
+<reference anchor='RFC4862'>
+
+<front>
+<title>IPv6 Stateless Address Autoconfiguration</title>
+<author initials='S.' surname='Thomson' fullname='S. Thomson'>
+<organization /></author>
+<author initials='T.' surname='Narten' fullname='T. Narten'>
+<organization /></author>
+<author initials='T.' surname='Jinmei' fullname='T. Jinmei'>
+<organization /></author>
+<date year='2007' month='September' />
+<abstract>
+<t>This document specifies the steps a host takes in deciding how to autoconfigure its interfaces in IP version 6.  The autoconfiguration process includes generating a link-local address, generating global addresses via stateless address autoconfiguration, and the Duplicate Address Detection procedure to verify the uniqueness of the addresses on a link. [STANDARDS-TRACK]</t></abstract></front>
+
+<seriesInfo name='RFC' value='4862' />
+<format type='TXT' octets='72482' target='http://www.rfc-editor.org/rfc/rfc4862.txt' />
+</reference>
+
+
+
+<reference anchor='RFC4941'>
+
+<front>
+<title>Privacy Extensions for Stateless Address Autoconfiguration in IPv6</title>
+<author initials='T.' surname='Narten' fullname='T. Narten'>
+<organization /></author>
+<author initials='R.' surname='Draves' fullname='R. Draves'>
+<organization /></author>
+<author initials='S.' surname='Krishnan' fullname='S. Krishnan'>
+<organization /></author>
+<date year='2007' month='September' />
+<abstract>
+<t>Nodes use IPv6 stateless address autoconfiguration to generate addresses using a combination of locally available information and information advertised by routers.  Addresses are formed by combining network prefixes with an interface identifier.  On an interface that contains an embedded IEEE Identifier, the interface identifier is typically derived from it.  On other interface types, the interface identifier is generated through other means, for example, via random number generation.  This document describes an extension to IPv6 stateless address autoconfiguration for interfaces whose interface identifier is derived from an IEEE identifier.  Use of the extension causes nodes to generate global scope addresses from interface identifiers that change over time, even in cases where the interface contains an embedded IEEE identifier.  Changing the interface identifier (and the global scope addresses generated from it) over time makes it more difficult for eavesdroppers and other information collectors to identify when different addresses used in different transactions actually correspond to the same node. [STANDARDS-TRACK]</t></abstract></front>
+
+<seriesInfo name='RFC' value='4941' />
+<format type='TXT' octets='56699' target='http://www.rfc-editor.org/rfc/rfc4941.txt' />
+</reference>
+
+
+
+<reference anchor='RFC5120'>
+
+<front>
+<title>M-ISIS: Multi Topology (MT) Routing in Intermediate System to Intermediate Systems (IS-ISs)</title>
+<author initials='T.' surname='Przygienda' fullname='T. Przygienda'>
+<organization /></author>
+<author initials='N.' surname='Shen' fullname='N. Shen'>
+<organization /></author>
+<author initials='N.' surname='Sheth' fullname='N. Sheth'>
+<organization /></author>
+<date year='2008' month='February' />
+<abstract>
+<t>This document describes an optional mechanism within Intermediate System to Intermediate Systems (IS-ISs) used today by many ISPs for IGP routing within their clouds.  This document describes how to run, within a single IS-IS domain, a set of independent IP topologies that we call Multi-Topologies (MTs).  This MT extension can be used for a variety of purposes, such as an in-band management network "on top" of the original IGP topology, maintaining separate IGP routing domains for isolated multicast or IPv6 islands within the backbone, or forcing a subset of an address space to follow a different topology. [STANDARDS-TRACK]</t></abstract></front>
+
+<seriesInfo name='RFC' value='5120' />
+<format type='TXT' octets='30318' target='http://www.rfc-editor.org/rfc/rfc5120.txt' />
+</reference>
+
+
+
+<reference anchor='RFC5308'>
+
+<front>
+<title>Routing IPv6 with IS-IS</title>
+<author initials='C.' surname='Hopps' fullname='C. Hopps'>
+<organization /></author>
+<date year='2008' month='October' />
+<abstract>
+<t>This document specifies a method for exchanging IPv6 routing information using the IS-IS routing protocol.  The described method utilizes two new TLVs: a reachability TLV and an interface address TLV to distribute the necessary IPv6 information throughout a routing domain.  Using this method, one can route IPv6 along with IPv4 and OSI using a single intra-domain routing protocol. [STANDARDS-TRACK]</t></abstract></front>
+
+<seriesInfo name='RFC' value='5308' />
+<format type='TXT' octets='13324' target='http://www.rfc-editor.org/rfc/rfc5308.txt' />
+</reference>
+
+
+
+<reference anchor='RFC5340'>
+
+<front>
+<title>OSPF for IPv6</title>
+<author initials='R.' surname='Coltun' fullname='R. Coltun'>
+<organization /></author>
+<author initials='D.' surname='Ferguson' fullname='D. Ferguson'>
+<organization /></author>
+<author initials='J.' surname='Moy' fullname='J. Moy'>
+<organization /></author>
+<author initials='A.' surname='Lindem' fullname='A. Lindem'>
+<organization /></author>
+<date year='2008' month='July' />
+<abstract>
+<t>This document describes the modifications to OSPF to support version 6 of the Internet Protocol (IPv6). The fundamental mechanisms of OSPF (flooding, Designated Router (DR) election, area support, Short Path First (SPF) calculations, etc.) remain unchanged. However, some changes have been necessary, either due to changes in protocol semantics between IPv4 and IPv6, or simply to handle the increased address size of IPv6. These modifications will necessitate incrementing the protocol version from version 2 to version 3. OSPF for IPv6 is also referred to as OSPF version 3 (OSPFv3).&lt;/t>&lt;t> Changes between OSPF for IPv4, OSPF Version 2, and OSPF for IPv6 as described herein include the following. Addressing semantics have been removed from OSPF packets and the basic Link State Advertisements (LSAs). New LSAs have been created to carry IPv6 addresses and prefixes. OSPF now runs on a per-link basis rather than on a per-IP-subnet basis. Flooding scope for LSAs has been generalized. Authentication has been removed from the OSPF protocol and instead relies on IPv6's Authentication Header and Encapsulating Security Payload (ESP).&lt;/t>&lt;t> Even with larger IPv6 addresses, most packets in OSPF for IPv6 are almost as compact as those in OSPF for IPv4. Most fields and packet- size limitations present in OSPF for IPv4 have been relaxed. In addition, option handling has been made more flexible.&lt;/t>&lt;t> All of OSPF for IPv4's optional capabilities, including demand circuit support and Not-So-Stubby Areas (NSSAs), are also supported in OSPF for IPv6. [STANDARDS-TRACK]</t></abstract></front>
+
+<seriesInfo name='RFC' value='5340' />
+<format type='TXT' octets='225664' target='http://www.rfc-editor.org/rfc/rfc5340.txt' />
+</reference>
+
+
+
+<reference anchor='RFC6052'>
+
+<front>
+<title>IPv6 Addressing of IPv4/IPv6 Translators</title>
+<author initials='C.' surname='Bao' fullname='C. Bao'>
+<organization /></author>
+<author initials='C.' surname='Huitema' fullname='C. Huitema'>
+<organization /></author>
+<author initials='M.' surname='Bagnulo' fullname='M. Bagnulo'>
+<organization /></author>
+<author initials='M.' surname='Boucadair' fullname='M. Boucadair'>
+<organization /></author>
+<author initials='X.' surname='Li' fullname='X. Li'>
+<organization /></author>
+<date year='2010' month='October' />
+<abstract>
+<t>This document discusses the algorithmic translation of an IPv6 address to a corresponding IPv4 address, and vice versa, using only statically configured information.  It defines a well-known prefix for use in algorithmic translations, while allowing organizations to also use network-specific prefixes when appropriate.  Algorithmic translation is used in IPv4/IPv6 translators, as well as other types of proxies and gateways (e.g., for DNS) used in IPv4/IPv6 scenarios. [STANDARDS-TRACK]</t></abstract></front>
+
+<seriesInfo name='RFC' value='6052' />
+<format type='TXT' octets='41849' target='http://www.rfc-editor.org/rfc/rfc6052.txt' />
+</reference>
+
+
+
+<reference anchor='RFC6144'>
+
+<front>
+<title>Framework for IPv4/IPv6 Translation</title>
+<author initials='F.' surname='Baker' fullname='F. Baker'>
+<organization /></author>
+<author initials='X.' surname='Li' fullname='X. Li'>
+<organization /></author>
+<author initials='C.' surname='Bao' fullname='C. Bao'>
+<organization /></author>
+<author initials='K.' surname='Yin' fullname='K. Yin'>
+<organization /></author>
+<date year='2011' month='April' />
+<abstract>
+<t>This note describes a framework for IPv4/IPv6 translation.  This is in the context of replacing Network Address Translation - Protocol Translation (NAT-PT), which was deprecated by RFC 4966, and to enable networks to have IPv4 and IPv6 coexist in a somewhat rational manner while transitioning to an IPv6 network.  This document is not an Internet Standards Track specification; it is published for informational purposes.</t></abstract></front>
+
+<seriesInfo name='RFC' value='6144' />
+<format type='TXT' octets='67181' target='http://www.rfc-editor.org/rfc/rfc6144.txt' />
+</reference>
+
+
+
+<reference anchor='RFC6145'>
+
+<front>
+<title>IP/ICMP Translation Algorithm</title>
+<author initials='X.' surname='Li' fullname='X. Li'>
+<organization /></author>
+<author initials='C.' surname='Bao' fullname='C. Bao'>
+<organization /></author>
+<author initials='F.' surname='Baker' fullname='F. Baker'>
+<organization /></author>
+<date year='2011' month='April' />
+<abstract>
+<t>This document describes the Stateless IP/ICMP Translation Algorithm (SIIT), which translates between IPv4 and IPv6 packet headers (including ICMP headers).  This document obsoletes RFC 2765. [STANDARDS-TRACK]</t></abstract></front>
+
+<seriesInfo name='RFC' value='6145' />
+<format type='TXT' octets='76484' target='http://www.rfc-editor.org/rfc/rfc6145.txt' />
+</reference>
+
+
+
+<reference anchor='RFC6146'>
+
+<front>
+<title>Stateful NAT64: Network Address and Protocol Translation from IPv6 Clients to IPv4 Servers</title>
+<author initials='M.' surname='Bagnulo' fullname='M. Bagnulo'>
+<organization /></author>
+<author initials='P.' surname='Matthews' fullname='P. Matthews'>
+<organization /></author>
+<author initials='I.' surname='van Beijnum' fullname='I. van Beijnum'>
+<organization /></author>
+<date year='2011' month='April' /></front>
+
+<seriesInfo name='RFC' value='6146' />
+<format type='TXT' octets='107954' target='http://www.rfc-editor.org/rfc/rfc6146.txt' />
+</reference>
+
+
+
+<reference anchor='RFC6147'>
+
+<front>
+<title>DNS64: DNS Extensions for Network Address Translation from IPv6 Clients to IPv4 Servers</title>
+<author initials='M.' surname='Bagnulo' fullname='M. Bagnulo'>
+<organization /></author>
+<author initials='A.' surname='Sullivan' fullname='A. Sullivan'>
+<organization /></author>
+<author initials='P.' surname='Matthews' fullname='P. Matthews'>
+<organization /></author>
+<author initials='I.' surname='van Beijnum' fullname='I. van Beijnum'>
+<organization /></author>
+<date year='2011' month='April' />
+<abstract>
+<t>DNS64 is a mechanism for synthesizing AAAA records from A records.  DNS64 is used with an IPv6/IPv4 translator to enable client-server communication between an IPv6-only client and an IPv4-only server, without requiring any changes to either the IPv6 or the IPv4 node, for the class of applications that work through NATs.  This document specifies DNS64, and provides suggestions on how it should be deployed in conjunction with IPv6/IPv4 translators. [STANDARDS-TRACK]</t></abstract></front>
+
+<seriesInfo name='RFC' value='6147' />
+<format type='TXT' octets='75103' target='http://www.rfc-editor.org/rfc/rfc6147.txt' />
+</reference>
+
+
+
+<reference anchor='RFC6437'>
+
+<front>
+<title>IPv6 Flow Label Specification</title>
+<author initials='S.' surname='Amante' fullname='S. Amante'>
+<organization /></author>
+<author initials='B.' surname='Carpenter' fullname='B. Carpenter'>
+<organization /></author>
+<author initials='S.' surname='Jiang' fullname='S. Jiang'>
+<organization /></author>
+<author initials='J.' surname='Rajahalme' fullname='J. Rajahalme'>
+<organization /></author>
+<date year='2011' month='November' />
+<abstract>
+<t>This document specifies the IPv6 Flow Label field and the minimum requirements for IPv6 nodes labeling flows, IPv6 nodes forwarding labeled packets, and flow state establishment methods. Even when mentioned as examples of possible uses of the flow labeling, more detailed requirements for specific use cases are out of the scope for this document.&lt;/t>&lt;t> The usage of the Flow Label field enables efficient IPv6 flow classification based only on IPv6 main header fields in fixed positions. [STANDARDS-TRACK]</t></abstract></front>
+
+<seriesInfo name='RFC' value='6437' />
+<format type='TXT' octets='35269' target='http://www.rfc-editor.org/rfc/rfc6437.txt' />
+</reference>
+
+
+
+<reference anchor='RFC6620'>
+
+<front>
+<title>FCFS SAVI: First-Come, First-Served Source Address Validation Improvement for Locally Assigned IPv6 Addresses</title>
+<author initials='E.' surname='Nordmark' fullname='E. Nordmark'>
+<organization /></author>
+<author initials='M.' surname='Bagnulo' fullname='M. Bagnulo'>
+<organization /></author>
+<author initials='E.' surname='Levy-Abegnoli' fullname='E. Levy-Abegnoli'>
+<organization /></author>
+<date year='2012' month='May' />
+<abstract>
+<t>This memo describes First-Come, First-Served Source Address Validation Improvement (FCFS SAVI), a mechanism that provides source address validation for IPv6 networks using the FCFS principle.  The proposed mechanism is intended to complement ingress filtering techniques to help detect and prevent source address spoofing. [STANDARDS-TRACK]</t></abstract></front>
+
+<seriesInfo name='RFC' value='6620' />
+<format type='TXT' octets='84010' target='http://www.rfc-editor.org/rfc/rfc6620.txt' />
+</reference>
+
+
+
+<reference anchor='RFC7217'>
+
+<front>
+<title>A Method for Generating Semantically Opaque Interface Identifiers with IPv6 Stateless Address Autoconfiguration (SLAAC)</title>
+<author initials='F.' surname='Gont' fullname='F. Gont'>
+<organization /></author>
+<date year='2014' month='April' />
+<abstract>
+<t>This document specifies a method for generating IPv6 Interface Identifiers to be used with IPv6 Stateless Address Autoconfiguration (SLAAC), such that an IPv6 address configured using this method is stable within each subnet, but the corresponding Interface Identifier changes when the host moves from one network to another.  This method is meant to be an alternative to generating Interface Identifiers based on hardware addresses (e.g., IEEE LAN Media Access Control (MAC) addresses), such that the benefits of stable addresses can be achieved without sacrificing the security and privacy of users.  The method specified in this document applies to all prefixes a host may be employing, including link-local, global, and unique-local prefixes (and their corresponding addresses).</t></abstract></front>
+
+<seriesInfo name='RFC' value='7217' />
+<format type='TXT' octets='48497' target='http://www.rfc-editor.org/rfc/rfc7217.txt' />
+</reference>
+
+
+
+<reference anchor='RFC7219'>
+
+<front>
+<title>SEcure Neighbor Discovery (SEND) Source Address Validation Improvement (SAVI)</title>
+<author initials='M.' surname='Bagnulo' fullname='M. Bagnulo'>
+<organization /></author>
+<author initials='A.' surname='Garcia-Martinez' fullname='A. Garcia-Martinez'>
+<organization /></author>
+<date year='2014' month='May' />
+<abstract>
+<t>This memo specifies SEcure Neighbor Discovery (SEND) Source Address Validation Improvement (SAVI), a mechanism to provide source address validation using the SEND protocol.  The proposed mechanism complements ingress filtering techniques to provide a finer granularity on the control of IPv6 source addresses.</t></abstract></front>
+
+<seriesInfo name='RFC' value='7219' />
+<format type='TXT' octets='90423' target='http://www.rfc-editor.org/rfc/rfc7219.txt' />
+</reference>
+
+
+<reference anchor="Microsoft-Azure" >
+  <front>
+    <title>Report: Microsoft Buys 100 Acres of Iowa land for Data Center
+          http://www.datacenterknowledge.com/archives/2014/08/01/report-microsoft-buys-100-acres-iowa-land-data-center/</title>
+    <author initials="Y." surname="Sverdlik" fullname="Y. Sverdlik">
+      <organization>Data Center Knowledge</organization>
+    </author>
+    <date year="2014" month="August"/>
+  </front>
+</reference>
+<reference anchor="FaceBook-IPv6" >
+  <front>
+    <title>Facebook Is Close to Having an IPv6-only Data Center
+          http://blog.ipspace.net/2014/03/facebook-is-close-to-having-ipv6-only.html</title>
+    <author initials="I." surname="Pepelnjak" fullname="I. Pepelnjak">
+      <organization>Internetworking perspectives by Ivan
+            Pepelnjak</organization>
+    </author>
+    <date year="2014" month="March"/>
+  </front>
+</reference>
+
+
+
+
+<reference anchor='I-D.baker-openstack-rbac-federated-identity'>
+<front>
+<title>Federated Identity for IPv6 Role-base Access Control</title>
+
+<author initials='F' surname='Baker' fullname='Fred Baker'>
+    <organization />
+</author>
+
+<date month='October' day='17' year='2014' />
+
+<abstract><t>This note describes an IPv6 option intended to carry a Federated Identity for use in Role-Based Access Control.  Rather than identify a person, it identifies a group of systems that the sender is a member of.  Role-Based Access Control permits specified sets of systems to communicate with other specified sets of systems, with the intention of scalability.</t></abstract>
+
+</front>
+
+<seriesInfo name='Internet-Draft' value='draft-baker-openstack-rbac-federated-identity-00' />
+<format type='TXT'
+        target='http://www.ietf.org/internet-drafts/draft-baker-openstack-rbac-federated-identity-00.txt' />
+</reference>
+
+
+
+
+    </references>
+
+
+<section anchor="log" title="Change Log">
+
+<t><list style="hanging">
+  <t hangText='Initial Version:'><vspace blankLines='0'/>
+  October 2014</t>
+</list></t>
+
+</section>
+
+
+  </back>
+</rfc>
+
