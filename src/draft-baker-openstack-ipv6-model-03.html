@@ -1,0 +1,1618 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" 
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head profile="http://www.w3.org/2006/03/hcard http://dublincore.org/documents/2008/08/04/dc-html/">
+  <meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+
+  <title>A Model for IPv6 Operation in OpenStack</title>
+
+  <style type="text/css" title="Xml2Rfc (sans serif)">
+  /*<![CDATA[*/
+	  a {
+	  text-decoration: none;
+	  }
+      /* info code from SantaKlauss at http://www.madaboutstyle.com/tooltip2.html */
+      a.info {
+          /* This is the key. */
+          position: relative;
+          z-index: 24;
+          text-decoration: none;
+      }
+      a.info:hover {
+          z-index: 25;
+          color: #FFF; background-color: #900;
+      }
+      a.info span { display: none; }
+      a.info:hover span.info {
+          /* The span will display just on :hover state. */
+          display: block;
+          position: absolute;
+          font-size: smaller;
+          top: 2em; left: -5em; width: 15em;
+          padding: 2px; border: 1px solid #333;
+          color: #900; background-color: #EEE;
+          text-align: left;
+      }
+	  a.smpl {
+	  color: black;
+	  }
+	  a:hover {
+	  text-decoration: underline;
+	  }
+	  a:active {
+	  text-decoration: underline;
+	  }
+	  address {
+	  margin-top: 1em;
+	  margin-left: 2em;
+	  font-style: normal;
+	  }
+	  body {
+	  color: black;
+	  font-family: verdana, helvetica, arial, sans-serif;
+	  font-size: 10pt;
+	  max-width: 55em;
+	  
+	  }
+	  cite {
+	  font-style: normal;
+	  }
+	  dd {
+	  margin-right: 2em;
+	  }
+	  dl {
+	  margin-left: 2em;
+	  }
+	
+	  ul.empty {
+	  list-style-type: none;
+	  }
+	  ul.empty li {
+	  margin-top: .5em;
+	  }
+	  dl p {
+	  margin-left: 0em;
+	  }
+	  dt {
+	  margin-top: .5em;
+	  }
+	  h1 {
+	  font-size: 14pt;
+	  line-height: 21pt;
+	  page-break-after: avoid;
+	  }
+	  h1.np {
+	  page-break-before: always;
+	  }
+	  h1 a {
+	  color: #333333;
+	  }
+	  h2 {
+	  font-size: 12pt;
+	  line-height: 15pt;
+	  page-break-after: avoid;
+	  }
+	  h3, h4, h5, h6 {
+	  font-size: 10pt;
+	  page-break-after: avoid;
+	  }
+	  h2 a, h3 a, h4 a, h5 a, h6 a {
+	  color: black;
+	  }
+	  img {
+	  margin-left: 3em;
+	  }
+	  li {
+	  margin-left: 2em;
+	  margin-right: 2em;
+	  }
+	  ol {
+	  margin-left: 2em;
+	  margin-right: 2em;
+	  }
+	  ol p {
+	  margin-left: 0em;
+	  }
+	  p {
+	  margin-left: 2em;
+	  margin-right: 2em;
+	  }
+	  pre {
+	  margin-left: 3em;
+	  background-color: lightyellow;
+	  padding: .25em;
+	  }
+	  pre.text2 {
+	  border-style: dotted;
+	  border-width: 1px;
+	  background-color: #f0f0f0;
+	  width: 69em;
+	  }
+	  pre.inline {
+	  background-color: white;
+	  padding: 0em;
+	  }
+	  pre.text {
+	  border-style: dotted;
+	  border-width: 1px;
+	  background-color: #f8f8f8;
+	  width: 69em;
+	  }
+	  pre.drawing {
+	  border-style: solid;
+	  border-width: 1px;
+	  background-color: #f8f8f8;
+	  padding: 2em;
+	  }
+	  table {
+	  margin-left: 2em;
+	  }
+	  table.tt {
+	  vertical-align: top;
+	  }
+	  table.full {
+	  border-style: outset;
+	  border-width: 1px;
+	  }
+	  table.headers {
+	  border-style: outset;
+	  border-width: 1px;
+	  }
+	  table.tt td {
+	  vertical-align: top;
+	  }
+	  table.full td {
+	  border-style: inset;
+	  border-width: 1px;
+	  }
+	  table.tt th {
+	  vertical-align: top;
+	  }
+	  table.full th {
+	  border-style: inset;
+	  border-width: 1px;
+	  }
+	  table.headers th {
+	  border-style: none none inset none;
+	  border-width: 1px;
+	  }
+	  table.left {
+	  margin-right: auto;
+	  }
+	  table.right {
+	  margin-left: auto;
+	  }
+	  table.center {
+	  margin-left: auto;
+	  margin-right: auto;
+	  }
+	  caption {
+	  caption-side: bottom;
+	  font-weight: bold;
+	  font-size: 9pt;
+	  margin-top: .5em;
+	  }
+	
+	  table.header {
+	  border-spacing: 1px;
+	  width: 95%;
+	  font-size: 10pt;
+	  color: white;
+	  }
+	  td.top {
+	  vertical-align: top;
+	  }
+	  td.topnowrap {
+	  vertical-align: top;
+	  white-space: nowrap; 
+	  }
+	  table.header td {
+	  background-color: gray;
+	  width: 50%;
+	  }
+	  table.header a {
+	  color: white;
+	  }
+	  td.reference {
+	  vertical-align: top;
+	  white-space: nowrap;
+	  padding-right: 1em;
+	  }
+	  thead {
+	  display:table-header-group;
+	  }
+	  ul.toc, ul.toc ul {
+	  list-style: none;
+	  margin-left: 1.5em;
+	  margin-right: 0em;
+	  padding-left: 0em;
+	  }
+	  ul.toc li {
+	  line-height: 150%;
+	  font-weight: bold;
+	  font-size: 10pt;
+	  margin-left: 0em;
+	  margin-right: 0em;
+	  }
+	  ul.toc li li {
+	  line-height: normal;
+	  font-weight: normal;
+	  font-size: 9pt;
+	  margin-left: 0em;
+	  margin-right: 0em;
+	  }
+	  li.excluded {
+	  font-size: 0pt;
+	  }
+	  ul p {
+	  margin-left: 0em;
+	  }
+	
+	  .comment {
+	  background-color: yellow;
+	  }
+	  .center {
+	  text-align: center;
+	  }
+	  .error {
+	  color: red;
+	  font-style: italic;
+	  font-weight: bold;
+	  }
+	  .figure {
+	  font-weight: bold;
+	  text-align: center;
+	  font-size: 9pt;
+	  }
+	  .filename {
+	  color: #333333;
+	  font-weight: bold;
+	  font-size: 12pt;
+	  line-height: 21pt;
+	  text-align: center;
+	  }
+	  .fn {
+	  font-weight: bold;
+	  }
+	  .hidden {
+	  display: none;
+	  }
+	  .left {
+	  text-align: left;
+	  }
+	  .right {
+	  text-align: right;
+	  }
+	  .title {
+	  color: #990000;
+	  font-size: 18pt;
+	  line-height: 18pt;
+	  font-weight: bold;
+	  text-align: center;
+	  margin-top: 36pt;
+	  }
+	  .vcardline {
+	  display: block;
+	  }
+	  .warning {
+	  font-size: 14pt;
+	  background-color: yellow;
+	  }
+	
+	
+	  @media print {
+	  .noprint {
+		display: none;
+	  }
+	
+	  a {
+		color: black;
+		text-decoration: none;
+	  }
+	
+	  table.header {
+		width: 90%;
+	  }
+	
+	  td.header {
+		width: 50%;
+		color: black;
+		background-color: white;
+		vertical-align: top;
+		font-size: 12pt;
+	  }
+	
+	  ul.toc a::after {
+		content: leader('.') target-counter(attr(href), page);
+	  }
+	
+	  ul.ind li li a {
+		content: target-counter(attr(href), page);
+	  }
+	
+	  .print2col {
+		column-count: 2;
+		-moz-column-count: 2;
+		column-fill: auto;
+	  }
+	  }
+	
+	  @page {
+	  @top-left {
+		   content: "Internet-Draft"; 
+	  } 
+	  @top-right {
+		   content: "December 2010"; 
+	  } 
+	  @top-center {
+		   content: "Abbreviated Title";
+	  } 
+	  @bottom-left {
+		   content: "Doe"; 
+	  } 
+	  @bottom-center {
+		   content: "Expires June 2011"; 
+	  } 
+	  @bottom-right {
+		   content: "[Page " counter(page) "]"; 
+	  } 
+	  }
+	
+	  @page:first { 
+		@top-left {
+		  content: normal;
+		}
+		@top-right {
+		  content: normal;
+		}
+		@top-center {
+		  content: normal;
+		}
+	  }
+  /*]]>*/
+  </style>
+
+  <link href="#rfc.toc" rel="Contents"/>
+<link href="#rfc.section.1" rel="Chapter" title="1 Introduction"/>
+<link href="#rfc.section.1.1" rel="Chapter" title="1.1 What is OpenStack?"/>
+<link href="#rfc.section.1.2" rel="Chapter" title="1.2 OpenStack Scaling Issues"/>
+<link href="#rfc.section.2" rel="Chapter" title="2 Requirements"/>
+<link href="#rfc.section.2.1" rel="Chapter" title="2.1 Design approach"/>
+<link href="#rfc.section.2.2" rel="Chapter" title="2.2 Multiple Data Centers"/>
+<link href="#rfc.section.2.3" rel="Chapter" title="2.3 Large Data Centers"/>
+<link href="#rfc.section.2.4" rel="Chapter" title="2.4 Multi-tenancy"/>
+<link href="#rfc.section.2.5" rel="Chapter" title="2.5 Isolation"/>
+<link href="#rfc.section.2.5.1" rel="Chapter" title="2.5.1 Inter-tenant isolation"/>
+<link href="#rfc.section.2.5.2" rel="Chapter" title="2.5.2 Intra-tenant isolation"/>
+<link href="#rfc.section.2.6" rel="Chapter" title="2.6 Operational Simplicity"/>
+<link href="#rfc.section.2.7" rel="Chapter" title="2.7 Address space "/>
+<link href="#rfc.section.2.8" rel="Chapter" title="2.8 Data Center Federation"/>
+<link href="#rfc.section.2.9" rel="Chapter" title="2.9 Path MTU Issues"/>
+<link href="#rfc.section.3" rel="Chapter" title="3 Models"/>
+<link href="#rfc.section.3.1" rel="Chapter" title="3.1 Configuration Model"/>
+<link href="#rfc.section.3.2" rel="Chapter" title="3.2 Data Center Model"/>
+<link href="#rfc.section.3.2.1" rel="Chapter" title="3.2.1 Tenant Address Model"/>
+<link href="#rfc.section.3.2.2" rel="Chapter" title="3.2.2 Use of Global Addresses by the Data Center"/>
+<link href="#rfc.section.3.3" rel="Chapter" title="3.3 Inter-tenant security services"/>
+<link href="#rfc.section.3.4" rel="Chapter" title="3.4 IPv6 Tenant Isolation using the Label"/>
+<link href="#rfc.section.3.5" rel="Chapter" title="3.5 Isolation in Routing"/>
+<link href="#rfc.section.4" rel="Chapter" title="4 BCP 38 Ingress Filtering"/>
+<link href="#rfc.section.5" rel="Chapter" title="5 Moving virtual machines"/>
+<link href="#rfc.section.5.1" rel="Chapter" title="5.1 Recreation of the VM"/>
+<link href="#rfc.section.5.2" rel="Chapter" title="5.2 Live Migration of a Running Virtual Machine"/>
+<link href="#rfc.section.6" rel="Chapter" title="6 OpenStack implications"/>
+<link href="#rfc.section.6.1" rel="Chapter" title="6.1 Configuration implications"/>
+<link href="#rfc.section.6.2" rel="Chapter" title="6.2 vSwitch implications"/>
+<link href="#rfc.section.7" rel="Chapter" title="7 IANA Considerations"/>
+<link href="#rfc.section.8" rel="Chapter" title="8 Security Considerations"/>
+<link href="#rfc.section.9" rel="Chapter" title="9 Privacy Considerations"/>
+<link href="#rfc.section.10" rel="Chapter" title="10 Acknowledgements"/>
+<link href="#rfc.section.11" rel="Chapter" title="11 Contributors"/>
+<link href="#rfc.references" rel="Chapter" title="12 References"/>
+<link href="#rfc.references.1" rel="Chapter" title="12.1 Normative References"/>
+<link href="#rfc.references.2" rel="Chapter" title="12.2 Informative References"/>
+<link href="#rfc.appendix.A" rel="Chapter" title="A Change Log"/>
+<link href="#rfc.appendix.B" rel="Chapter" title="B Alternative Labels considered"/>
+<link href="#rfc.appendix.B.1" rel="Chapter" title="B.1 IPv6 Flow Label"/>
+<link href="#rfc.appendix.B.1.1" rel="Chapter" title="B.1.1 Metaconsiderations"/>
+<link href="#rfc.appendix.B.2" rel="Chapter" title="B.2 Federated Identity"/>
+<link href="#rfc.appendix.B.2.1" rel="Chapter" title="B.2.1 Introduction"/>
+<link href="#rfc.appendix.B.2.2" rel="Chapter" title="B.2.2 Federated identity Option"/>
+<link href="#rfc.appendix.B.2.3" rel="Chapter" title="B.2.3 Metaconsiderations"/>
+<link href="#rfc.appendix.B.3" rel="Chapter" title="B.3 Universal Cloud Classification"/>
+<link href="#rfc.appendix.B.3.1" rel="Chapter" title="B.3.1 Introduction"/>
+<link href="#rfc.appendix.B.3.2" rel="Chapter" title="B.3.2 Universal Cloud Classification Options"/>
+<link href="#rfc.appendix.B.3.3" rel="Chapter" title="B.3.3 UCC Extension Header"/>
+<link href="#rfc.appendix.B.4" rel="Chapter" title="B.4 Policy List in Segment Routing Header"/>
+<link href="#rfc.appendix.B.4.1" rel="Chapter" title="B.4.1 Metaconsiderations"/>
+<link href="#rfc.appendix.B.5" rel="Chapter" title="B.5 RFC 4291 Interface Identifier (IID)"/>
+<link href="#rfc.appendix.B.5.1" rel="Chapter" title="B.5.1 Address Format"/>
+<link href="#rfc.appendix.B.5.2" rel="Chapter" title="B.5.2 Metaconsiderations"/>
+<link href="#rfc.appendix.B.6" rel="Chapter" title="B.6 Modified IID using modified Privacy Extension"/>
+<link href="#rfc.appendix.B.6.1" rel="Chapter" title="B.6.1 Metaconsiderations"/>
+<link href="#rfc.authors" rel="Chapter"/>
+
+
+  <meta name="generator" content="xml2rfc version 2.4.5 - http://tools.ietf.org/tools/xml2rfc" />
+  <link rel="schema.dct" href="http://purl.org/dc/terms/" />
+
+  <meta name="dct.creator" content="Baker, F., Ed., Marino, C., Wells, I., Agarwalla, R., Jeuk, S., and G. Salgueiro" />
+  <meta name="dct.identifier" content="urn:ietf:id:draft-baker-openstack-ipv6-model-03" />
+  <meta name="dct.issued" scheme="ISO8601" content="2015-4-20" />
+  <meta name="dct.abstract" content="This is an overview of a network model for OpenStack, designed to dramatically simplify scalable network deployment and operations." />
+  <meta name="description" content="This is an overview of a network model for OpenStack, designed to dramatically simplify scalable network deployment and operations." />
+
+</head>
+
+<body>
+
+  <table class="header">
+    <tbody>
+    
+    	<tr>
+  <td class="left">Network Working Group</td>
+  <td class="right">F. Baker, Ed.</td>
+</tr>
+<tr>
+  <td class="left">Internet-Draft</td>
+  <td class="right">C. Marino</td>
+</tr>
+<tr>
+  <td class="left">Intended status: Informational</td>
+  <td class="right">I. Wells</td>
+</tr>
+<tr>
+  <td class="left">Expires: October 22, 2015</td>
+  <td class="right">R. Agarwalla</td>
+</tr>
+<tr>
+  <td class="left"></td>
+  <td class="right">S. Jeuk</td>
+</tr>
+<tr>
+  <td class="left"></td>
+  <td class="right">G. Salgueiro</td>
+</tr>
+<tr>
+  <td class="left"></td>
+  <td class="right">Cisco Systems</td>
+</tr>
+<tr>
+  <td class="left"></td>
+  <td class="right">April 20, 2015</td>
+</tr>
+
+    	
+    </tbody>
+  </table>
+
+  <p class="title">A Model for IPv6 Operation in OpenStack<br />
+  <span class="filename">draft-baker-openstack-ipv6-model-03</span></p>
+  
+  <h1 id="rfc.abstract">
+  <a href="#rfc.abstract">Abstract</a>
+</h1>
+<p>This is an overview of a network model for OpenStack, designed to dramatically simplify scalable network deployment and operations.</p>
+<h1>
+  <a>Requirements Language</a>
+</h1>
+<p>The key words 'MUST', 'MUST NOT', 'REQUIRED', 'SHALL', 'SHALL NOT', 'SHOULD', 'SHOULD NOT', 'RECOMMENDED', 'MAY', and 'OPTIONAL' in this document are to be interpreted as described in <a href="#RFC2119">[RFC2119]</a>.</p>
+<h1>
+  <a>Design Principle</a>
+</h1>
+<p>Perfection is achieved, not when there is nothing more to add, but when there is nothing left to take away. </p>
+
+<ul class="empty">
+  <li>Antoine de Saint-Exupery</li>
+</ul>
+<h1 id="rfc.status">
+  <a href="#rfc.status">Status of This Memo</a>
+</h1>
+<p>This Internet-Draft is submitted in full conformance with the provisions of BCP 78 and BCP 79.</p>
+<p>Internet-Drafts are working documents of the Internet Engineering Task Force (IETF).  Note that other groups may also distribute working documents as Internet-Drafts.  The list of current Internet-Drafts is at http://datatracker.ietf.org/drafts/current/.</p>
+<p>Internet-Drafts are draft documents valid for a maximum of six months and may be updated, replaced, or obsoleted by other documents at any time.  It is inappropriate to use Internet-Drafts as reference material or to cite them other than as "work in progress."</p>
+<p>This Internet-Draft will expire on October 22, 2015.</p>
+<h1 id="rfc.copyrightnotice">
+  <a href="#rfc.copyrightnotice">Copyright Notice</a>
+</h1>
+<p>Copyright (c) 2015 IETF Trust and the persons identified as the document authors.  All rights reserved.</p>
+<p>This document is subject to BCP 78 and the IETF Trust's Legal Provisions Relating to IETF Documents (http://trustee.ietf.org/license-info) in effect on the date of publication of this document.  Please review these documents carefully, as they describe your rights and restrictions with respect to this document.  Code Components extracted from this document must include Simplified BSD License text as described in Section 4.e of the Trust Legal Provisions and are provided without warranty as described in the Simplified BSD License.</p>
+
+  
+  <hr class="noprint" />
+  <h1 class="np" id="rfc.toc"><a href="#rfc.toc">Table of Contents</a></h1>
+  <ul class="toc">
+
+  	<li>1.   <a href="#rfc.section.1">Introduction</a></li>
+<li>1.1.   <a href="#rfc.section.1.1">What is OpenStack?</a></li>
+<li>1.2.   <a href="#rfc.section.1.2">OpenStack Scaling Issues</a></li>
+<li>2.   <a href="#rfc.section.2">Requirements</a></li>
+<li>2.1.   <a href="#rfc.section.2.1">Design approach</a></li>
+<li>2.2.   <a href="#rfc.section.2.2">Multiple Data Centers</a></li>
+<li>2.3.   <a href="#rfc.section.2.3">Large Data Centers</a></li>
+<li>2.4.   <a href="#rfc.section.2.4">Multi-tenancy</a></li>
+<li>2.5.   <a href="#rfc.section.2.5">Isolation</a></li>
+<li>2.5.1.   <a href="#rfc.section.2.5.1">Inter-tenant isolation</a></li>
+<li>2.5.2.   <a href="#rfc.section.2.5.2">Intra-tenant isolation</a></li>
+<li>2.6.   <a href="#rfc.section.2.6">Operational Simplicity</a></li>
+<li>2.7.   <a href="#rfc.section.2.7">Address space </a></li>
+<li>2.8.   <a href="#rfc.section.2.8">Data Center Federation</a></li>
+<li>2.9.   <a href="#rfc.section.2.9">Path MTU Issues</a></li>
+<li>3.   <a href="#rfc.section.3">Models</a></li>
+<li>3.1.   <a href="#rfc.section.3.1">Configuration Model</a></li>
+<li>3.2.   <a href="#rfc.section.3.2">Data Center Model</a></li>
+<li>3.2.1.   <a href="#rfc.section.3.2.1">Tenant Address Model</a></li>
+<li>3.2.2.   <a href="#rfc.section.3.2.2">Use of Global Addresses by the Data Center</a></li>
+<li>3.3.   <a href="#rfc.section.3.3">Inter-tenant security services</a></li>
+<li>3.4.   <a href="#rfc.section.3.4">IPv6 Tenant Isolation using the Label</a></li>
+<li>3.5.   <a href="#rfc.section.3.5">Isolation in Routing</a></li>
+<li>4.   <a href="#rfc.section.4">BCP 38 Ingress Filtering</a></li>
+<li>5.   <a href="#rfc.section.5">Moving virtual machines</a></li>
+<li>5.1.   <a href="#rfc.section.5.1">Recreation of the VM</a></li>
+<li>5.2.   <a href="#rfc.section.5.2">Live Migration of a Running Virtual Machine</a></li>
+<li>6.   <a href="#rfc.section.6">OpenStack implications</a></li>
+<li>6.1.   <a href="#rfc.section.6.1">Configuration implications</a></li>
+<li>6.2.   <a href="#rfc.section.6.2">vSwitch implications</a></li>
+<li>7.   <a href="#rfc.section.7">IANA Considerations</a></li>
+<li>8.   <a href="#rfc.section.8">Security Considerations</a></li>
+<li>9.   <a href="#rfc.section.9">Privacy Considerations</a></li>
+<li>10.   <a href="#rfc.section.10">Acknowledgements</a></li>
+<li>11.   <a href="#rfc.section.11">Contributors</a></li>
+<li>12.   <a href="#rfc.references">References</a></li>
+<li>12.1.   <a href="#rfc.references.1">Normative References</a></li>
+<li>12.2.   <a href="#rfc.references.2">Informative References</a></li>
+<li>Appendix A.   <a href="#rfc.appendix.A">Change Log</a></li>
+<li>Appendix B.   <a href="#rfc.appendix.B">Alternative Labels considered</a></li>
+<li>B.1.   <a href="#rfc.appendix.B.1">IPv6 Flow Label</a></li>
+<li>B.1.1.   <a href="#rfc.appendix.B.1.1">Metaconsiderations</a></li>
+<li>B.2.   <a href="#rfc.appendix.B.2">Federated Identity</a></li>
+<li>B.2.1.   <a href="#rfc.appendix.B.2.1">Introduction</a></li>
+<li>B.2.2.   <a href="#rfc.appendix.B.2.2">Federated identity Option</a></li>
+<li>B.2.3.   <a href="#rfc.appendix.B.2.3">Metaconsiderations</a></li>
+<li>B.3.   <a href="#rfc.appendix.B.3">Universal Cloud Classification</a></li>
+<li>B.3.1.   <a href="#rfc.appendix.B.3.1">Introduction</a></li>
+<li>B.3.2.   <a href="#rfc.appendix.B.3.2">Universal Cloud Classification Options</a></li>
+<li>B.3.3.   <a href="#rfc.appendix.B.3.3">UCC Extension Header</a></li>
+<li>B.4.   <a href="#rfc.appendix.B.4">Policy List in Segment Routing Header</a></li>
+<li>B.4.1.   <a href="#rfc.appendix.B.4.1">Metaconsiderations</a></li>
+<li>B.5.   <a href="#rfc.appendix.B.5">RFC 4291 Interface Identifier (IID)</a></li>
+<li>B.5.1.   <a href="#rfc.appendix.B.5.1">Address Format</a></li>
+<li>B.5.2.   <a href="#rfc.appendix.B.5.2">Metaconsiderations</a></li>
+<li>B.6.   <a href="#rfc.appendix.B.6">Modified IID using modified Privacy Extension</a></li>
+<li>B.6.1.   <a href="#rfc.appendix.B.6.1">Metaconsiderations</a></li>
+<li><a href="#rfc.authors">Authors' Addresses</a></li>
+
+
+  </ul>
+
+  <h1 id="rfc.section.1"><a href="#rfc.section.1">1.</a> <a href="#introduction" id="introduction">Introduction</a></h1>
+<p id="rfc.section.1.p.1">OpenStack, and its issues.</p>
+<h1 id="rfc.section.1.1"><a href="#rfc.section.1.1">1.1.</a> <a href="#projects" id="projects">What is OpenStack?</a></h1>
+<p id="rfc.section.1.1.p.1">OpenStack is a cloud computing orchestration solution developed using an open source community process. It consists of a collection of 'projects', each implementing the creation, control, and administration of tenant resources. There are separate OpenStack projects for managing compute, storage and network resources.</p>
+<p id="rfc.section.1.1.p.2">Neutron is the project that manages OpenStack networking. It exposes a northbound API to the other OpenStack projects for programmatic control over tenant network connectivity. The southbound interface is implemented as one or more device driver plugins that are built to interact with specific devices in the network. This approach provides the flexibility to deploy OpenStack networking using a range of alternative techniques.</p>
+<p id="rfc.section.1.1.p.3">An OpenStack tenant, in the Kilo and earlier releases, is required to create what OpenStack identifies as a 'Neutron Network' connecting their virtual machines. This Network is instantiated via the plugins as either a layer 2 network, a layer 3 network, or as an overlay network. The actual implementation is unknown to the tenant. The technology used to provide these networks is selected by the OpenStack operator based upon the requirements of the cloud deployment.</p>
+<p id="rfc.section.1.1.p.4">The tenant also is required, in the Kilo and earlier releases, to specify an 'IP Subnet' for each Network. This specification is made by providing a CIDR prefix for IPv4 address allocation via DHCP or for IPv6 address allocation via DHCP or SLAAC. This address range may be from within the address range of the data center (non-overlapping), or overlapping <a href="#RFC1918">[RFC1918]</a> addresses. Tenants may create multiple Networks, each with its own Subnet.</p>
+<p id="rfc.section.1.1.p.5">An OpenStack Subnet is a logical layer 2 network and requires layer 3 routing for packets to exit the Subnet. This is achieved by attaching the Subnet to a Neutron Router. The Neutron router implements Network Address Translation for external traffic from tenant networks as well for providing connectivity to tenant networks from the outside. Using Linux utilities, OpenStack can support overlapping RFC 1918 addresses between tenants.</p>
+<p id="rfc.section.1.1.p.6">OpenStack Subnets are typically implemented as VLANs in a data center. When tenant scalability requirement grow large, an overlay approach is typically used. Because of the difficulties in scaling and administering large layer 2 and/or overlay networks, some OpenStack integrations chose not to provide isolated Subnets and simply offer tenants a layer 3 based network alternative.</p>
+<p id="rfc.section.1.1.p.7">OpenStack uses Layer 3 and Layer 2 Linux utilities on hosts to provide protection against IP/MAC spoofing and ARP poisoning.</p>
+<h1 id="rfc.section.1.2"><a href="#rfc.section.1.2">1.2.</a> <a href="#openstack-issues" id="openstack-issues">OpenStack Scaling Issues</a></h1>
+<p id="rfc.section.1.2.p.1">One of the fundamental requirements of OpenStack Networking (Neutron) is to provide scalable, isolated tenant networks. Today this is achieved via L2 segmentation using either a) standard 802.1Q VLANs or b) an overlay approach based on one of several L2 over L3 encapsulation techniques available today such as 802.1ad, VXLAN, STT or NVGRE.</p>
+<p id="rfc.section.1.2.p.2">However, these approaches still struggle to provide scalable, transparent, manageable, high performance, isolated tenant networks.  VLAN's don't scale beyond 4096 (2^12) networks and have complex trunking requirements when tenants span host and racks. IEEE 802.1ad (QinQ) partially solves that, but adds another limit - at most 2^12 tenants, each of which may have 2^12 VLANs. IP Encapsulation introduces additional complexity on host computers running hypervisors as well as impact performance of tenant applications running on virtual machines. Overlay based isolation techniques may also impair traditional network monitoring and performance management tools.  Moreover, when these isolated (L2) networks require external access to other networks or the public Internet, they require even more complex solutions to accommodate overlapping IP prefixes and network address translation (NAT).</p>
+<p id="rfc.section.1.2.p.3">As more capabilities are built on to these layer 2 based &#8216;virtual&#8217; networks, complexity continues to grow.</p>
+<p id="rfc.section.1.2.p.4">This draft presents a new Layer 3 based approach to OpenStack networking using IPv6 that can be deployed natively on IPv6 networks.  It will be shown that this approach can provide tenant isolation without the limitations of existing alternatives, as well as deliver high performance networks transparently using a simplified tenant network connectivity model, without the overhead of encapsulation or managing overlapping IP addresses and address translations. We note that some large content providers, notably Google and <a href="#FaceBook-IPv6">Facebook</a> <cite title="NONE">[FaceBook-IPv6]</cite>, are going in exactly this direction.</p>
+<h1 id="rfc.section.2"><a href="#rfc.section.2">2.</a> <a href="#require" id="require">Requirements</a></h1>
+<p id="rfc.section.2.p.1">In this section, we attempt to list critical requirements.</p>
+<h1 id="rfc.section.2.1"><a href="#rfc.section.2.1">2.1.</a> <a href="#approach" id="approach">Design approach</a></h1>
+<p id="rfc.section.2.1.p.1">As a design approach, we presume an IPv6-only data center in a world that might have IPv4 or IPv6 clients outside of it. This design explicitly does not depend on VLANs, QinQ, VXLAN, MPLS, Segment Routing, LISP, IP/IP or GRE tunnels, or any other supporting encapsulation. Data center operators remain free to use any of those tools, but they are not required. If we can do everything required for OpenStack networking with IPv6 alone, these other networking technologies may be used as optimizations. If we are unable to satisfy the OpenStack requirements that also is something we wish to know and understand.</p>
+<p id="rfc.section.2.1.p.2">OpenStack is designed to be used by many cloud users or 'tenants'.  Scalable, secure and isolated tenant networks are a requirement for building a multi-tenant cloud data center. The OpenStack administrator/operator can design and configure a cloud environment to provide network isolation using the approach described in this document, alone, or in combination with any of the above network technologies . However, all the details of the underlying technology and implementation details are completely transparent to the tenant itself.</p>
+<h1 id="rfc.section.2.2"><a href="#rfc.section.2.2">2.2.</a> <a href="#multicenter" id="multicenter">Multiple Data Centers</a></h1>
+<p id="rfc.section.2.2.p.1">A common requirement in network and data center operations is reliability, serviceability, and maintainability of their operations in the presence of an outage. At minimum, this implies multihoming in the sense of having multiple upstream ISPs; in many cases, it also implies multiple and at times duplicate data centers, and tenants stretched or able to be readily moved or recreated across multiple data centers.</p>
+<h1 id="rfc.section.2.3"><a href="#rfc.section.2.3">2.3.</a> <a href="#large" id="large">Large Data Centers</a></h1>
+<p><a href="#Microsoft-Azure">Microsoft Azure</a> <cite title="NONE">[Microsoft-Azure]</cite> has purchased a 100 acre piece of land for the construction of a single data center.  In terms of physical space, that is enough for a data center with about half a million 19' RETMA racks.</p>
+<p id="rfc.section.2.3.p.2">With even modest virtual machine density, infrastructure at this scale easily exhausts the 16M available RFC 1918 private addresses (i.e. 10.0.0.0/8) and explains the recent efforts by webscale cloud providers to deploy IPv6 throughout their new datacenters.</p>
+<h1 id="rfc.section.2.4"><a href="#rfc.section.2.4">2.4.</a> <a href="#multitenant" id="multitenant">Multi-tenancy</a></h1>
+<p id="rfc.section.2.4.p.1">While it is possible that a single tenant would require a 100 acre data center, it would be unusual. In most such data centers, one would expect a large number of tenants.</p>
+<h1 id="rfc.section.2.5"><a href="#rfc.section.2.5">2.5.</a> <a href="#isolation" id="isolation">Isolation</a></h1>
+<p id="rfc.section.2.5.p.1">Isolation is required between tenants, and at times between tenants hierarchically related to larger tenants.</p>
+<h1 id="rfc.section.2.5.1"><a href="#rfc.section.2.5.1">2.5.1.</a> <a href="#interisolation" id="interisolation">Inter-tenant isolation</a></h1>
+<p id="rfc.section.2.5.1.p.1">A 'tenant' is defined as a set of resources under common administrative control. It may be appropriate for tenants to communicate with each other within the context of an application or relationships among their owners or operators. However, unless specified otherwise, tenants are intended to operate as if they were on their own company's premises and be isolated from one another.</p>
+<h1 id="rfc.section.2.5.2"><a href="#rfc.section.2.5.2">2.5.2.</a> <a href="#intraisolation" id="intraisolation">Intra-tenant isolation</a></h1>
+<p id="rfc.section.2.5.2.p.1">There are often security compartments within a corporate network, just as there are security barriers between companies. As a result, there is a recursive isolation requirement: it must be possible to isolate an identified part of a tenant (which we also think of as a tenant) from another part of the same tenant.</p>
+<h1 id="rfc.section.2.6"><a href="#rfc.section.2.6">2.6.</a> <a href="#requirement5" id="requirement5">Operational Simplicity</a></h1>
+<p id="rfc.section.2.6.p.1">To the extent possible (and, for operators, the concept will bring a smile), operation of a multi-location multi-tenant data center, and the design of an application that runs in one, should be simple and uncoupled.</p>
+<p id="rfc.section.2.6.p.2">As discussed in <a href="#RFC3439">[RFC3439]</a>, this requires that the operational model required to support a tenant with only two physical machines, or virtual machines in the same physical chassis, should be the same as that required to support a tenant running a million machines in a federated multiple data center application.  Additionally, this same operational model should scale from running a single tenant up to many thousands of tenants.</p>
+<h1 id="rfc.section.2.7"><a href="#rfc.section.2.7">2.7.</a> <a href="#requirement8" id="requirement8">Address space </a></h1>
+<p id="rfc.section.2.7.p.1">As described in <a href="#projects">Section 1.1</a>, currently, an OpenStack tenant is required to specify a Subnet's CIDR prefix for IP address allocation. With this proposal, this is no longer required.</p>
+<h1 id="rfc.section.2.8"><a href="#rfc.section.2.8">2.8.</a> <a href="#requirement9" id="requirement9">Data Center Federation</a></h1>
+<p id="rfc.section.2.8.p.1">It must be possible to extend the architecture across multiple data centers. These data centers may be operated by distinct entities, with security policies that apply to their interconnection.</p>
+<h1 id="rfc.section.2.9"><a href="#rfc.section.2.9">2.9.</a> <a href="#pmtu" id="pmtu">Path MTU Issues</a></h1>
+<p id="rfc.section.2.9.p.1">An issue in virtualized data center architectures is <a href="#RFC1981">Path MTU Discovery</a> <cite title="NONE">[RFC1981]</cite> implementation.  Implementing Path MTU requires the <a href="#RFC4443">ICMPv6</a> <cite title="NONE">[RFC4443]</cite> Packet Too Big message to get from the originating router or middleware to the indicated host, which is in this case virtual and potentially hidden within a tunnel. This is a special case of the issues raised in <a href="#RFC2923">[RFC2923]</a>.</p>
+<h1 id="rfc.section.3"><a href="#rfc.section.3">3.</a> <a href="#models" id="models">Models</a></h1>
+<p/>
+<h1 id="rfc.section.3.1"><a href="#rfc.section.3.1">3.1.</a> <a href="#configuration" id="configuration">Configuration Model</a></h1>
+<p id="rfc.section.3.1.p.1">In the OpenStack model, the cloud computing user, or tenant, is building something Edward Yourdon might call a 'structured design' for the application they are building. In the 1960's, when Yourdon started specifying process and data flow diagrams, these were job steps in a deck of Job Control Language cards; in OpenStack, they are multiple, individual machines, virtual or physical, running parts of a structured application.</p>
+<p id="rfc.section.3.1.p.2">In these, one might find a load balancer that receives and distributes requests to request processors, a set of stored data processing applications, and the storage they depend on. What is important to the OpenStack tenant is that 'this' and 'that' communicate, potentially using or not using multicast communications, and don't communicate with 'the other'. Typically unnecessary is any and all information regarding how this communication actually needs to occur (i.e., placement of routers, switches, and IP subnets, prefixes, etc.).</p>
+<p id="rfc.section.3.1.p.3">An IPv6 based networking model simplifies the configuration of tenant connectivity requirements. Global reachability eliminates the need for network address translation devices as well as tenant-specified Subnet prefixes (<a href="#requirement8">Section 2.7</a>), although tenant-specified ULA prefixes or prefixes from the owner of the tenant's address space are usable with it. With the exception of network security functions, no network devices need to be specified or configured to provide connectivity.</p>
+<h1 id="rfc.section.3.2"><a href="#rfc.section.3.2">3.2.</a> <a href="#addressing" id="addressing">Data Center Model</a></h1>
+<p id="rfc.section.3.2.p.1">The premises of the routing and addressing models are that </p>
+
+<ul>
+  <li>The address tells the routing system what topological location to deliver a packet to, and within that, what interface to deliver it to, and</li>
+  <li>The routing system should deliver traffic to a resource if and only if the sender is authorized to communicate with that resource.</li>
+  <li>Contrary to the OpenStack Neutron Networking Model, tunnels are not necessary to provide tenant network isolation; we include resources in a tenant network by a Role-based Access Control model, but address the tenant resources within the data center in a manner that scales for the data center.</li>
+</ul>
+<p id="rfc.section.3.2.p.2">We expect to find the data center to be composed of some minimal unit of connectivity and maintenance, such as a rack or row, and equipped with one or more Top-of-Rack or End-of-Row switch(es); each configured with at least one subnet prefix, perhaps one per such switch. For the purposes of this note, these will be called Racks and Top-of-Rack switches, and when applied to other architectures the appropriate translation needs to be imposed.</p>
+<p><a href="#zynga">Figure 1</a> describes a relatively typical rack design.  It is a simple fat-tree architecture, with every device in a pair, so that any failure has an immediate hot backup. There are other common designs, such as those that consider each rack to be in a 'row' and in a 'column', with one or more distribution switches in each.</p>
+<div id="rfc.figure.1"/>
+<div id="zynga"/>
+<pre>
+       Distribution   Switches connecting
+       / Layer /      racks in a pod, and
+      /       /       connecting pods
+     /       /
+  +-+-+   +-+-+       Mutual backup TOR
++-+TOR+---+TOR+-+     switches
+| +---+   +---+ |
+| +-----------+ |
++-+    host   +-+     Each host has two
+| +-----------+ |     Ethernet interfaces
++-+    host   +-+     with separate subnets
+| +-----------+ |
+| .           . |
+| .           . |
+| .           . |     Design premise: complete
+| +-----------+ |     redundancy, with every
++-+    host   +-+     switch and every cable
+| +-----------+ |     backed up by a doppelganger
++-+    host   +-+
+  +-----------+
+</pre>
+<p class="figure">Figure 1: Typical Rack Design</p>
+<h1 id="rfc.section.3.2.1"><a href="#rfc.section.3.2.1">3.2.1.</a> <a href="#tenant" id="tenant">Tenant Address Model</a></h1>
+<p id="rfc.section.3.2.1.p.1">Tenant resources need to be told, by configuration or naming, the addresses of resources they communicate with. This is true regardless of their location or relationship to a given tenant. In environments with well-known addresses, this becomes complex and unscalable. This was learned very early with Internet hostnames; a single 'hostfile' was maintained by a central entity and updated daily, which quickly became unwieldy. The result was the development of the Domain Name System; the level of indirection between names and addresses improved scalability. It also facilitated ongoing maintenance. If a service needed multiple servers, or a server needed to change its address, that was trivially solved by changing the DNS Resource Record; every resource that needed the new address would obtain it the next time it queried the DNS. It has also facilitated the IPv4/IPv6 transition; a resource that has an IPv6 address is given a AAAA record in addition to, or to replace, its IPv4 A record.</p>
+<p id="rfc.section.3.2.1.p.2">Similarly, today's reliance on NAPT technology frequently limits the capabilities of an application. It works reasonably well for a client accessing a client/server application when the protocol does not carry addressing information. If there is an expectation that one resource's private address will be meaningful to a peer, such as when an SIP client presents its address in SDP or an HTTP server presents an address in a redirection, either the resource needs to understand the difference between an 'inside' and an 'outside' address and know which is which, or it needs a traversal algorithm that changes the addresses. For peer-to-peer applications, this ultimately means providing a network design in which those issues don't apply.</p>
+<p id="rfc.section.3.2.1.p.3">IPv6 provides global addresses, enough of them that there is no real expectation of running out any time soon, making these issues go away. In addition, with the IPv4 address space running out, both globally and within today's large datacenters, there aren't necessarily addresses available for an IPv4 application to use, even as a floating IP address.</p>
+<p id="rfc.section.3.2.1.p.4">Hence, the model we propose is that a resource in a tenant is told the addresses of the other resources with which it communicates. They are IPv6 addresses, and the data center takes care to ensure that inappropriate communications do not take place.</p>
+<h1 id="rfc.section.3.2.1.1"><a href="#rfc.section.3.2.1.1">3.2.1.1.</a> <a href="#gua-tenant" id="gua-tenant">Use of Global Unicast Addresses by Tenants</a></h1>
+<p id="rfc.section.3.2.1.1.p.1">A unicast address in an IP network identifies a topological location, by association with an IP prefix (which might be for a subnet or any aggregate of subnets). It also identifies a single interface located within that subnet, which may or may not be instantiated at the time. We assume that there is a subnet associated with a top-of-rack switch or whatever its counterpart would be in a given network design, and that the physical and virtual machines located in that rack have addresses in that subnet. This is the same prefix that is used by the datacenter administrator.</p>
+<h1 id="rfc.section.3.2.1.2"><a href="#rfc.section.3.2.1.2">3.2.1.2.</a> <a href="#ula" id="ula">Unique Local Addresses</a></h1>
+<p id="rfc.section.3.2.1.2.p.1">A common requirement is that tenants have the use of some form of private address space. In an IPv6 network, a <a href="#RFC4193">Unique Local IPv6 Unicast Address</a> <cite title="NONE">[RFC4193]</cite> may be used to accomplish this. In this case, however, the addresses will need to be explicitly assigned to physical or virtual machines used by the tenant, perhaps using DHCP or YANG, where a standard IPv6 address could be allocated using SLAAC, DHCPv6, or other technologies.</p>
+<p id="rfc.section.3.2.1.2.p.2">The value of this is that the distinction between a Global Address and a Unique Local Address is a corner case in the data center; a ULA will not generally be useful when communicating outside the data center, but within the data center it is rational. Tenants have no routing information or other awareness of the prefix. This is not intended for use behind a NAPT; resources that need accessibility to or from resources outside the tenant, and especially outside the data center, need global addresses.</p>
+<h1 id="rfc.section.3.2.1.3"><a href="#rfc.section.3.2.1.3">3.2.1.3.</a> <a href="#multicast" id="multicast">Multicast Domains</a></h1>
+<p id="rfc.section.3.2.1.3.p.1">Multicast capability is a capability enjoyed by some groups of resources, that enables them to send a single message and have it delivered to multiple destinations roughly simultaneously. At the link layer, this means sending a message once that is received by a specified set of recipient resources using hardware capabilities. IP multicast can be implemented on a LAN as specified in <a href="#RFC4291">[RFC4291]</a>, and can also cross multiple subnets directly, using routing protocols such as <a href="#RFC4601">Protocol Independent Multicast</a> <cite title="NONE">[RFC4601]</cite> <a href="#RFC4602">[RFC4602]</a> <a href="#RFC4604">[RFC4604]</a> <a href="#RFC4605">[RFC4605]</a> <a href="#RFC4607">[RFC4607]</a>. In IPv6, the model would be that when a group of resources is created with a multicast capability, it is allocated one or more source-specific transient group addresses as defined in section 2.7 of that RFC.</p>
+<h1 id="rfc.section.3.2.1.4"><a href="#rfc.section.3.2.1.4">3.2.1.4.</a> <a href="#ipv4" id="ipv4">IPv4 Interaction Model</a></h1>
+<p id="rfc.section.3.2.1.4.p.1">OpenStack IPv4 Neutron uses &#8220;floating IPv4 addresses&#8221; &#8211; global or public IPv4 addresses and Network Address Translation - to enable remote resources to connect to tenant private network endpoints. Tenant end points can connect out to remote resources through an &#8220;External Default Gateway&#8221;. Both of these depend on <a href="#RFC2391">NAPT (DNAT/SNAT)</a> <cite title="NONE">[RFC2391]</cite> to ensure that IPv4 end points are able communicate and at the same time ensure tenant isolation.</p>
+<p id="rfc.section.3.2.1.4.p.2">If IPv6 is deployed in a data center, there are fundamentally two ways a tenant can interact with IPv4 peers: </p>
+
+<ul>
+  <li>it can run existing IPv4 OpenStack technology in parallel with the IPv6 deployment, or</li>
+  <li>It can have a translator at the data center edge (such as described in <a href="#I-D.ietf-v6ops-siit-dc">[I-D.ietf-v6ops-siit-dc]</a>) that associates an IPv4 address or address plus port with an IPv6 address or address plus port. The IPv4 address, in this model, becomes a floating IPv4 address attached to an internal IPv6 address. The 'data center edge' is, by definition, a system that has IPv4 reachability to at least the data center's upstream ISP and all IPv4 systems in the data center, IPv6 connectivity to all of the IPv6 systems in the data center, and (if the upstream offers IPv6 service) IPv6 connectivity to the upstream as well.</li>
+  <li>An application that is not IP version agnostic can be accessed using IPv4 as a service running over IPv6. <a href="#I-D.ietf-v6ops-siit-dc-2xlat">SIIT-DC: Dual Translation Mode</a> <cite title="NONE">[I-D.ietf-v6ops-siit-dc-2xlat]</cite> would have the vSwitch re-translate the message back to IPv4, using the same or a different address.</li>
+  <li>In the event that A+P IPv4 address multiplexing is in view, the vSwitch can also implement the mapping of Address and Port using either <a href="#I-D.ietf-softwire-map">Encapsulation (MAP)</a> <cite title="NONE">[I-D.ietf-softwire-map]</cite> or <a href="#I-D.ietf-softwire-map-t">Translation (MAP-T)</a> <cite title="NONE">[I-D.ietf-softwire-map-t]</cite>.</li>
+</ul>
+<p id="rfc.section.3.2.1.4.p.3">The first model is complex, if for no other reason than that there are two fundamental models in use, one with various encapsulations hiding overlapping address space and one with non-overlapping address space.</p>
+<p id="rfc.section.3.2.1.4.p.4">To simplify the network, as noted in <a href="#approach">Section 2.1</a>, we suggest that the data center be internally IPv6-only, and IPv4 be translated to IPv6 at the data center edge. The advantage is that it enables IPv4 access while that remains in use, and as IPv6 takes over, it reduces the impact of vestigial support for IPv4.</p>
+<p id="rfc.section.3.2.1.4.p.5">The SIIT Translation model in <a href="#I-D.ietf-v6ops-siit-dc">[I-D.ietf-v6ops-siit-dc]</a> has IPv4 traffic come to an <a href="#RFC6145">translator</a> <cite title="NONE">[RFC6145]</cite><a href="#RFC6146">[RFC6146]</a> having a pre-configured translation, resulting in an IPv6 packet indistinguishable from the packet the remote resource might have sent had it been IPv6-capable, with one exception. The IPv6 destination address is that of the endpoint (the same address advertised in a AAAA record), but the source address is an <a href="#RFC6052">IPv4-Embedded IPv6 Address</a> <cite title="NONE">[RFC6052]</cite> with the IPv4 address of the sender embedded in a prefix used by the translator.</p>
+<p id="rfc.section.3.2.1.4.p.6">Access to external IPv4 resources is provided in the same way: an <a href="#RFC6147">DNS64</a> <cite title="NONE">[RFC6147]</cite> server is implemented that contains AAAA records with an <a href="#RFC6052">IPv4-Embedded IPv6 Address</a> <cite title="NONE">[RFC6052]</cite> with the IPv4 address of the remote resource embedded in a prefix used by the translator.</p>
+<p id="rfc.section.3.2.1.4.p.7">This follows the <a href="#RFC6144">Framework for IPv4/IPv6 Translation</a> <cite title="NONE">[RFC6144]</cite>, making the internal IPv4 address a floating IP address attached to an internal IPv6 address, and the external 'dial-out' address indistinguishable from a native IPv6 address.</p>
+<h1 id="rfc.section.3.2.1.5"><a href="#rfc.section.3.2.1.5">3.2.1.5.</a> Legacy IPv4 OpenStack</h1>
+<p id="rfc.section.3.2.1.5.p.1">The other possible model, applicable to IPv4-only devices, is to run a legacy OpenStack environment inside IPv6 tunnels. This preserves the data center IPv6-only, and enables IPv4-only applications, notably those whose licenses tie them to IPv4 addresses, to run. However, it adds significant overhead in terms of encapsulation size and network management complexity.</p>
+<h1 id="rfc.section.3.2.2"><a href="#rfc.section.3.2.2">3.2.2.</a> <a href="#dc" id="dc">Use of Global Addresses by the Data Center</a></h1>
+<p id="rfc.section.3.2.2.p.1">Every rack and physical host requires an IP prefix that is reachable by the OpenStack operator. This will normally be a global IPv6 unicast address. For scalability purposes, as isolation is handled separately, this is normally the same prefix as is used by tenants in the rack.</p>
+<h1 id="rfc.section.3.3"><a href="#rfc.section.3.3">3.3.</a> <a href="#security-isolation" id="security-isolation">Inter-tenant security services</a></h1>
+<p id="rfc.section.3.3.p.1">In this model, the a label is used to identify a set of virtual or physical systems under common ownership and administration that are authorized to communicate freely among themselves - a tenant. Tenants are not generally authorized to communicate with each other, but interactions between specified tenants may be authorized, and specific systems may be authorized to communicate generally.</p>
+<p id="rfc.section.3.3.p.2">The fundamental premise is that the vSwitch can determine whether a VM is authorized to send or receive a given message. It does so by finding the label in a message being sent or received and comparing it to a locally-held authorization policy. This policy would indicate that the VM is permitted to send or receive messages containing one of a small list of labels. In the case of a label contained in the IID of an IPv6 address, it would also need to verify the prefix used in the address, as this type of policy would be specific to an IPv6 prefix.</p>
+<p id="rfc.section.3.3.p.3">A set of possible choices that were considered is to be found in <a href="#label-appendix">Appendix B</a>. The key questions are a list of considerations, presented in no particular order: </p>
+
+<ul>
+  <li>In what way does the approach the IPv6 Path MTU?</li>
+  <li>How does the address come into being?</li>
+  <li>What security implications apply? For example, how hard would it be for a VM to spoof the source address or attack a random destination?</li>
+  <li>What is the service offered? Can, for example, policy be applied at <ul><li>The sender of a datagram?</li><li>The receiver of a datagram?</li><li>An arbitrary point between the sender and receiver?</li><li>At the data center edge, on arriving or departing traffic other data centers?</li><li>At the data center edge, on arriving or departing traffic random locations?</li></ul></li>
+  <li>In what way does the approach the IPv6 Path MTU?</li>
+</ul>
+<h1 id="rfc.section.3.4"><a href="#rfc.section.3.4">3.4.</a> <a href="#ipv6-isolation" id="ipv6-isolation">IPv6 Tenant Isolation using the Label</a></h1>
+<p id="rfc.section.3.4.p.1">Neutron today already implements a form of <a href="#RFC2827">Network Ingress Filtering</a> <cite title="NONE">[RFC2827]</cite>. It prevents the VM from emitting traffic with an unauthorized MAC, IPv4, or IPv6 source address.</p>
+<p id="rfc.section.3.4.p.2">In addition to this, in this model Neutron prevents the VM from transmitting a network packet with an unauthorized label value. The VM MAY be configured with and authorized to use one of a short list of authorized label values, as opposed to simply having its choice overridden; in that case, Neutron verifies the value and overwrites one not in the list.</p>
+<p id="rfc.section.3.4.p.3">When a hypervisor is about to deliver an IPv6 packet to a VM, it checks the label value against a list of values that the VM is permitted to receive. If it contains an unauthorized value, the hypervisor discards the packet rather than deliver it. If the Flow Label is in use, Neutron zeros the label prior to delivery.</p>
+<p id="rfc.section.3.4.p.4">The intention is to hide the label value from malware potentially found in the VM, and enable the label to be used as a form of first and last hop security. This provides basic tenant isolation, if the label is assigned as a tenant identifier, and may be used more creatively such as to identify a network management application as separate from a managed resource.</p>
+<h1 id="rfc.section.3.5"><a href="#rfc.section.3.5">3.5.</a> <a href="#routing" id="routing">Isolation in Routing</a></h1>
+<p id="rfc.section.3.5.p.1">This concept has the weakness that if a packet is not dropped at its source, it is dropped at its destination. It would be preferable for the packet to be dropped in flight, such as at the top-of-rack switch or an aggregation router.</p>
+<p id="rfc.section.3.5.p.2">Concepts discussed in <a href="#I-D.baker-ipv6-isis-dst-flowlabel-routing">IS-IS LSP Extendibility</a> <cite title="NONE">[I-D.baker-ipv6-isis-dst-flowlabel-routing]</cite><a href="#RFC5120">[RFC5120]</a><a href="#RFC5308">[RFC5308]</a> and <a href="#I-D.baker-ipv6-ospf-dst-flowlabel-routing">OSPFv3 LSA Extendibility</a> <cite title="NONE">[I-D.baker-ipv6-ospf-dst-flowlabel-routing]</cite> <a href="#I-D.ietf-ospf-ospfv3-lsa-extend">[I-D.ietf-ospf-ospfv3-lsa-extend]</a><a href="#RFC5340">[RFC5340]</a> may be used to isolate tenants in the routing of the data center backbone.  This is not strictly necessary, if <a href="#ipv6-isolation">Section 3.4</a> is uniformly and correctly implemented. It does, however, present a second defense against misconfiguration, as the filter becomes ubiquitous in the data center and as scalable as routing.</p>
+<h1 id="rfc.section.4"><a href="#rfc.section.4">4.</a> <a href="#bcp38" id="bcp38">BCP 38 Ingress Filtering</a></h1>
+<p id="rfc.section.4.p.1">As noted in <a href="#ipv6-isolation">Section 3.4</a>, Neutron today implements a form of <a href="#RFC2827">Network Ingress Filtering</a> <cite title="NONE">[RFC2827]</cite>. It prevents the VM from emitting traffic with an unauthorized MAC, IPv4, or IPv6 source address.</p>
+<p id="rfc.section.4.p.2">In IPv6, this is readily handled when the address or addresses used by a VM are selected by the OpenStack operator. It may then configure a per-VM filter with the addresses it has chosen, following logic similar to the <a href="#I-D.ietf-savi-dhcp">Source Address Validation Solution for DHCP</a> <cite title="NONE">[I-D.ietf-savi-dhcp]</cite> or <a href="#RFC7219">SEND</a> <cite title="NONE">[RFC7219]</cite>. This is also true of <a href="#RFC4862">IPv6 Stateless Address Autoconfiguration (SLAAC)</a> <cite title="NONE">[RFC4862]</cite> when the MAC address is known and not shared.</p>
+<p id="rfc.section.4.p.3">However, when SLAAC is in use and either the MAC address is unknown or SLAAC's <a href="#RFC4941">Privacy Extensions </a> <cite title="NONE">[RFC4941]</cite><a href="#RFC7217">[RFC7217]</a>, are in use, Neutron will need to implement the provisions of <a href="#RFC6620">FCFS SAVI: First-Come, First-Served Source Address Validation</a> <cite title="NONE">[RFC6620]</cite> in order to learn the addresses that a VM is using and include them in the per-VM filter.</p>
+<h1 id="rfc.section.5"><a href="#rfc.section.5">5.</a> Moving virtual machines</h1>
+<p id="rfc.section.5.p.1">This design supports these kinds of required layer 2 networks with the additional use of a layer 2 over layer 3 encapsulation and tunneling protocol, such as <a href="#RFC7348">VXLAN</a> <cite title="NONE">[RFC7348]</cite>. The important point here being that these overlays are used to address specific tenant network requirements and NOT deployed to remove the scalability limitations of OpenStack networking.</p>
+<p id="rfc.section.5.p.2">There are at least three ways VM movement can be accomplished: </p>
+
+<ul>
+  <li>Recreation of the VM</li>
+  <li>VLAN Modification</li>
+  <li>Live Migration of a Running Virtual Machine</li>
+</ul>
+<h1 id="rfc.section.5.1"><a href="#rfc.section.5.1">5.1.</a> <a href="#motion-new-vm" id="motion-new-vm">Recreation of the VM</a></h1>
+<p id="rfc.section.5.1.p.1">The simplest and most reliable is to </p>
+
+<ol>
+  <li>Create a new VM in the new location,</li>
+  <li>Add its address to the DNS Resource Record for the name, allowing new references to the name to send transactions there,</li>
+  <li>Remove the old address from the DNS Resource Record (including the SIIT translation, if one exists), ending the use of the old VM for new transactions,</li>
+  <li>Wait for the period of the DNS Resource Record's lifetime (including the SIIT translation, if one exists), as it will get new requests throughout that interval,</li>
+  <li>Wait for the for the old VM to finish any outstanding transactions, and then</li>
+  <li>Kill the old VM.</li>
+</ol>
+<p id="rfc.section.5.1.p.2">This is obviously not movement of an existing VM, but preservation of the same number and function of VMs by creation of a new VM and killing the old.</p>
+<h1 id="rfc.section.5.2"><a href="#rfc.section.5.2">5.2.</a> <a href="#vmotion" id="vmotion">Live Migration of a Running Virtual Machine</a></h1>
+<p id="rfc.section.5.2.p.1">At http://blogs.vmware.com/vsphere/2011/02/vmotion-whats-going-on-under-the-covers.html, VMWare describes its capability, called vMotion, in the following terms: </p>
+
+<ol>
+  <li>Shadow VM created on the destination host.</li>
+  <li>Copy each memory page from the source to the destination via the vMotion network. This is known as preCopy.</li>
+  <li>Perform another pass over the VM's memory, copying any pages that changed during the last preCopy iteration.</li>
+  <li>Continue this iterative memory copying until no changed pages (outstanding to be-copied pages) remain or 100 seconds elapse.</li>
+  <li>Stun the VM on the source and resume it on the destination.</li>
+</ol>
+<p id="rfc.section.5.2.p.2">In a native-address environment, we add three steps:</p>
+
+<ol>
+  <li>Shadow VM created on the destination host.</li>
+  <li>Copy each memory page from the source to the destination via the vMotion network. This is known as preCopy.</li>
+  <li>Perform another pass over the VM's memory, copying any pages that changed during the last preCopy iteration.</li>
+  <li>Continue this iterative memory copying until no changed pages (outstanding to be-copied pages) remain or 100 seconds elapse.</li>
+  <li>Stitch routing for the old address.</li>
+  <li>Stun the VM on the source and resume it on the destination.</li>
+  <li>Renumber the VM as instructed in <a href="#RFC4192">[RFC4192]</a>.</li>
+  <li>Unstitch routing for the old address.</li>
+</ol>
+<p id="rfc.section.5.2.p.3">If the VM is moved within the same subnet (which usually implies the same rack), there is no stitching or renumbering apart from ensuring that the MAC address moves with the VM. When the VM moves to a different subnet, however, we need to restitch routing, at least temporarily. This obviously calls for some definitions. </p>
+
+<dl>
+  <dt>Stitching Routing:</dt>
+  <dd style="margin-left: 8">The VM is potentially in communication with two sets of peers: VMs in the same subnet, and VMs in different subnets. <ul><li>The router in the new subnet is instructed to advertise a host route (/128) to the moved VM, and to install a static route to the old address with the VM's address in the new subnet as its next hop address. Traffic from VMs from other subnets will now follow the host route to the VM in its new location.</li><li>The router in the old subnet is instructed to direct LAN traffic to the VM's MAC Address to its IPv6 forwarding logic.  Traffic from other VMs in the old subnet will now follow the host route to the moved VM.</li></ul></dd>
+  <dt>Renumbering:</dt>
+  <dd style="margin-left: 8">This step is optional, but is good hygiene if the VM will be there a while. If the VM will reside in its new location only temporarily, it can be skipped. <br/><br/> Note that every IPv6 address, unlike an IPv4 address, has a lifetime. At least in theory, when the lifetime expires, neighbor relationships with the address must be extended or the address removed from the system. The <a href="#RFC4861">Neighbor Discovery</a> <cite title="NONE">[RFC4861]</cite> process in the subnet router will periodically emit a Router Advertisement; the VM will gain an IPv6 address in the new subnet at that time if not earlier. As described in <a href="#RFC4192">[RFC4192]</a>, DNS should be changed to report the new address instead of the old. The DNS lifetime and any ambient sessions using the old address are now allowed to expire. That this point, any new sessions will be using the new address, and the old is vestigial. <br/><br/> Waiting for sessions using the address to expire can take an arbitrarily long interval, because the session generally has no knowledge of the lifetime of the IPv6 address.</dd>
+  <dt>Unstitching Routing:</dt>
+  <dd style="margin-left: 8">This is the reverse process of stitching. If the VM is renumbered, when the old address becomes vestigial, the address will be discarded by the VM; if the VM is subsequently taken out of service, it has the same effect. At that point, the host route is withdrawn, and the MAC address in the old subnet router's tables is removed.</dd>
+</dl>
+<h1 id="rfc.section.6"><a href="#rfc.section.6">6.</a> <a href="#implications" id="implications">OpenStack implications</a></h1>
+<h1 id="rfc.section.6.1"><a href="#rfc.section.6.1">6.1.</a> <a href="#config-implications" id="config-implications">Configuration implications</a></h1>
+<p/>
+
+<ol>
+  <li>Neutron MUST be configured with a pre-determined default label value for each tenant virtual network <a href="#ipv6-isolation">Section 3.4</a>.</li>
+  <li>Neutron MAY be configured with a set of authorized label values for each tenant virtual network <a href="#ipv6-isolation">Section 3.4</a>.</li>
+  <li>A virtual tenant network MAY be configured with a set of authorized label values <a href="#ipv6-isolation">Section 3.4</a>.</li>
+  <li>Neutron MUST be configured with one or more label values per virtual tenant network that the network is permitted to receive <a href="#ipv6-isolation">Section 3.4</a>.</li>
+</ol>
+<h1 id="rfc.section.6.2"><a href="#rfc.section.6.2">6.2.</a> <a href="#vSwitch-implications" id="vSwitch-implications">vSwitch implications</a></h1>
+<p id="rfc.section.6.2.p.1">On messages transmitted by a virtual machine </p>
+
+<dl>
+  <dt>Label Correctness:</dt>
+  <dd style="margin-left: 8">As described in <a href="#security-isolation">Section 3.3</a>, ensure that the label in the packet is one that the VM is authorized to use. Exactly what label is in view is a deferred, and potentially configurable, option. Again Depending on configuration, the vSwitch may overwrite whatever value is there, or may ratify that the value there is as specified in a VM-specific list.</dd>
+  <dt>Source Address Validation:</dt>
+  <dd style="margin-left: 8">As described in <a href="#bcp38">Section 4</a>, force the source address to be among those the VM is authorized to use. The VM may simultaneously be authorized to use several addresses.</dd>
+  <dt>Destination Address Validation:</dt>
+  <dd style="margin-left: 8">OpenStack for IPv4 permits a NAT translation, called a 'floating IP address', to enable a VM to communicate outside the domain; without that, it cannot. For IPv6, the destination address should be permitted by some access list, which may permit all addresses, or addresses matching one or more CIDR prefixes such as permitted multicast addresses, and the prefix of the data center.</dd>
+</dl>
+<p id="rfc.section.6.2.p.2">On messages received for delivery to a virtual machine </p>
+
+<dl>
+  <dt>Label Authorization:</dt>
+  <dd style="margin-left: 8">As described in <a href="#ipv6-isolation">Section 3.4</a>, the vSwitch only delivers a packet to a VM if the VM is authorized to receive it. The VM may have been authorized to receive several such labels.</dd>
+</dl>
+<p id="rfc.section.6.2.p.3">Each approach in the appendix discusses filtering.</p>
+<h1 id="rfc.section.7"><a href="#rfc.section.7">7.</a> <a href="#IANA" id="IANA">IANA Considerations</a></h1>
+<p id="rfc.section.7.p.1">This document does not ask IANA to do anything.</p>
+<h1 id="rfc.section.8"><a href="#rfc.section.8">8.</a> <a href="#Security" id="Security">Security Considerations</a></h1>
+<p id="rfc.section.8.p.1">In <a href="#isolation">Section 2.5</a> and <a href="#security-isolation">Section 3.3</a>, this specification considers inter-tenant and intra-tenant network isolation. It is intended to contribute to the security of a network, much like encapsulation in a maze of tunnels or VLANs might, but without the complexities and overhead of the management of such resources. This does not replace the use of IPSec, SSH, or TLS encryption or the use authentication technologies; if these would be appropriate in an on-premises corporate data center, they remain appropriate in a multi-tenant data center regardless of the isolation technology. However, one can think of this as a simple inter-tenant firewall based on the concepts of role-based access control; if it can be readily determined that a sender is not authorized to communicate with a receiver, such a transmission is prevented.</p>
+<h1 id="rfc.section.9"><a href="#rfc.section.9">9.</a> <a href="#Privacy" id="Privacy">Privacy Considerations</a></h1>
+<p id="rfc.section.9.p.1">This specification places no personally identifying information in an unencrypted part of a packet.</p>
+<h1 id="rfc.section.10"><a href="#rfc.section.10">10.</a> <a href="#Acknowledgements" id="Acknowledgements">Acknowledgements</a></h1>
+<p id="rfc.section.10.p.1">This document grew out of a discussion among the authors and contributors.</p>
+<h1 id="rfc.section.11"><a href="#rfc.section.11">11.</a> <a href="#Contributors" id="Contributors">Contributors</a></h1>
+<div id="rfc.figure.2"/>
+<div id="a"/>
+<pre>
+   Puneet Konghot
+   Cisco Systems
+   San Jose, California  95134
+   USA
+   Email: pkonghot@cisco.com
+
+   Shannon McFarland
+   Cisco Systems
+   Boulder, Colorado  80301
+   USA
+   Email: shmcfarl@cisco.com
+	</pre>
+<p class="figure">Figure 2</p>
+<h1 id="rfc.references"><a href="#rfc.references">12.</a> References</h1>
+<h1 id="rfc.references.1"><a href="#rfc.references.1">12.1.</a> Normative References</h1>
+<table>
+  <tbody>
+    <tr>
+      <td class="reference">
+        <b id="RFC2119">[RFC2119]</b>
+      </td>
+      <td class="top"><a href="mailto:sob@harvard.edu" title="Harvard University">Bradner, S.</a>, "<a href="http://tools.ietf.org/html/rfc2119">Key words for use in RFCs to Indicate Requirement Levels</a>", BCP 14, RFC 2119, March 1997.</td>
+    </tr>
+    <tr>
+      <td class="reference">
+        <b id="RFC2460">[RFC2460]</b>
+      </td>
+      <td class="top"><a href="mailto:deering@cisco.com" title="Cisco Systems, Inc.">Deering, S.</a> and <a href="mailto:hinden@iprg.nokia.com" title="Nokia">R. Hinden</a>, "<a href="http://tools.ietf.org/html/rfc2460">Internet Protocol, Version 6 (IPv6) Specification</a>", RFC 2460, December 1998.</td>
+    </tr>
+  </tbody>
+</table>
+<h1 id="rfc.references.2"><a href="#rfc.references.2">12.2.</a> Informative References</h1>
+<table>
+  <tbody>
+    <tr>
+      <td class="reference">
+        <b id="FaceBook-IPv6">[FaceBook-IPv6]</b>
+      </td>
+      <td class="top"><a title="Internetworking perspectives by Ivan Pepelnjak">Pepelnjak, I.</a>, "<a>Facebook Is Close to Having an IPv6-only Data Center http://blog.ipspace.net/2014/03/facebook-is-close-to-having-ipv6-only.html</a>", March 2014.</td>
+    </tr>
+    <tr>
+      <td class="reference">
+        <b id="I-D.baker-ipv6-isis-dst-flowlabel-routing">[I-D.baker-ipv6-isis-dst-flowlabel-routing]</b>
+      </td>
+      <td class="top"><a>Baker, F.</a>, "<a href="http://tools.ietf.org/html/draft-baker-ipv6-isis-dst-flowlabel-routing-00">Using IS-IS with Role-Based Access Control</a>", Internet-Draft draft-baker-ipv6-isis-dst-flowlabel-routing-00, February 2013.</td>
+    </tr>
+    <tr>
+      <td class="reference">
+        <b id="I-D.baker-ipv6-ospf-dst-flowlabel-routing">[I-D.baker-ipv6-ospf-dst-flowlabel-routing]</b>
+      </td>
+      <td class="top"><a>Baker, F.</a>, "<a href="http://tools.ietf.org/html/draft-baker-ipv6-ospf-dst-flowlabel-routing-02">Using OSPFv3 with Role-Based Access Control</a>", Internet-Draft draft-baker-ipv6-ospf-dst-flowlabel-routing-02, May 2013.</td>
+    </tr>
+    <tr>
+      <td class="reference">
+        <b id="I-D.gont-v6ops-ipv6-ehs-in-real-world">[I-D.gont-v6ops-ipv6-ehs-in-real-world]</b>
+      </td>
+      <td class="top"><a>Gont, F.</a>, <a>Linkova, J.</a>, <a>Chown, T.</a> and <a>W. Will</a>, "<a href="http://tools.ietf.org/html/draft-gont-v6ops-ipv6-ehs-in-real-world-02">Observations on IPv6 EH Filtering in the Real World</a>", Internet-Draft draft-gont-v6ops-ipv6-ehs-in-real-world-02, March 2015.</td>
+    </tr>
+    <tr>
+      <td class="reference">
+        <b id="I-D.ietf-6man-default-iids">[I-D.ietf-6man-default-iids]</b>
+      </td>
+      <td class="top"><a>Gont, F.</a>, <a>Cooper, A.</a>, <a>Thaler, D.</a> and <a>W. Will</a>, "<a href="http://tools.ietf.org/html/draft-ietf-6man-default-iids-01">Recommendation on Stable IPv6 Interface Identifiers</a>", Internet-Draft draft-ietf-6man-default-iids-01, October 2014.</td>
+    </tr>
+    <tr>
+      <td class="reference">
+        <b id="I-D.ietf-ospf-ospfv3-lsa-extend">[I-D.ietf-ospf-ospfv3-lsa-extend]</b>
+      </td>
+      <td class="top"><a>Lindem, A.</a>, <a>Mirtorabi, S.</a>, <a>Roy, A.</a> and <a>F. Baker</a>, "<a href="http://tools.ietf.org/html/draft-ietf-ospf-ospfv3-lsa-extend-03">OSPFv3 LSA Extendibility</a>", Internet-Draft draft-ietf-ospf-ospfv3-lsa-extend-03, May 2014.</td>
+    </tr>
+    <tr>
+      <td class="reference">
+        <b id="I-D.ietf-savi-dhcp">[I-D.ietf-savi-dhcp]</b>
+      </td>
+      <td class="top"><a>Bi, J.</a>, <a>Wu, J.</a>, <a>Yao, G.</a> and <a>F. Baker</a>, "<a href="http://tools.ietf.org/html/draft-ietf-savi-dhcp-26">SAVI Solution for DHCP</a>", Internet-Draft draft-ietf-savi-dhcp-26, May 2014.</td>
+    </tr>
+    <tr>
+      <td class="reference">
+        <b id="I-D.ietf-softwire-map">[I-D.ietf-softwire-map]</b>
+      </td>
+      <td class="top"><a>Troan, O.</a>, <a>Dec, W.</a>, <a>Li, X.</a>, <a>Bao, C.</a>, <a>Matsushima, S.</a>, <a>Murakami, T.</a> and <a>T. Taylor</a>, "<a href="http://tools.ietf.org/html/draft-ietf-softwire-map-12">Mapping of Address and Port with Encapsulation (MAP)</a>", Internet-Draft draft-ietf-softwire-map-12, November 2014.</td>
+    </tr>
+    <tr>
+      <td class="reference">
+        <b id="I-D.ietf-softwire-map-t">[I-D.ietf-softwire-map-t]</b>
+      </td>
+      <td class="top"><a>Li, X.</a>, <a>Bao, C.</a>, <a>Dec, W.</a>, <a>Troan, O.</a>, <a>Matsushima, S.</a> and <a>T. Murakami</a>, "<a href="http://tools.ietf.org/html/draft-ietf-softwire-map-t-08">Mapping of Address and Port using Translation (MAP-T)</a>", Internet-Draft draft-ietf-softwire-map-t-08, December 2014.</td>
+    </tr>
+    <tr>
+      <td class="reference">
+        <b id="I-D.ietf-v6ops-siit-dc">[I-D.ietf-v6ops-siit-dc]</b>
+      </td>
+      <td class="top"><a>tore, t.</a>, "<a href="http://tools.ietf.org/html/draft-ietf-v6ops-siit-dc-00">SIIT-DC: Stateless IP/ICMP Translation for IPv6 Data Centre Environments</a>", Internet-Draft draft-ietf-v6ops-siit-dc-00, December 2014.</td>
+    </tr>
+    <tr>
+      <td class="reference">
+        <b id="I-D.ietf-v6ops-siit-dc-2xlat">[I-D.ietf-v6ops-siit-dc-2xlat]</b>
+      </td>
+      <td class="top"><a>tore, t.</a>, "<a href="http://tools.ietf.org/html/draft-ietf-v6ops-siit-dc-2xlat-00">SIIT-DC: Dual Translation Mode</a>", Internet-Draft draft-ietf-v6ops-siit-dc-2xlat-00, January 2015.</td>
+    </tr>
+    <tr>
+      <td class="reference">
+        <b id="I-D.previdi-6man-segment-routing-header">[I-D.previdi-6man-segment-routing-header]</b>
+      </td>
+      <td class="top"><a>Previdi, S.</a>, <a>Filsfils, C.</a>, <a>Field, B.</a> and <a>I. Leung</a>, "<a href="http://tools.ietf.org/html/draft-previdi-6man-segment-routing-header-04">IPv6 Segment Routing Header (SRH)</a>", Internet-Draft draft-previdi-6man-segment-routing-header-04, November 2014.</td>
+    </tr>
+    <tr>
+      <td class="reference">
+        <b id="Microsoft-Azure">[Microsoft-Azure]</b>
+      </td>
+      <td class="top"><a title="Data Center Knowledge">Sverdlik, Y.</a>, "<a>Report: Microsoft Buys 100 Acres of Iowa land for Data Center http://www.datacenterknowledge.com/archives/2014/08/01/report-microsoft-buys-100-acres-iowa-land-data-center/</a>", August 2014.</td>
+    </tr>
+    <tr>
+      <td class="reference">
+        <b id="RFC1918">[RFC1918]</b>
+      </td>
+      <td class="top"><a href="mailto:yakov@cisco.com" title="Cisco systems">Rekhter, Y.</a>, <a href="mailto:rgm3@is.chrysler.com" title="Chrysler Corporation">Moskowitz, R.</a>, <a href="mailto:Daniel.Karrenberg@ripe.net" title="RIPE Network Coordination Centre">Karrenberg, D.</a>, <a href="mailto:GeertJan.deGroot@ripe.net" title="RIPE Network Coordination Centre">Groot, G.</a> and <a href="mailto:lear@sgi.com" title="Silicon Graphics, Inc.">E. Lear</a>, "<a href="http://tools.ietf.org/html/rfc1918">Address Allocation for Private Internets</a>", BCP 5, RFC 1918, February 1996.</td>
+    </tr>
+    <tr>
+      <td class="reference">
+        <b id="RFC1981">[RFC1981]</b>
+      </td>
+      <td class="top"><a href="mailto:mccann@zk3.dec.com" title="Digital Equipment Corporation">McCann, J.</a>, <a href="mailto:deering@parc.xerox.com" title="Xerox Palo Alto Research Center">Deering, S.</a> and <a href="mailto:mogul@pa.dec.com" title="Digital Equipment Corporation, Western Research Laboratory">J. Mogul</a>, "<a href="http://tools.ietf.org/html/rfc1981">Path MTU Discovery for IP version 6</a>", RFC 1981, August 1996.</td>
+    </tr>
+    <tr>
+      <td class="reference">
+        <b id="RFC2205">[RFC2205]</b>
+      </td>
+      <td class="top"><a href="mailto:Braden@ISI.EDU" title="USC Information Sciences Institute">Braden, B.</a>, <a href="mailto:lixia@cs.ucla.edu" title="UCLA Computer Science Department">Zhang, L.</a>, <a href="mailto:Berson@ISI.EDU" title="USC Information Sciences Institute">Berson, S.</a>, <a href="mailto:Herzog@WATSON.IBM.COM" title="IBM T. J. Watson Research Center">Herzog, S.</a> and <a href="mailto:jamin@EECS.UMICH.EDU" title="University of Michigan">S. Jamin</a>, "<a href="http://tools.ietf.org/html/rfc2205">Resource ReSerVation Protocol (RSVP) -- Version 1 Functional Specification</a>", RFC 2205, September 1997.</td>
+    </tr>
+    <tr>
+      <td class="reference">
+        <b id="RFC2391">[RFC2391]</b>
+      </td>
+      <td class="top"><a href="mailto:suresh@ra.lucent.com" title="Lucent Technologies">Srisuresh, P.</a> and <a href="mailto:dhg@juniper.net" title="Juniper Networks, Inc.">D. Gan</a>, "<a href="http://tools.ietf.org/html/rfc2391">Load Sharing using IP Network Address Translation (LSNAT)</a>", RFC 2391, August 1998.</td>
+    </tr>
+    <tr>
+      <td class="reference">
+        <b id="RFC2710">[RFC2710]</b>
+      </td>
+      <td class="top"><a href="mailto:deering@cisco.com" title="Cisco Systems, Inc.">Deering, S.</a>, <a href="mailto:fenner@research.att.com" title="AT &amp; T Research">Fenner, W.</a> and <a href="mailto:haberman@raleigh.ibm.com" title="IBM Corporation">B. Haberman</a>, "<a href="http://tools.ietf.org/html/rfc2710">Multicast Listener Discovery (MLD) for IPv6</a>", RFC 2710, October 1999.</td>
+    </tr>
+    <tr>
+      <td class="reference">
+        <b id="RFC2827">[RFC2827]</b>
+      </td>
+      <td class="top"><a>Ferguson, P.</a> and <a>D. Senie</a>, "<a href="http://tools.ietf.org/html/rfc2827">Network Ingress Filtering: Defeating Denial of Service Attacks which employ IP Source Address Spoofing</a>", BCP 38, RFC 2827, May 2000.</td>
+    </tr>
+    <tr>
+      <td class="reference">
+        <b id="RFC2923">[RFC2923]</b>
+      </td>
+      <td class="top"><a>Lahey, K.</a>, "<a href="http://tools.ietf.org/html/rfc2923">TCP Problems with Path MTU Discovery</a>", RFC 2923, September 2000.</td>
+    </tr>
+    <tr>
+      <td class="reference">
+        <b id="RFC3439">[RFC3439]</b>
+      </td>
+      <td class="top"><a>Bush, R.</a> and <a>D. Meyer</a>, "<a href="http://tools.ietf.org/html/rfc3439">Some Internet Architectural Guidelines and Philosophy</a>", RFC 3439, December 2002.</td>
+    </tr>
+    <tr>
+      <td class="reference">
+        <b id="RFC3697">[RFC3697]</b>
+      </td>
+      <td class="top"><a>Rajahalme, J.</a>, <a>Conta, A.</a>, <a>Carpenter, B.</a> and <a>S. Deering</a>, "<a href="http://tools.ietf.org/html/rfc3697">IPv6 Flow Label Specification</a>", RFC 3697, March 2004.</td>
+    </tr>
+    <tr>
+      <td class="reference">
+        <b id="RFC4192">[RFC4192]</b>
+      </td>
+      <td class="top"><a>Baker, F.</a>, <a>Lear, E.</a> and <a>R. Droms</a>, "<a href="http://tools.ietf.org/html/rfc4192">Procedures for Renumbering an IPv6 Network without a Flag Day</a>", RFC 4192, September 2005.</td>
+    </tr>
+    <tr>
+      <td class="reference">
+        <b id="RFC4193">[RFC4193]</b>
+      </td>
+      <td class="top"><a>Hinden, R.</a> and <a>B. Haberman</a>, "<a href="http://tools.ietf.org/html/rfc4193">Unique Local IPv6 Unicast Addresses</a>", RFC 4193, October 2005.</td>
+    </tr>
+    <tr>
+      <td class="reference">
+        <b id="RFC4291">[RFC4291]</b>
+      </td>
+      <td class="top"><a>Hinden, R.</a> and <a>S. Deering</a>, "<a href="http://tools.ietf.org/html/rfc4291">IP Version 6 Addressing Architecture</a>", RFC 4291, February 2006.</td>
+    </tr>
+    <tr>
+      <td class="reference">
+        <b id="RFC4443">[RFC4443]</b>
+      </td>
+      <td class="top"><a>Conta, A.</a>, <a>Deering, S.</a> and <a>M. Gupta</a>, "<a href="http://tools.ietf.org/html/rfc4443">Internet Control Message Protocol (ICMPv6) for the Internet Protocol Version 6 (IPv6) Specification</a>", RFC 4443, March 2006.</td>
+    </tr>
+    <tr>
+      <td class="reference">
+        <b id="RFC4601">[RFC4601]</b>
+      </td>
+      <td class="top"><a>Fenner, B.</a>, <a>Handley, M.</a>, <a>Holbrook, H.</a> and <a>I. Kouvelas</a>, "<a href="http://tools.ietf.org/html/rfc4601">Protocol Independent Multicast - Sparse Mode (PIM-SM): Protocol Specification (Revised)</a>", RFC 4601, August 2006.</td>
+    </tr>
+    <tr>
+      <td class="reference">
+        <b id="RFC4602">[RFC4602]</b>
+      </td>
+      <td class="top"><a>Pusateri, T.</a>, "<a href="http://tools.ietf.org/html/rfc4602">Protocol Independent Multicast - Sparse Mode (PIM-SM) IETF Proposed Standard Requirements Analysis</a>", RFC 4602, August 2006.</td>
+    </tr>
+    <tr>
+      <td class="reference">
+        <b id="RFC4604">[RFC4604]</b>
+      </td>
+      <td class="top"><a>Holbrook, H.</a>, <a>Cain, B.</a> and <a>B. Haberman</a>, "<a href="http://tools.ietf.org/html/rfc4604">Using Internet Group Management Protocol Version 3 (IGMPv3) and Multicast Listener Discovery Protocol Version 2 (MLDv2) for Source-Specific Multicast</a>", RFC 4604, August 2006.</td>
+    </tr>
+    <tr>
+      <td class="reference">
+        <b id="RFC4605">[RFC4605]</b>
+      </td>
+      <td class="top"><a>Fenner, B.</a>, <a>He, H.</a>, <a>Haberman, B.</a> and <a>H. Sandick</a>, "<a href="http://tools.ietf.org/html/rfc4605">Internet Group Management Protocol (IGMP) / Multicast Listener Discovery (MLD)-Based Multicast Forwarding ("IGMP/MLD Proxying")</a>", RFC 4605, August 2006.</td>
+    </tr>
+    <tr>
+      <td class="reference">
+        <b id="RFC4607">[RFC4607]</b>
+      </td>
+      <td class="top"><a>Holbrook, H.</a> and <a>B. Cain</a>, "<a href="http://tools.ietf.org/html/rfc4607">Source-Specific Multicast for IP</a>", RFC 4607, August 2006.</td>
+    </tr>
+    <tr>
+      <td class="reference">
+        <b id="RFC4861">[RFC4861]</b>
+      </td>
+      <td class="top"><a>Narten, T.</a>, <a>Nordmark, E.</a>, <a>Simpson, W.</a> and <a>H. Soliman</a>, "<a href="http://tools.ietf.org/html/rfc4861">Neighbor Discovery for IP version 6 (IPv6)</a>", RFC 4861, September 2007.</td>
+    </tr>
+    <tr>
+      <td class="reference">
+        <b id="RFC4862">[RFC4862]</b>
+      </td>
+      <td class="top"><a>Thomson, S.</a>, <a>Narten, T.</a> and <a>T. Jinmei</a>, "<a href="http://tools.ietf.org/html/rfc4862">IPv6 Stateless Address Autoconfiguration</a>", RFC 4862, September 2007.</td>
+    </tr>
+    <tr>
+      <td class="reference">
+        <b id="RFC4941">[RFC4941]</b>
+      </td>
+      <td class="top"><a>Narten, T.</a>, <a>Draves, R.</a> and <a>S. Krishnan</a>, "<a href="http://tools.ietf.org/html/rfc4941">Privacy Extensions for Stateless Address Autoconfiguration in IPv6</a>", RFC 4941, September 2007.</td>
+    </tr>
+    <tr>
+      <td class="reference">
+        <b id="RFC5120">[RFC5120]</b>
+      </td>
+      <td class="top"><a>Przygienda, T.</a>, <a>Shen, N.</a> and <a>N. Sheth</a>, "<a href="http://tools.ietf.org/html/rfc5120">M-ISIS: Multi Topology (MT) Routing in Intermediate System to Intermediate Systems (IS-ISs)</a>", RFC 5120, February 2008.</td>
+    </tr>
+    <tr>
+      <td class="reference">
+        <b id="RFC5308">[RFC5308]</b>
+      </td>
+      <td class="top"><a>Hopps, C.</a>, "<a href="http://tools.ietf.org/html/rfc5308">Routing IPv6 with IS-IS</a>", RFC 5308, October 2008.</td>
+    </tr>
+    <tr>
+      <td class="reference">
+        <b id="RFC5340">[RFC5340]</b>
+      </td>
+      <td class="top"><a>Coltun, R.</a>, <a>Ferguson, D.</a>, <a>Moy, J.</a> and <a>A. Lindem</a>, "<a href="http://tools.ietf.org/html/rfc5340">OSPF for IPv6</a>", RFC 5340, July 2008.</td>
+    </tr>
+    <tr>
+      <td class="reference">
+        <b id="RFC5548">[RFC5548]</b>
+      </td>
+      <td class="top"><a>Dohler, M.</a>, <a>Watteyne, T.</a>, <a>Winter, T.</a> and <a>D. Barthel</a>, "<a href="http://tools.ietf.org/html/rfc5548">Routing Requirements for Urban Low-Power and Lossy Networks</a>", RFC 5548, May 2009.</td>
+    </tr>
+    <tr>
+      <td class="reference">
+        <b id="RFC5673">[RFC5673]</b>
+      </td>
+      <td class="top"><a>Pister, K.</a>, <a>Thubert, P.</a>, <a>Dwars, S.</a> and <a>T. Phinney</a>, "<a href="http://tools.ietf.org/html/rfc5673">Industrial Routing Requirements in Low-Power and Lossy Networks</a>", RFC 5673, October 2009.</td>
+    </tr>
+    <tr>
+      <td class="reference">
+        <b id="RFC6052">[RFC6052]</b>
+      </td>
+      <td class="top"><a>Bao, C.</a>, <a>Huitema, C.</a>, <a>Bagnulo, M.</a>, <a>Boucadair, M.</a> and <a>X. Li</a>, "<a href="http://tools.ietf.org/html/rfc6052">IPv6 Addressing of IPv4/IPv6 Translators</a>", RFC 6052, October 2010.</td>
+    </tr>
+    <tr>
+      <td class="reference">
+        <b id="RFC6144">[RFC6144]</b>
+      </td>
+      <td class="top"><a>Baker, F.</a>, <a>Li, X.</a>, <a>Bao, C.</a> and <a>K. Yin</a>, "<a href="http://tools.ietf.org/html/rfc6144">Framework for IPv4/IPv6 Translation</a>", RFC 6144, April 2011.</td>
+    </tr>
+    <tr>
+      <td class="reference">
+        <b id="RFC6145">[RFC6145]</b>
+      </td>
+      <td class="top"><a>Li, X.</a>, <a>Bao, C.</a> and <a>F. Baker</a>, "<a href="http://tools.ietf.org/html/rfc6145">IP/ICMP Translation Algorithm</a>", RFC 6145, April 2011.</td>
+    </tr>
+    <tr>
+      <td class="reference">
+        <b id="RFC6146">[RFC6146]</b>
+      </td>
+      <td class="top"><a>Bagnulo, M.</a>, <a>Matthews, P.</a> and <a>I. van Beijnum</a>, "<a href="http://tools.ietf.org/html/rfc6146">Stateful NAT64: Network Address and Protocol Translation from IPv6 Clients to IPv4 Servers</a>", RFC 6146, April 2011.</td>
+    </tr>
+    <tr>
+      <td class="reference">
+        <b id="RFC6147">[RFC6147]</b>
+      </td>
+      <td class="top"><a>Bagnulo, M.</a>, <a>Sullivan, A.</a>, <a>Matthews, P.</a> and <a>I. van Beijnum</a>, "<a href="http://tools.ietf.org/html/rfc6147">DNS64: DNS Extensions for Network Address Translation from IPv6 Clients to IPv4 Servers</a>", RFC 6147, April 2011.</td>
+    </tr>
+    <tr>
+      <td class="reference">
+        <b id="RFC6437">[RFC6437]</b>
+      </td>
+      <td class="top"><a>Amante, S.</a>, <a>Carpenter, B.</a>, <a>Jiang, S.</a> and <a>J. Rajahalme</a>, "<a href="http://tools.ietf.org/html/rfc6437">IPv6 Flow Label Specification</a>", RFC 6437, November 2011.</td>
+    </tr>
+    <tr>
+      <td class="reference">
+        <b id="RFC6620">[RFC6620]</b>
+      </td>
+      <td class="top"><a>Nordmark, E.</a>, <a>Bagnulo, M.</a> and <a>E. Levy-Abegnoli</a>, "<a href="http://tools.ietf.org/html/rfc6620">FCFS SAVI: First-Come, First-Served Source Address Validation Improvement for Locally Assigned IPv6 Addresses</a>", RFC 6620, May 2012.</td>
+    </tr>
+    <tr>
+      <td class="reference">
+        <b id="RFC7217">[RFC7217]</b>
+      </td>
+      <td class="top"><a>Gont, F.</a>, "<a href="http://tools.ietf.org/html/rfc7217">A Method for Generating Semantically Opaque Interface Identifiers with IPv6 Stateless Address Autoconfiguration (SLAAC)</a>", RFC 7217, April 2014.</td>
+    </tr>
+    <tr>
+      <td class="reference">
+        <b id="RFC7219">[RFC7219]</b>
+      </td>
+      <td class="top"><a>Bagnulo, M.</a> and <a>A. Garcia-Martinez</a>, "<a href="http://tools.ietf.org/html/rfc7219">SEcure Neighbor Discovery (SEND) Source Address Validation Improvement (SAVI)</a>", RFC 7219, May 2014.</td>
+    </tr>
+    <tr>
+      <td class="reference">
+        <b id="RFC7348">[RFC7348]</b>
+      </td>
+      <td class="top"><a>Mahalingam, M.</a>, <a>Dutt, D.</a>, <a>Duda, K.</a>, <a>Agarwal, P.</a>, <a>Kreeger, L.</a>, <a>Sridhar, T.</a>, <a>Bursell, M.</a> and <a>C. Wright</a>, "<a href="http://tools.ietf.org/html/rfc7348">Virtual eXtensible Local Area Network (VXLAN): A Framework for Overlaying Virtualized Layer 2 Networks over Layer 3 Networks</a>", RFC 7348, August 2014.</td>
+    </tr>
+    <tr>
+      <td class="reference">
+        <b id="UCC">[UCC]</b>
+      </td>
+      <td class="top"><a>Jeuk, S.</a>, <a>Szefer, J.</a> and <a>S. Zhou</a>, "<a>Towards Cloud, Service and Tenant Classification for Cloud Computing</a>", IEEE Xplore Digital Library: Cluster, Cloud and Grid Computing (CCGrid), 2014 14th IEEE/ACM International Symposium, May 2014.</td>
+    </tr>
+  </tbody>
+</table>
+<h1 id="rfc.appendix.A"><a href="#rfc.appendix.A">Appendix A.</a> <a href="#log" id="log">Change Log</a></h1>
+<p/>
+
+<dl>
+  <dt>Initial Version:</dt>
+  <dd style="margin-left: 8">October 2014</dd>
+  <dt>First update:</dt>
+  <dd style="margin-left: 8">January 2015</dd>
+</dl>
+<h1 id="rfc.appendix.B"><a href="#rfc.appendix.B">Appendix B.</a> <a href="#label-appendix" id="label-appendix">Alternative Labels considered</a></h1>
+<p id="rfc.section.B.p.1">Several different approaches have been proposed to labeling packets.  The one we are prototyping first is <a href="#B-label-IID">Appendix B.5</a>.</p>
+<p id="rfc.section.B.p.2">A use case that is primary in our thinking is shown in xref target="use-case-1"/&gt;.</p>
+<div id="rfc.figure.3"/>
+<div id="use-case-1"/>
+<pre>
+	
+                       ,---------.
+                     ,'Tenant A's `.
+                    (  Home Network )
+                     `.           ,'
+                       `----+----'
+                            |  2001:db8:3::/48
+                   ,--------+--------.
+Data Center       (   "the Internet"  )   Data Center
+2001:db8:1::/48    `-----+------+----'    2001:db8:2::/48
+            ,-----.     /        \     ,-----.
+          ,'       `.  /          \  ,'       `.
+         /           \/            \/           \
+        /  ,-------.  \            /  ,-------.  \
+       / ,'Tenant A `. \          / ,'Tenant A `. \
+      / (  0xA12345   ) \        / (  0xC12345   ) \
+     ;   `.         ,'   :      ;   `.         ,'   :
+     |     `-------'     |      |     `-------'     |
+     |                   |      |                   |
+     |     ,-------.     |      |     ,-------.     |
+     :   ,'Tenant B `.   ;      :   ,'Tenant C `.   ;
+      \ (  0xB12345   ) /        \ (  0xA12345   ) /
+       \ `.         ,' /          \ `.         ,' /
+        \  `-------'  /            \  `-------'  /
+         \           /              \           /
+          `.       ,'                `.       ,'
+            '-----'                    '-----' 
+
+	</pre>
+<p class="figure">Figure 3: Multi-site Multi-administration data center application</p>
+<p id="rfc.section.B.p.3">In this use case, there exist two data centers that one might presume are operated by different entities. The two data centers use separate address spaces, 2001:db8:1::/48 and 2001:db8:2::/48. One tenant (which is to say, a set of systems, virtual or physical, that normally communicate with each other), Tenant A, is spread across the two data centers, and has a different Tenant ID in each of them. One administration has an additional tenant, Tenant B, and the other also has an additional tenant, Tenant C. For the sake of amusement, we presume that Tenant C, in the right data center, has the same tenant ID as Tenant A uses in the left data center. Additionally, Tenant A has a "home site" that is authorized to communicate with its data center systems.</p>
+<p id="rfc.section.B.p.4">From the perspective of communication management, therefore, to connect Tenant A to itself and deny all other communications, we need four filter rules: </p>
+
+<ul>
+  <li>Permit messages from/to 2001:db8:1::/48 with tenant ID 0xA12345,</li>
+  <li>Permit messages from/to 2001:db8:2::/48 with tenant ID 0xC12345,</li>
+  <li>Permit messages from/to 2001:db8:3::/48</li>
+  <li>Deny everything else</li>
+</ul>
+<p id="rfc.section.B.p.5">Ideally, one would like to apply those rules to the destination address at the sender of a packet, and the source address at the receiver of a packet. And one would like to do so in a manner that minimizes the possibility of disruptive packet filtering such as discussed in <a href="#I-D.gont-v6ops-ipv6-ehs-in-real-world">[I-D.gont-v6ops-ipv6-ehs-in-real-world]</a>.</p>
+<p id="rfc.section.B.p.6">In addition, one wants a BCP-38 filter, ensuring that packets sent by a system (virtual or physical) uses only one of the source addresses it is supposed to be using.</p>
+<h1 id="rfc.appendix.B.1"><a href="#rfc.appendix.B.1">B.1.</a> <a href="#B-label-2460" id="B-label-2460">IPv6 Flow Label</a></h1>
+<p id="rfc.section.B.1.p.1">The IPv6 flow label may be used to identify a tenant or part of a tenant, and to facilitate access control based on the flow label value. The flow label is a flat 20 bits, facilitating the designation of 2^20 (1,048,576) tenants without regard to their location.  1,048,576 is less than infinity, but compared to current data centers is large, and much simpler to manage.</p>
+<p id="rfc.section.B.1.p.2">Note that this usage differs from the current <a href="#RFC6437">IPv6 Flow Label Specification</a> <cite title="NONE">[RFC6437]</cite>. It also differs from the use of a flow label recommended by the <a href="#RFC2460">IPv6 Specification</a> <cite title="NONE">[RFC2460]</cite>, and the respective usages of the flow label in the <a href="#RFC2205">Resource ReSerVation Protocol</a> <cite title="NONE">[RFC2205]</cite> and the previous <a href="#RFC3697">IPv6 Flow Label Specification</a> <cite title="NONE">[RFC3697]</cite>, and the projected usage in <a href="#RFC5548">Low-Power and Lossy Networks</a> <cite title="NONE">[RFC5548]</cite><a href="#RFC5673">[RFC5673]</a>. Within a target domain, the usage may be specified by the domain. That is the viewpoint taken in this specification.</p>
+<h1 id="rfc.appendix.B.1.1"><a href="#rfc.appendix.B.1.1">B.1.1.</a> Metaconsiderations</h1>
+<h1 id="rfc.appendix.B.1.1.1"><a href="#rfc.appendix.B.1.1.1">B.1.1.1.</a> Service offered</h1>
+<p id="rfc.section.B.1.1.1.p.1">To Be Supplied</p>
+<h1 id="rfc.appendix.B.1.1.2"><a href="#rfc.appendix.B.1.1.2">B.1.1.2.</a> Pros and Cons</h1>
+<h1 id="rfc.appendix.B.1.1.2.1"><a href="#rfc.appendix.B.1.1.2.1">B.1.1.2.1.</a> The case in favor of this approach</h1>
+<p id="rfc.section.B.1.1.2.1.p.1">To Be Supplied</p>
+<h1 id="rfc.appendix.B.1.1.2.2"><a href="#rfc.appendix.B.1.1.2.2">B.1.1.2.2.</a> The case against</h1>
+<p id="rfc.section.B.1.1.2.2.p.1">To Be Supplied</p>
+<h1 id="rfc.appendix.B.1.1.3"><a href="#rfc.appendix.B.1.1.3">B.1.1.3.</a> Filtering considerations</h1>
+<p id="rfc.section.B.1.1.3.p.1">To Be Supplied</p>
+<h1 id="rfc.appendix.B.2"><a href="#rfc.appendix.B.2">B.2.</a> <a href="#B-label-federated" id="B-label-federated">Federated Identity</a></h1>
+<h1 id="rfc.appendix.B.2.1"><a href="#rfc.appendix.B.2.1">B.2.1.</a> Introduction</h1>
+<p id="rfc.section.B.2.1.p.1">In the course of developing draft-baker-ipv6-openstack-model, it was determined that a way was needed to encode a federated identity for use in Role-Based Access Control. This appendix describes an <a href="#RFC2460">IPv6</a> <cite title="NONE">[RFC2460]</cite> option that could be carried in the Hop-by-Hop or Destination Options Header. The format of an option is defined in section 4.2 of that document, and the Hop-by-Hop and Destination Options are defined in sections 4.3 and 4.6 of that document respectively.</p>
+<p id="rfc.section.B.2.1.p.2">A 'Federated Identity', in the words of the Wikipedia, 'is the means of linking an electronic identity and attributes, stored across multiple distinct identity management systems.' In this context, it is a fairly weak form of that; it is intended for quick interpretation in an access list at the Internet layer as opposed to deep analysis for login or other security purposes at the application layer, and rather than identifying an individual or a system, it identifies a set of systems whose members are authorized to communicate freely among themselves and may also be authorized to communicate with other identified sets of systems. Either two systems are authorized to communicate or they are not, and unauthorized traffic can be summarily discarded. The identifier is defined in a hierarchical fashion, for flexibility and scalability.</p>
+<p id="rfc.section.B.2.1.p.3">'Role-Based Access Control', in this context, applies to groups of virtual or physical hosts, not individuals. In the simplest case, the several tenants of a multi-tenant data center might be identified, and authorized to communicate only with other systems within the same 'tenant' or with identified systems in other tenants that manage external access. One could imagine a company purchasing cloud services from multiple data center operators, and as a result wanting to identify the systems in its tenant in one cloud service as being authorized to communicate with the systems its tenant of the other. One could further imagine a given department within that company being authorized to speak only with itself and an identified set of other departments within the same company. To that end, when a datagram is sent, it is tagged with the federated identify of the sender (e.g., {datacenter, client, department}), and the receiving system filters traffic it receives to limit itself to a specific set of authorized communicants.</p>
+<h1 id="rfc.appendix.B.2.2"><a href="#rfc.appendix.B.2.2">B.2.2.</a> <a href="#B-sect2" id="B-sect2">Federated identity Option</a></h1>
+<p id="rfc.section.B.2.2.p.1">The option is defined as a sequence of numbers that identify relevant parties hierarchically. The specific semantics (as in, what number identifies what party) are beyond the scope of this specification, but they may be interpreted as being successively more specific; as shown in <a href="#B-hierarchical">Figure 4</a>, the first might identify a cloud operator, the second, if present, might identify a client of that operator, and the third, if present, might identify a subset of that client's systems. In an application entirely used by Company A, there might be only one number, and it would identify sets of systems important to Company A such as business units. If Company A uses the services of a multi-tenant data center #1, it might require that there be two numbers, identifying Company A and its internal structure. If Company A uses the services of both multi-tenant data centers #1 and #2, and they are federated, the identifier might need to identify the data center, the client, and the structure of the client.</p>
+<div id="rfc.figure.4"/>
+<div id="B-hierarchical"/>
+<pre>
+                   _.----------------------.
+           _.----''                         `------.
+      ,--''                                         `---.
+   ,-' DataCenter      .---------------------.           `-.
+ ,'    Company #2,---''      Unauthorized     `----.        `.
+;              ,' ,-----+-----.        ,--+--------.`.        :
+|             (  ( Department 1)--//--( Department 2) )       |
+;              `. `-----+----+'        `-----------','        |
+ `.              `----. |     X Company A     _.---'        ,'
+   '-.                 A|------X------------''           ,-'
+      `---.            u|       X                   _.--'
+           `------.    t|        X          _.----''
+                   `---h|---------X-------''
+                       o|          X
+                   _.--r+-----------X------.
+           _.----''    i|            X      `------.
+      ,--''            z|             X             `---.
+   ,-' DataCenter      e|--------------X-----.           `-.
+ ,'    Company #2,---''d|               X     `----.        `.
+;              ,' ,-----+-----.        ,-+---------.`.        :
+|             (  ( Department 1)      ( Department 2) )       |
+;              `. `-----------'        `-----------','        |
+ `.              `----.     Company A         _.---'        ,'
+   '-.                 `--------------------''           ,-'
+      `---.                                         _.--'
+           `------.                         _.----''
+                   `----------------------''
+</pre>
+<p class="figure">Figure 4: Use case: Identifying authorized communicatants in an RBAC environment</p>
+<h1 id="rfc.appendix.B.2.2.1"><a href="#rfc.appendix.B.2.2.1">B.2.2.1.</a> <a href="#B-format" id="B-format">Option Format</a></h1>
+<p id="rfc.section.B.2.2.1.p.1">A number (<a href="#B-number">Figure 5</a>) is represented as a base 128 number whose coefficients are stored in the lower 7 bits of a string of bytes. The upper bit of each byte is zero, except in the final byte, in which case it is 1. The most significant coefficient of a non-zero number is never zero.</p>
+<div id="rfc.figure.5"/>
+<div id="B-number"/>
+<pre>
+8 = 8*128^0
++-+------+
+|1|    8 |
++-+------+
+
+987 = 7*128^1 + 91*128^0
++-+------+-+------+
+|0|    7 |1|   91 |
++-+------+-+------+
+
+121393 = 7*128^2 + 52*128^1 + 49*128^0
++-+------+-+------+-+------+
+|0|    7 |0|   52 |1|   49 |
++-+------+-+------+-+------+
+</pre>
+<p class="figure">Figure 5: Sample numbers</p>
+<p id="rfc.section.B.2.2.1.p.2">The identifier {8, 987, 121393} looks like</p>
+<div id="rfc.figure.6"/>
+<div id="B-identifier"/>
+<pre>
++-------+-------+-+-----+-+-----+-+-----+-+-----+-+-----+-+-----+
+| type  | len=6 |1|   8 |0|   7 |1|  91 |0|   7 |0|  52 |1|  49 |
++-------+-------+-+-----+-+-----+-+-----+-+-----+-+-----+-+-----+
+</pre>
+<p class="figure">Figure 6</p>
+<h1 id="rfc.appendix.B.2.2.1.1"><a href="#rfc.appendix.B.2.2.1.1">B.2.2.1.1.</a> <a href="#B-destopt" id="B-destopt">Use in the Destination Options Header</a></h1>
+<p id="rfc.section.B.2.2.1.1.p.1">In an environment in which the validation of the option only occurs in the receiving system or its hypervisor, this option is best placed in the Destination Options Header.</p>
+<h1 id="rfc.appendix.B.2.2.1.2"><a href="#rfc.appendix.B.2.2.1.2">B.2.2.1.2.</a> <a href="#B-hopbyhop" id="B-hopbyhop">Use in the Hop-by-Hop Header</a></h1>
+<p id="rfc.section.B.2.2.1.2.p.1">In an environment in which the validation of the option occurs in transit, such as in a firewall or other router, this option is best placed in the Hop-by-Hop Header.</p>
+<h1 id="rfc.appendix.B.2.3"><a href="#rfc.appendix.B.2.3">B.2.3.</a> Metaconsiderations</h1>
+<h1 id="rfc.appendix.B.2.3.1"><a href="#rfc.appendix.B.2.3.1">B.2.3.1.</a> Service offered</h1>
+<p id="rfc.section.B.2.3.1.p.1">To Be Supplied</p>
+<h1 id="rfc.appendix.B.2.3.2"><a href="#rfc.appendix.B.2.3.2">B.2.3.2.</a> Pros and Cons</h1>
+<h1 id="rfc.appendix.B.2.3.2.1"><a href="#rfc.appendix.B.2.3.2.1">B.2.3.2.1.</a> The case in favor of this approach</h1>
+<p id="rfc.section.B.2.3.2.1.p.1">To Be Supplied</p>
+<h1 id="rfc.appendix.B.2.3.2.2"><a href="#rfc.appendix.B.2.3.2.2">B.2.3.2.2.</a> The case against</h1>
+<p id="rfc.section.B.2.3.2.2.p.1">To Be Supplied</p>
+<h1 id="rfc.appendix.B.2.3.3"><a href="#rfc.appendix.B.2.3.3">B.2.3.3.</a> Filtering considerations</h1>
+<p id="rfc.section.B.2.3.3.p.1">To Be Supplied</p>
+<h1 id="rfc.appendix.B.3"><a href="#rfc.appendix.B.3">B.3.</a> <a href="#Appendix_UCC" id="Appendix_UCC">Universal Cloud Classification</a></h1>
+<h1 id="rfc.appendix.B.3.1"><a href="#rfc.appendix.B.3.1">B.3.1.</a> <a href="#UCC_Intro" id="UCC_Intro">Introduction</a></h1>
+<p id="rfc.section.B.3.1.p.1">Cloud environments suffer from ambiguity in identifying their services and tenants. Traffic from different cloud providers cannot be distinguished easily on the Internet. Filters are simply not able to obtain the provider, service and tenant identities from network packets without leveraging other more latency intense inspection methods. This appendix describes the Universal Cloud Classification (UCC) <a href="#UCC">[UCC]</a> approach as a way to identify cloud providers, their services and tenants on the network layer. It introduces a Cloud-ID, Service-ID and Tenant-ID. The IDs are incorporated into an IPv6 extension header and can be used for different use-cases both within and outside a Cloud Environment. The format of the IDs and their characteristics are defined in <a href="#UCC_Options">Appendix B.3.2</a> of the document and the extension header is defined in <a href="#UCC_Extensions_Header">Appendix B.3.3</a>.</p>
+<p id="rfc.section.B.3.1.p.2">Applications and users are defined in many different ways in cloud environments, therefore ambiguity is multifold:</p>
+
+<ol>
+  <li>The first ambiguity is described by how a service is defined in cloud environments. Here, an application within a Cloud Provider is called a service. However, the cloud providers network can not distinguish services from services run on top of other services. Distinguishing sub-services hosted by a service becomes critical when applying network services to specific sub-services.</li>
+  <li>Secondly, a tenant in a cloud provider can have different meanings. Here, tenant is used to define a consumer of a cloud service. At the same time a service run on top of another service can be considered a tenant of that particular service.  These ambiguities make it extremely difficult to uniquely identify services and their tenants in cloud environments. This multi-layered service and tenant relationship is one of the most complex tasks to handle using existing technologies.</li>
+</ol>
+<p id="rfc.section.B.3.1.p.3">A service can be defined as a group of entities offering a specific function to a tenant within a Cloud Provider.</p>
+<h1 id="rfc.appendix.B.3.2"><a href="#rfc.appendix.B.3.2">B.3.2.</a> <a href="#UCC_Options" id="UCC_Options">Universal Cloud Classification Options</a></h1>
+<p id="rfc.section.B.3.2.p.1">Three IDs are defined that classify a Tenant specific to the service used within a certain Cloud Provider. The Cloud-ID, Service-ID and Tenant-ID are defined hierarchically and support service-stacking. The IDs are based on the 'Digital Object Identifier' scheme and support incorporating metadata per ID. The ID can be of variable length but Cloud-ID, Service-ID and Tenant-ID are proposed within a 4 byte, 6 byte and 6 byte tuple respectively.</p>
+<h1 id="rfc.appendix.B.3.2.1"><a href="#rfc.appendix.B.3.2.1">B.3.2.1.</a> <a href="#UCC_Cloud_ID" id="UCC_Cloud_ID">Cloud ID</a></h1>
+<p id="rfc.section.B.3.2.1.p.1">The Cloud ID is a globally unique ID that is managed by a registrar similar to DNS. It is 4 bytes in sizes and defined with a 10 bit location part and a 22 bit provider ID.</p>
+<h1 id="rfc.appendix.B.3.2.2"><a href="#rfc.appendix.B.3.2.2">B.3.2.2.</a> <a href="#UCC_Service_ID" id="UCC_Service_ID">Service ID</a></h1>
+<p id="rfc.section.B.3.2.2.p.1">The Service ID is used to identify a service both within and outside a cloud environment. It is a 6 byte long ID that is separated into several sub-IDs defining the data center, service and an option field. The Data Center location is defined by 8 bits, the Service is 32 bits long and the Option field provides another 8 bits. The option bits can be used to incorporate information used for en-route or destination tasks.</p>
+<h1 id="rfc.appendix.B.3.2.3"><a href="#rfc.appendix.B.3.2.3">B.3.2.3.</a> <a href="#UCC_Tenant_ID" id="UCC_Tenant_ID">Tenant ID</a></h1>
+<p id="rfc.section.B.3.2.3.p.1">The Tenant-ID is classifying consumers (tenants) of Cloud Services. It is a 6 byte long ID that is defined and managed by the Cloud Provider. Similar to the Service-ID the Tenant-ID incorporates metadata specific to that tenant. The MetaData field is of variable length and can be defined by the Cloud Provider as needed.</p>
+<h1 id="rfc.appendix.B.3.3"><a href="#rfc.appendix.B.3.3">B.3.3.</a> <a href="#UCC_Extensions_Header" id="UCC_Extensions_Header">UCC Extension Header</a></h1>
+<div id="rfc.figure.7"/>
+<div id="UCCheader"/>
+<pre>
+0       8       16      24      32      40      48      56      64
++-------+-------+-------+-------+-------+-------+-------+-------+
+| FLAG  |  SIZE |    CLOUD-ID                   |  FLAG | SIZE  |
++-------+-------+-------+-------+-------+-------+-------+-------+
+|                    SERVICE-ID                 |  FLAG | SIZE  |
++-------+-------+-------+-------+-------+-------+-------+-------+
+|                    TENANT-ID                  |
++-------+-------+-------+-------+-------+-------+
+         </pre>
+<p class="figure">Figure 7: UCC IPv6 hop-by-hop extension header</p>
+<p id="rfc.section.B.3.3.p.1">The UCC proposal <a href="#UCC">[UCC]</a> defines an IPv6 hop-by-hop extension header to incorporate the Cloud-ID, Service-ID and Tenant-ID. Each ID area also includes bits to define enroute behavior for devices understanding/not-understanding the newly defined hop-by-hop extension header. This is useful for legacy devices on the Internet to avoid drops the packet but forward it without processing the added IPv6 extension header. </p>
+<h1 id="rfc.appendix.B.4"><a href="#rfc.appendix.B.4">B.4.</a> <a href="#B-label-segment-routing" id="B-label-segment-routing">Policy List in Segment Routing Header</a></h1>
+<p id="rfc.section.B.4.p.1">The model here suggests using the Policy List described in the <a href="#I-D.previdi-6man-segment-routing-header">IPv6 Segment Routing Header</a> <cite title="NONE">[I-D.previdi-6man-segment-routing-header]</cite>. Technically, it would violate that specification, as the Policy List is described as containing a set of optional addresses representing specific nodes in the SR path, where in this case it would be a 128 bit number identifying the tenant or other set of communicating nodes.</p>
+<h1 id="rfc.appendix.B.4.1"><a href="#rfc.appendix.B.4.1">B.4.1.</a> Metaconsiderations</h1>
+<h1 id="rfc.appendix.B.4.1.1"><a href="#rfc.appendix.B.4.1.1">B.4.1.1.</a> Service offered</h1>
+<p id="rfc.section.B.4.1.1.p.1">To Be Supplied</p>
+<h1 id="rfc.appendix.B.4.1.2"><a href="#rfc.appendix.B.4.1.2">B.4.1.2.</a> Pros and Cons</h1>
+<h1 id="rfc.appendix.B.4.1.2.1"><a href="#rfc.appendix.B.4.1.2.1">B.4.1.2.1.</a> The case in favor of this approach</h1>
+<p id="rfc.section.B.4.1.2.1.p.1">To Be Supplied</p>
+<h1 id="rfc.appendix.B.4.1.2.2"><a href="#rfc.appendix.B.4.1.2.2">B.4.1.2.2.</a> The case against</h1>
+<p id="rfc.section.B.4.1.2.2.p.1">To Be Supplied</p>
+<h1 id="rfc.appendix.B.4.1.3"><a href="#rfc.appendix.B.4.1.3">B.4.1.3.</a> Filtering considerations</h1>
+<p id="rfc.section.B.4.1.3.p.1">To Be Supplied</p>
+<h1 id="rfc.appendix.B.5"><a href="#rfc.appendix.B.5">B.5.</a> <a href="#B-label-IID" id="B-label-IID">RFC 4291 Interface Identifier (IID)</a></h1>
+<p id="rfc.section.B.5.p.1">The approach starts from the observation that Openstack assigns the MAC address used by a VM, and can assign it according to any algorithm it chooses. A desire has been expressed to put the tenant identifier into the IPv6 address. This would put it into the IID in that address without modifying the VM OS or the virtual switch.</p>
+<h1 id="rfc.appendix.B.5.1"><a href="#rfc.appendix.B.5.1">B.5.1.</a> <a href="#address-format" id="address-format">Address Format</a></h1>
+<p id="rfc.section.B.5.1.p.1">The proposed address format is identical to the IPv6 <a href="#RFC4291">EUI-48 based Address</a> <cite title="NONE">[RFC4291]</cite>, and is derived from the MAC address space specified in <a href="#RFC4862">SLAAC</a> <cite title="NONE">[RFC4862]</cite>. However, the MAC address provided by the OpenStack Controller differs from an IEEE 802.3 MAC Address.</p>
+<p id="rfc.section.B.5.1.p.2">Walking through the details, an IEEE 802.3 MAC Address (<a href="#MAC">Figure 8</a>) consists of two single bit fields, a 22 bit Organizationally Unique Identifier (OUI), and a serial number or other NIC-specific identifier. The intention is to create a globally unique address, so that the NIC may be used on any LAN in the world without colliding with other addresses.</p>
+<div id="rfc.figure.8"/>
+<div id="MAC"/>
+<pre>
+ 0       8       16      24      32      40
++-------+-------+-------+-------+-------+-------+
+|Organizationally Unique|  NIC Specific Number  |
+| Identifier (OUI)      |                       |
++-------+-------+-------+-------+-------+-------+
+      AA
+      |+--- 0=Unicast/1=Multicast
+      +---- 1=Local/0=Global
+ </pre>
+<p class="figure">Figure 8: Ethernet MAC Address as specified by IEEE 802.3</p>
+<p><a href="#RFC4291">[RFC4291]</a> describes a transformation from that address (which it refers to as an EUI-48 address) to the IID of an IPv6 Address (<a href="#addr4291">Figure 9</a>).</p>
+<div id="rfc.figure.9"/>
+<div id="addr4291"/>
+<pre>
+ 0       8       16      24      32      40      48      56
++-------+-------+-------+-------+-------+-------+-------+-------+
+|Organizationally Unique| Fixed Value   |  NIC Specific Number  |
+| Identifier (OUI)      |               |                       |
++-------+-------+-------+-------+-------+-------+-------+-------+
+      AA
+      |+--- Reserved
+      +---- 0=Local/1=Global
+ </pre>
+<p class="figure">Figure 9: RFC 4291 IPv6 Address</p>
+<p id="rfc.section.B.5.1.p.4">OpenStack today specifies a local IEEE 802.3 address (bit 6 is one). IPv6 addresses are either installed using DHCP or derived from the MAC address via SLAAC.</p>
+<p id="rfc.section.B.5.1.p.5">One could imagine the MAC address used in an OpenStack environment including both a tenant identifier and a system number on a LAN. If the tenant identifier is 24 bits (it could be longer or shorter, but for this document it is treated as 24 bits), as in common in VxLAN and QinQ implementations, that would allow for a 22 bit system number, plus two magic bits specifying a locally defined unicast address, as shown in <a href="#TenantMAC">Figure 10</a>.  Alternatively, the first byte could be some specified values such as 0xFA (as is common with current OpenStack implementations), followed by a 16 bit system number within the subnet.</p>
+<div id="rfc.figure.10"/>
+<div id="TenantMAC"/>
+<pre>
+ 0       8       16      24      32      40    47
++-------+-------+-------+-------+-------+-------+
+|System Number within   | Openstack Tenant      |
+|    LAN                | Identifier            |
++-------+-------+-------+-------+-------+-------+
+      AA
+      |+--- 0=Unicast/1=Multicast
+      +---- 1=Local/0=Global
+ </pre>
+<p class="figure">Figure 10: Ethernet MAC Address as installed by OpenStack</p>
+<p id="rfc.section.B.5.1.p.6">After being passed through SLAAC, that results in an IID that contains the Tenant ID in bits 48..63, has bit 6 zero as a locally-specified unicast address, and a 22 bit system number, as in <a href="#SLAACIPv6">Figure 11</a>.</p>
+<div id="rfc.figure.11"/>
+<div id="SLAACIPv6"/>
+<pre>
+ 0       8       16      24      32      40      48      56    63
++-------+-------+-------+-------+-------+-------+-------+-------+
+|system number within   | Fixed Value   |  24 bit OpenStack     |
+| LAN                   |               |  Tenant Identifier    |
++-------+-------+-------+-------+-------+-------+-------+-------+
+      AA
+      |+--- Reserved
+      +---- 0=Local/1=Global
+ </pre>
+<p class="figure">Figure 11: RFC 4291 IPv6 IID Derived from OpenStack MAC Address</p>
+<p id="rfc.section.B.5.1.p.7">More generally, if SLAAC is not in use and addresses are conveyed using DHCPv6 or another technology, the IID would be as described in <a href="#TenantIPv6">Figure 12</a>.</p>
+<div id="rfc.figure.12"/>
+<div id="TenantIPv6"/>
+<pre>
+ 0       8       16      24      32      40      48      56    63
++-------+-------+-------+-------+-------+-------+-------+-------+
+|        system number within LAN       |  24 bit OpenStack     |
+|                                       |  Tenant Identifier    |
++-------+-------+-------+-------+-------+-------+-------+-------+
+      AA
+      |+--- Reserved
+      +---- 0=Local/1=Global
+ </pre>
+<p class="figure">Figure 12: Generalized Tenant IID</p>
+<p id="rfc.section.B.5.1.p.8">As noted, the Tenant Identifier might be longer or shorter in a given implementation. Specifically in <a href="#TenantIPv6">Figure 12</a>, a 32 bit Tenant ID would occupy bit positions 32..63, and a 16 bit Tenant ID would occupy positions 48..63.</p>
+<p id="rfc.section.B.5.1.p.9">Following the same model, IPv6 Multicast Addresses can be associated with a tenant identifier by placing the tenant identifier in the same set of bits and using the remaining bits of the Multicast Group ID as the ID within the tenant as show in <a href="#TenantMulticast">Figure 13</a>. Flags and scope are as specified in <a href="#RFC4291">[RFC4291]</a> section 2.7. To avoid clashes with multicast addresses specified in ibid 2.7.1 and future allocations, The Tenant Group ID MUST NOT be zero.</p>
+<div id="rfc.figure.13"/>
+<div id="TenantMulticast"/>
+<pre>
+|   8    |  4 |  4 |           88 bits               24 bits     |
++------ -+----+----+-----------------------------+---------------+
+|11111111|flgs|scop|        Tenant Group ID      |  Tenant ID    |
++--------+----+----+-----------------------------+---------------+
+ </pre>
+<p class="figure">Figure 13: RFC 4291 Multicast Address with Tenant ID</p>
+<h1 id="rfc.appendix.B.5.2"><a href="#rfc.appendix.B.5.2">B.5.2.</a> Metaconsiderations</h1>
+<h1 id="rfc.appendix.B.5.2.1"><a href="#rfc.appendix.B.5.2.1">B.5.2.1.</a> Service offered</h1>
+<p id="rfc.section.B.5.2.1.p.1">The fundamental service offered in this model is that the key policy parameter, the Tenant ID, is encoded in every datagram for both sender and receiver, and can therefore be tested by sender, receiver, or any other party. It is secure in the sense that it cannot be directly spoofed; in the sender vSwitch, the vSwitch prevents the sender from sending another address as discussed in <a href="#bcp38">Section 4</a>, and if the recipient address is a randomly chosen address, even if it meets inter-tenant communication policy, there is unlikely to be a matching destination to deliver it to. Where this breaks down is if a valid and acceptable destination is discovered and used; that is the argument for further protection via TLS.</p>
+<h1 id="rfc.appendix.B.5.2.2"><a href="#rfc.appendix.B.5.2.2">B.5.2.2.</a> Pros and Cons</h1>
+<h1 id="rfc.appendix.B.5.2.2.1"><a href="#rfc.appendix.B.5.2.2.1">B.5.2.2.1.</a> The case in favor of this approach</h1>
+<p id="rfc.section.B.5.2.2.1.p.1">The case in favor of this approach consists of several observations: </p>
+
+<ul>
+  <li>Many Cisco customers are using and prefer SLAAC for IPv6 clients in OpenStack environments.</li>
+  <li>It is easy to configure this IID from the Neutron Controller without modifying the VM, or it even knowing it happened.</li>
+  <li>From a security perspective, the tenant ID cannot be spoofed per se; the sender of a message is not permitted to send a message from the wrong address or to an unauthorized address.</li>
+  <li>Since it requires no extension headers or other encapsulations, it has no impact on Path MTU.</li>
+  <li>Filters can be applied anywhere, and notably at the sender and the receiver of a message.</li>
+</ul>
+<h1 id="rfc.appendix.B.5.2.2.2"><a href="#rfc.appendix.B.5.2.2.2">B.5.2.2.2.</a> The case against</h1>
+<p id="rfc.section.B.5.2.2.2.p.1">In <a href="#I-D.ietf-6man-default-iids">[I-D.ietf-6man-default-iids]</a>, the IETF is moving toward deprecating <a href="#RFC4291">[RFC4291]</a>'s Modified EUI-64 IID.</p>
+<h1 id="rfc.appendix.B.5.2.3"><a href="#rfc.appendix.B.5.2.3">B.5.2.3.</a> Filtering considerations</h1>
+<p id="rfc.section.B.5.2.3.p.1">In this model, the vSwitch needs, for each VM it manages, two access control lists: </p>
+
+<ul>
+  <li>Zero or more {IPv6 prefix, tenant ID} pairs; these may be read as 'if the IPv6 prefix matches {prefix}, the IID contains a tenant ID, and it may be {tenant ID}.'</li>
+  <li>Zero or more IPv6 prefixes that the VM is authorized to communicate without regard to tenant ID.</li>
+</ul>
+<p id="rfc.section.B.5.2.3.p.2">Generally speaking, one would expect at least one of those three lists to contain an entry - at minimum, the VM would be authorized to communicate with ::/0, which is to say 'anyone'.</p>
+<p id="rfc.section.B.5.2.3.p.3">Among the generic IPv6 prefixes that may be communicated with, there may be zero or more <a href="#RFC6052">IPv4-embedded IPv6 prefix</a> <cite title="NONE">[RFC6052]</cite> prefixes that the VM is permitted to communicate with. For example, if the <a href="#I-D.ietf-v6ops-siit-dc">[I-D.ietf-v6ops-siit-dc]</a> translation prefix is 2001:db8:0:1::/96, and the enterprise is using 192.0.2.0/24 as its IPv4 address, the filter would contain the prefix 2001:db8:0:1:0:0:c000:0200/120.</p>
+<p id="rfc.section.B.5.2.3.p.4">Note that the lists may also include multicast prefixes as specified in <a href="#address-format">Appendix B.5.1</a>, such as locally-scoped multicast ff01::/104 or locally-scoped multicast within the tenant {ff01::/16, tenant id} . While these access lists are applied in both directions (as a sender, what prefixes may the destination address contain, and as a receiver, what prefixes may the source address contain), only the destination address may contain multicast addresses. For multicast, therefore, the vSwitch should filter <a href="#RFC2710">Multicast Listener Discovery</a> <cite title="NONE">[RFC2710]</cite> using the multicast subset, permitting the VM to only join relevant multicast groups.</p>
+<h1 id="rfc.appendix.B.6"><a href="#rfc.appendix.B.6">B.6.</a> <a href="#B-5-label-Privacy-Address" id="B-5-label-Privacy-Address">Modified IID using modified Privacy Extension</a></h1>
+<p id="rfc.section.B.6.p.1">This variant reflects and builds on the <a href="#RFC4291">IPv6 Addressing Architecture</a> <cite title="NONE">[RFC4291]</cite> <a href="#RFC4862">Stateless Address Autoconfiguration</a> <cite title="NONE">[RFC4862]</cite>, and the associated <a href="#RFC4941">Privacy Extensions</a> <cite title="NONE">[RFC4941]</cite>. The address format is identical to that of <a href="#B-label-IID">Appendix B.5</a>, with the exception that The 'System Number within the LAN' is a random number determined by the host rather than being specified by the controller.</p>
+<p id="rfc.section.B.6.p.2">It does have implications, however. It will require </p>
+
+<ul>
+  <li>a modification to <a href="#RFC4941">[RFC4941]</a> to have the host include the Tenant ID in the IID,</li>
+  <li>a means to inform the host of the Tenant ID,</li>
+  <li>a means to inform the vSwitch of the Tenant ID,</li>
+  <li>a the vSwitch to follow <a href="#RFC6620">FCFS SAVI</a> <cite title="NONE">[RFC6620]</cite> to learn the addresses being used by the host, and</li>
+  <li>a filter to prevent FCFS SAVI from learning addresses that have the wrong Tenant ID.</li>
+</ul>
+<h1 id="rfc.appendix.B.6.1"><a href="#rfc.appendix.B.6.1">B.6.1.</a> Metaconsiderations</h1>
+<h1 id="rfc.appendix.B.6.1.1"><a href="#rfc.appendix.B.6.1.1">B.6.1.1.</a> Service offered</h1>
+<p id="rfc.section.B.6.1.1.p.1">To Be Supplied</p>
+<h1 id="rfc.appendix.B.6.1.2"><a href="#rfc.appendix.B.6.1.2">B.6.1.2.</a> Pros and Cons</h1>
+<h1 id="rfc.appendix.B.6.1.2.1"><a href="#rfc.appendix.B.6.1.2.1">B.6.1.2.1.</a> The case in favor of this approach</h1>
+<p id="rfc.section.B.6.1.2.1.p.1">To Be Supplied</p>
+<h1 id="rfc.appendix.B.6.1.2.2"><a href="#rfc.appendix.B.6.1.2.2">B.6.1.2.2.</a> The case against</h1>
+<p id="rfc.section.B.6.1.2.2.p.1">To Be Supplied</p>
+<h1 id="rfc.appendix.B.6.1.3"><a href="#rfc.appendix.B.6.1.3">B.6.1.3.</a> Filtering considerations</h1>
+<p id="rfc.section.B.6.1.3.p.1">To Be Supplied</p>
+<h1 id="rfc.authors">
+  <a href="#rfc.authors">Authors' Addresses</a>
+</h1>
+<div class="avoidbreak">
+  <address class="vcard">
+	<span class="vcardline">
+	  <span class="fn">Fred Baker</span> (editor)
+	  <span class="n hidden">
+		<span class="family-name">Baker</span>
+	  </span>
+	</span>
+	<span class="org vcardline">Cisco Systems</span>
+	<span class="adr">
+	  
+	  <span class="vcardline">
+		<span class="locality">Santa Barbara</span>,  
+		<span class="region">California</span> 
+		<span class="code">93117</span>
+	  </span>
+	  <span class="country-name vcardline">USA</span>
+	</span>
+	<span class="vcardline">EMail: <a href="mailto:fred@cisco.com">fred@cisco.com</a></span>
+
+  </address>
+</div><div class="avoidbreak">
+  <address class="vcard">
+	<span class="vcardline">
+	  <span class="fn">Chris Marino</span> 
+	  <span class="n hidden">
+		<span class="family-name">Marino</span>
+	  </span>
+	</span>
+	<span class="org vcardline">Cisco Systems</span>
+	<span class="adr">
+	  
+	  <span class="vcardline">
+		<span class="locality">San Jose</span>,  
+		<span class="region">California</span> 
+		<span class="code">95134</span>
+	  </span>
+	  <span class="country-name vcardline">USA</span>
+	</span>
+	<span class="vcardline">EMail: <a href="mailto:chrmarin@cisco.com">chrmarin@cisco.com</a></span>
+
+  </address>
+</div><div class="avoidbreak">
+  <address class="vcard">
+	<span class="vcardline">
+	  <span class="fn">Ian Wells</span> 
+	  <span class="n hidden">
+		<span class="family-name">Wells</span>
+	  </span>
+	</span>
+	<span class="org vcardline">Cisco Systems</span>
+	<span class="adr">
+	  
+	  <span class="vcardline">
+		<span class="locality">San Jose</span>,  
+		<span class="region">California</span> 
+		<span class="code">95134</span>
+	  </span>
+	  <span class="country-name vcardline">USA</span>
+	</span>
+	<span class="vcardline">EMail: <a href="mailto:iawells@cisco.com">iawells@cisco.com</a></span>
+
+  </address>
+</div><div class="avoidbreak">
+  <address class="vcard">
+	<span class="vcardline">
+	  <span class="fn">Rohit Agarwalla</span> 
+	  <span class="n hidden">
+		<span class="family-name">Agarwalla</span>
+	  </span>
+	</span>
+	<span class="org vcardline">Cisco Systems</span>
+	<span class="adr">
+	  
+	  <span class="vcardline">
+		<span class="locality">San Jose</span>,  
+		<span class="region">California</span> 
+		<span class="code">95134</span>
+	  </span>
+	  <span class="country-name vcardline">USA</span>
+	</span>
+	<span class="vcardline">EMail: <a href="mailto:roagarwa@cisco.com">roagarwa@cisco.com</a></span>
+
+  </address>
+</div><div class="avoidbreak">
+  <address class="vcard">
+	<span class="vcardline">
+	  <span class="fn">Sebastian Jeuk</span> 
+	  <span class="n hidden">
+		<span class="family-name">Jeuk</span>
+	  </span>
+	</span>
+	<span class="org vcardline">Cisco Systems</span>
+	<span class="adr">
+	  
+	  <span class="vcardline">
+		<span class="locality">San Jose</span>,  
+		<span class="region">California</span> 
+		<span class="code">95134</span>
+	  </span>
+	  <span class="country-name vcardline">USA</span>
+	</span>
+	<span class="vcardline">EMail: <a href="mailto:sjeuk@cisco.com">sjeuk@cisco.com</a></span>
+
+  </address>
+</div><div class="avoidbreak">
+  <address class="vcard">
+	<span class="vcardline">
+	  <span class="fn">Gonzalo Salgueiro</span> 
+	  <span class="n hidden">
+		<span class="family-name">Salgueiro</span>
+	  </span>
+	</span>
+	<span class="org vcardline">Cisco Systems</span>
+	<span class="adr">
+	  
+	  <span class="vcardline">
+		<span class="locality">Research Triangle Park</span>,  
+		<span class="region">NC</span> 
+		<span class="code">27709</span>
+	  </span>
+	  <span class="country-name vcardline">US</span>
+	</span>
+	<span class="vcardline">EMail: <a href="mailto:gsalguei@cisco.com">gsalguei@cisco.com</a></span>
+
+  </address>
+</div>
+
+</body>
+</html>
