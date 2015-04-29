@@ -17,64 +17,64 @@ pi:
   symrefs: yes
 
 author:
-	-
-	ins: F. Baker
-	name: Fred Baker
-	role: editor
-	org: Cisco Systems
-	city: Santa Barbara
-	region: California
-	code: 93117
-	country: USA
-	email: fred@cisco.com
+	  -
+	    ins: F. Baker
+	    name: Fred Baker
+    	role: editor
+    	org: Cisco Systems
+    	city: Santa Barbara
+    	region: California
+    	code: 93117
+    	country: USA
+	    email: fred@cisco.com
 
-	-
-	ins: C. Marino
-	name: Chris Marino
-	org: Cisco Systems
-	city: San Jose
-	region: California
-	code: 95134
-	country: USA
-	email: chrmarin@cisco.com
+      -
+    	ins: C. Marino
+    	name: Chris Marino
+    	org: Cisco Systems
+    	city: San Jose
+		region: California
+		code: 95134
+		country: USA
+		email: chrmarin@cisco.com
 	
-	-
-	ins: I. Wells
-	name: Ian Wells
-	org: Cisco Systems
-	city: San Jose
-	region: California
-	code: 95134
-	email: iawells@cisco.com
+	  -
+	    ins: I. Wells
+    	name: Ian Wells
+    	org: Cisco Systems
+    	city: San Jose
+    	region: California
+    	code: 95134
+    	email: iawells@cisco.com
 
-	-
-	ins: R. Agarwalla
-	name: Rohit Agarwalla
-	org: Cisco Systems
-	city: San Jose
-	region: California
-	code: 95134
-	email: rogarwa@cisco.com
+	  -
+    	ins: R. Agarwalla
+		name: Rohit Agarwalla
+		org: Cisco Systems
+		city: San Jose
+		region: California
+		code: 95134
+		email: rogarwa@cisco.com
 
-	-
-	ins: S. Jeuk
-	name: Sebastian Jeuk
-	org: Cisco Systems
-	city: San Jose
-	region: California
-	code: 95134
-	country: USA
-	email: sjeuk@cisco.com
+      -
+		ins: S. Jeuk
+		name: Sebastian Jeuk
+		org: Cisco Systems
+		city: San Jose
+		region: California
+		code: 95134
+		country: USA
+		email: sjeuk@cisco.com
 
-	-
-	ins: G. Salgueiro
-	name: Gonzalo Salgueiro
-	org: Cisco Systems
-	city: Research Triangle Park
-	region: NC
-	code: 27709
-	country: US
-	email: gsalguei@cisco.com
+	  -
+	    ins: G. Salgueiro
+		name: Gonzalo Salgueiro
+		org: Cisco Systems
+		city: Research Triangle Park
+		region: NC
+		code: 27709
+		country: US
+		email: gsalguei@cisco.com
 	
 informative:
   Microsoft-Azure:
@@ -83,7 +83,7 @@ informative:
 	  ins: Y. Sverdlik
 	  name: Y. Sverdlik
 	  org: Data Center Knowledge
-	date: 2014-08  
+	date: 2014-08
 
 --- abstract
 
@@ -100,11 +100,11 @@ and operations.</t> </abstract>
 
 --- middle
 
-# Introduction {#introduction}
+# Introduction {: #introduction}
 
 OpenStack, and its issues.
 
-## What is OpenStack? {#projects}
+## What is OpenStack? {: #projects}
 
 OpenStack is a cloud computing orchestration solution developed using
 an open source community process. It consists of a collection of
@@ -155,8 +155,7 @@ tenants a layer 3 based network alternative.
 OpenStack uses Layer 3 and Layer 2 Linux utilities on hosts to provide
 protection against IP/MAC spoofing and ARP poisoning.
 
-## OpenStack Scaling Issues {#openstack-issues}
-
+## OpenStack Scaling Issues {: #openstack-issues}
 
 One of the fundamental requirements of OpenStack Networking (Neutron)
 is to provide scalable, isolated tenant networks. Today this is
@@ -194,11 +193,11 @@ that some large content providers, notably Google and <xref
 target="FaceBook-IPv6">Facebook</xref>, are going in exactly this
 direction.
      
-# Requirements {#require}
+# Requirements {: #require}
 
 In this section, we attempt to list critical requirements.
 
-## Design approach {#approach}
+## Design approach {: #approach}
 
 As a design approach, we presume an IPv6-only data center in a world
 that might have IPv4 or IPv6 clients outside of it. This design
@@ -221,8 +220,7 @@ technologies . However, all the details of the underlying technology
 and implementation details are completely transparent to the tenant
 itself.
 
-## Multiple Data Centers {#multicenter}
-
+## Multiple Data Centers {: #multicenter}
 
 A common requirement in network and data center operations is
 reliability, serviceability, and maintainability of their operations
@@ -232,7 +230,7 @@ implies multiple and at times duplicate data centers, and tenants
 stretched or able to be readily moved or recreated across multiple
 data centers.
 
-## Large Data Centers {#large}
+## Large Data Centers {: #large}
 
 Microsoft Azure {{Microsoft-Azure}} has purchased a 100 acre piece of
 land for the construction of a single data center.  In terms of
@@ -244,19 +242,18 @@ easily exhausts the 16M available RFC 1918 private addresses
 (i.e. 10.0.0.0/8) and explains the recent efforts by webscale cloud
 providers to deploy IPv6 throughout their new datacenters.
 
-## Multi-tenancy {#multitenant}
+## Multi-tenancy {: #multitenant}
 
 While it is possible that a single tenant would require a 100 acre
 data center, it would be unusual. In most such data centers, one would
 expect a large number of tenants.
 
-## Isolation {#isolation}
-
+## Isolation {: #isolation}
 
 Isolation is required between tenants, and at times between tenants
 hierarchically related to larger tenants.
 
-### Inter-tenant isolation {#interisolation}
+### Inter-tenant isolation {: #interisolation}
 
 A *tenant* is defined as a set of resources under common
 administrative control. It may be appropriate for tenants to
@@ -265,7 +262,7 @@ relationships among their owners or operators. However, unless
 specified otherwise, tenants are intended to operate as if they were
 on their own company's premises and be isolated from one another.
 
-### Intra-tenant isolation {#intraisolation}
+### Intra-tenant isolation {: #intraisolation}
 
 There are often security compartments within a corporate network, just
 as there are security barriers between companies. As a result, there
@@ -273,7 +270,7 @@ is a recursive isolation requirement: it must be possible to isolate
 an identified part of a tenant (which we also think of as a tenant)
 from another part of the same tenant.
 
-## Operational Simplicity {#requirement5}
+## Operational simplicity {: #requirement5}
 
 To the extent possible (and, for operators, the concept will bring a
 smile), operation of a multi-location multi-tenant data center, and
@@ -288,99 +285,89 @@ machines in a federated multiple data center application.
 Additionally, this same operational model should scale from running a
 single tenant up to many thousands of tenants.
 
+## Address space {: #requirement8}
 
-      <section anchor="requirement8" title="Address space ">
-        As described in <xref target="projects"/>, currently, an OpenStack
-        tenant is required to specify a Subnet's CIDR prefix for IP address
-        allocation. With this proposal, this is no longer required.
-      </section>
+As described in <xref target="projects"/>, currently, an OpenStack
+tenant is required to specify a Subnet's CIDR prefix for IP address
+allocation. With this proposal, this is no longer required.
 
-      <section anchor="requirement9" title="Data Center Federation">
-        It must be possible to extend the architecture across multiple data
-        centers. These data centers may be operated by distinct entities, with
-        security policies that apply to their interconnection.
-      </section>
+## Data center federation {: #requirement9}
 
-      <section anchor="pmtu" title="Path MTU Issues">
-        An issue in virtualized data center architectures is <xref
-        target="RFC1981">Path MTU Discovery</xref> implementation.
-        Implementing Path MTU requires the <xref
-        target="RFC4443">ICMPv6</xref> Packet Too Big message to get from the
-        originating router or middleware to the indicated host, which is in
-        this case virtual and potentially hidden within a tunnel. This is a
-        special case of the issues raised in <xref target="RFC2923"/>.
-      </section>
-    </section>
+It must be possible to extend the architecture across multiple data
+centers. These data centers may be operated by distinct entities, with
+security policies that apply to their interconnection.
 
-    <section anchor="models" title="Models">
-      <t/>
+## Path MTU issues {: #pmtu}
 
-      <section anchor="configuration" title="Configuration Model">
-        In the OpenStack model, the cloud computing user, or tenant, is
-        building something Edward Yourdon might call a 'structured design' for
-        the application they are building. In the 1960's, when Yourdon started
-        specifying process and data flow diagrams, these were job steps in a
-        deck of Job Control Language cards; in OpenStack, they are multiple,
-        individual machines, virtual or physical, running parts of a
-        structured application.
+An issue in virtualized data center architectures is Path MTU
+discovery {{?RFC1981}} implementation.  Implementing Path MTU requires
+the ICMPv6 {{?RFC4443}} *packet too big* to get from the originating
+router or middleware to the indicated host, which is in this case
+virtual and potentially hidden within a tunnel. This is a special case
+of the issues raised in {{?RFC2923}}.
 
-        In these, one might find a load balancer that receives and
-        distributes requests to request processors, a set of stored data
-        processing applications, and the storage they depend on. What is
-        important to the OpenStack tenant is that 'this' and 'that'
-        communicate, potentially using or not using multicast communications,
-        and don't communicate with 'the other'. Typically unnecessary is any
-        and all information regarding how this communication actually needs to
-        occur (i.e., placement of routers, switches, and IP subnets, prefixes,
-        etc.).
+# Models {: #models}
 
-        An IPv6 based networking model simplifies the configuration of
-        tenant connectivity requirements. Global reachability eliminates the
-        need for network address translation devices as well as
-        tenant-specified Subnet prefixes (<xref target="requirement8"/>),
-        although tenant-specified ULA prefixes or prefixes from the owner of
-        the tenant's address space are usable with it. With the exception of
-        network security functions, no network devices need to be specified or
-        configured to provide connectivity.
-      </section>
+## Configuration model {: #configuration}
 
-      <section anchor="addressing" title="Data Center Model">
-        The premises of the routing and addressing models are that <list
-            style="symbols">
-            The address tells the routing system what topological location
-            to deliver a packet to, and within that, what interface to deliver
-            it to, and
+In the OpenStack model, the cloud computing user, or tenant, is
+building something Edward Yourdon might call a 'structured design' for
+the application they are building. In the 1960's, when Yourdon started
+specifying process and data flow diagrams, these were job steps in a
+deck of Job Control Language cards; in OpenStack, they are multiple,
+individual machines, virtual or physical, running parts of a
+structured application.
 
-            The routing system should deliver traffic to a resource if and
-            only if the sender is authorized to communicate with that
-            resource.
+In these, one might find a load balancer that receives and distributes
+requests to request processors, a set of stored data processing
+applications, and the storage they depend on. What is important to the
+OpenStack tenant is that 'this' and 'that' communicate, potentially
+using or not using multicast communications, and don't communicate
+with 'the other'. Typically unnecessary is any and all information
+regarding how this communication actually needs to occur (i.e.,
+placement of routers, switches, and IP subnets, prefixes, etc.).
 
-            Contrary to the OpenStack Neutron Networking Model, tunnels are
-            not necessary to provide tenant network isolation; we include
-            resources in a tenant network by a Role-based Access Control
-            model, but address the tenant resources within the data center in
-            a manner that scales for the data center.
-          </list>
+An IPv6 based networking model simplifies the configuration of tenant
+connectivity requirements. Global reachability eliminates the need for
+network address translation devices as well as tenant-specified Subnet
+prefixes (<xref target="requirement8"/>), although tenant-specified
+ULA prefixes or prefixes from the owner of the tenant's address space
+are usable with it. With the exception of network security functions,
+no network devices need to be specified or configured to provide
+connectivity.
 
-        We expect to find the data center to be composed of some minimal
-        unit of connectivity and maintenance, such as a rack or row, and
-        equipped with one or more Top-of-Rack or End-of-Row switch(es); each
-        configured with at least one subnet prefix, perhaps one per such
-        switch. For the purposes of this note, these will be called Racks and
-        Top-of-Rack switches, and when applied to other architectures the
-        appropriate translation needs to be imposed.
+## Data center model {: #addressing}
 
-        <xref target="zynga"/> describes a relatively typical rack design.
-        It is a simple fat-tree architecture, with every device in a pair, so
-        that any failure has an immediate hot backup. There are other common
-        designs, such as those that consider each rack to be in a 'row' and in
-        a 'column', with one or more distribution switches in each.
+The premises of the routing and addressing models are that
 
-        <?rfc needLines='22'?>
+* The address tells the routing system what topological location to
+  deliver a packet to, and within that, what interface to deliver it
+  to, and
 
-        <figure anchor="zynga" title="Typical Rack Design">
-        <artwork align="center"><![CDATA[
+* The routing system should deliver traffic to a resource if and only
+  if the sender is authorized to communicate with that resource.
 
+* Contrary to the OpenStack Neutron Networking Model, tunnels are not
+  necessary to provide tenant network isolation; we include resources
+  in a tenant network by a Role-based Access Control model, but
+  address the tenant resources within the data center in a manner that
+  scales for the data center.
+
+We expect to find the data center to be composed of some minimal unit
+of connectivity and maintenance, such as a rack or row, and equipped
+with one or more Top-of-Rack or End-of-Row switch(es); each configured
+with at least one subnet prefix, perhaps one per such switch. For the
+purposes of this note, these will be called Racks and Top-of-Rack
+switches, and when applied to other architectures the appropriate
+translation needs to be imposed.
+
+{{zynga}} describes a relatively typical rack design.  It is a simple
+fat-tree architecture, with every device in a pair, so that any
+failure has an immediate hot backup. There are other common designs,
+such as those that consider each rack to be in a 'row' and in a
+'column', with one or more distribution switches in each.
+
+{: artwork-align="center" artwork-name="zynga" artwork-title="Typical rack design"}
 ~~~~
        Distribution   Switches connecting
        / Layer /      racks in a pod, and
@@ -404,215 +391,193 @@ single tenant up to many thousands of tenants.
   +-----------+
 ~~~~
 
-        <section anchor="tenant" title="Tenant Address Model">
-          Tenant resources need to be told, by configuration or naming, the
-          addresses of resources they communicate with. This is true
-          regardless of their location or relationship to a given tenant. In
-          environments with well-known addresses, this becomes complex and
-          unscalable. This was learned very early with Internet hostnames; a
-          single 'hostfile' was maintained by a central entity and updated
-          daily, which quickly became unwieldy. The result was the development
-          of the Domain Name System; the level of indirection between names
-          and addresses improved scalability. It also facilitated ongoing
-          maintenance. If a service needed multiple servers, or a server
-          needed to change its address, that was trivially solved by changing
-          the DNS Resource Record; every resource that needed the new address
-          would obtain it the next time it queried the DNS. It has also
-          facilitated the IPv4/IPv6 transition; a resource that has an IPv6
-          address is given a AAAA record in addition to, or to replace, its
-          IPv4 A record.
+### Tenant address model {: #tenant}
 
-          Similarly, today's reliance on NAPT technology frequently limits
-          the capabilities of an application. It works reasonably well for a
-          client accessing a client/server application when the protocol does
-          not carry addressing information. If there is an expectation that
-          one resource's private address will be meaningful to a peer, such as
-          when an SIP client presents its address in SDP or an HTTP server
-          presents an address in a redirection, either the resource needs to
-          understand the difference between an 'inside' and an 'outside'
-          address and know which is which, or it needs a traversal algorithm
-          that changes the addresses. For peer-to-peer applications, this
-          ultimately means providing a network design in which those issues
-          don't apply.
+Tenant resources need to be told, by configuration or naming, the
+addresses of resources they communicate with. This is true regardless
+of their location or relationship to a given tenant. In environments
+with well-known addresses, this becomes complex and unscalable. This
+was learned very early with Internet hostnames; a single 'hostfile'
+was maintained by a central entity and updated daily, which quickly
+became unwieldy. The result was the development of the Domain Name
+System; the level of indirection between names and addresses improved
+scalability. It also facilitated ongoing maintenance. If a service
+needed multiple servers, or a server needed to change its address,
+that was trivially solved by changing the DNS Resource Record; every
+resource that needed the new address would obtain it the next time it
+queried the DNS. It has also facilitated the IPv4/IPv6 transition; a
+resource that has an IPv6 address is given a AAAA record in addition
+to, or to replace, its IPv4 A record.
 
-          IPv6 provides global addresses, enough of them that there is no
-          real expectation of running out any time soon, making these issues
-          go away. In addition, with the IPv4 address space running out, both
-          globally and within today's large datacenters, there aren't
-          necessarily addresses available for an IPv4 application to use, even
-          as a floating IP address.
+Similarly, today's reliance on NAPT technology frequently limits the
+capabilities of an application. It works reasonably well for a client
+accessing a client/server application when the protocol does not carry
+addressing information. If there is an expectation that one resource's
+private address will be meaningful to a peer, such as when an SIP
+client presents its address in SDP or an HTTP server presents an
+address in a redirection, either the resource needs to understand the
+difference between an 'inside' and an 'outside' address and know which
+is which, or it needs a traversal algorithm that changes the
+addresses. For peer-to-peer applications, this ultimately means
+providing a network design in which those issues don't apply.
 
-          Hence, the model we propose is that a resource in a tenant is
-          told the addresses of the other resources with which it
-          communicates. They are IPv6 addresses, and the data center takes
-          care to ensure that inappropriate communications do not take
-          place.
+IPv6 provides global addresses, enough of them that there is no real
+expectation of running out any time soon, making these issues go
+away. In addition, with the IPv4 address space running out, both
+globally and within today's large datacenters, there aren't
+necessarily addresses available for an IPv4 application to use, even
+as a floating IP address.
 
-          <section anchor="gua-tenant"
-                   title="Use of Global Unicast Addresses by Tenants">
-            A unicast address in an IP network identifies a topological
-            location, by association with an IP prefix (which might be for a
-            subnet or any aggregate of subnets). It also identifies a single
-            interface located within that subnet, which may or may not be
-            instantiated at the time. We assume that there is a subnet
-            associated with a top-of-rack switch or whatever its counterpart
-            would be in a given network design, and that the physical and
-            virtual machines located in that rack have addresses in that
-            subnet. This is the same prefix that is used by the datacenter
-            administrator.
-          </section>
+Hence, the model we propose is that a resource in a tenant is told the
+addresses of the other resources with which it communicates. They are
+IPv6 addresses, and the data center takes care to ensure that
+inappropriate communications do not take place.
 
-          <section anchor="ula" title="Unique Local Addresses">
-            A common requirement is that tenants have the use of some form
-            of private address space. In an IPv6 network, a <xref
-            target="RFC4193">Unique Local IPv6 Unicast Address</xref> may be
-            used to accomplish this. In this case, however, the addresses will
-            need to be explicitly assigned to physical or virtual machines
-            used by the tenant, perhaps using DHCP or YANG, where a standard
-            IPv6 address could be allocated using SLAAC, DHCPv6, or other
-            technologies.
+#### Use of Global Unicast Addresses by tenants {: #gua-tenant}
 
-            The value of this is that the distinction between a Global
-            Address and a Unique Local Address is a corner case in the data
-            center; a ULA will not generally be useful when communicating
-            outside the data center, but within the data center it is
-            rational. Tenants have no routing information or other awareness
-            of the prefix. This is not intended for use behind a NAPT;
-            resources that need accessibility to or from resources outside the
-            tenant, and especially outside the data center, need global
-            addresses.
-          </section>
+A unicast address in an IP network identifies a topological location,
+by association with an IP prefix (which might be for a subnet or any
+aggregate of subnets). It also identifies a single interface located
+within that subnet, which may or may not be instantiated at the
+time. We assume that there is a subnet associated with a top-of-rack
+switch or whatever its counterpart would be in a given network design,
+and that the physical and virtual machines located in that rack have
+addresses in that subnet. This is the same prefix that is used by the
+datacenter administrator.  </section>
 
-          <section anchor="multicast" title="Multicast Domains">
-            Multicast capability is a capability enjoyed by some groups of
-            resources, that enables them to send a single message and have it
-            delivered to multiple destinations roughly simultaneously. At the
-            link layer, this means sending a message once that is received by
-            a specified set of recipient resources using hardware
-            capabilities. IP multicast can be implemented on a LAN as
-            specified in <xref target="RFC4291"/>, and can also cross multiple
-            subnets directly, using routing protocols such as <xref
-            target="RFC4601">Protocol Independent Multicast</xref> <xref
-            target="RFC4602"/> <xref target="RFC4604"/> <xref
-            target="RFC4605"/> <xref target="RFC4607"/>. In IPv6, the model
-            would be that when a group of resources is created with a
-            multicast capability, it is allocated one or more source-specific
-            transient group addresses as defined in section 2.7 of that
-            RFC.
-          </section>
+#### Unique local addresses {: #ula}
 
-          <section anchor="ipv4" title="IPv4 Interaction Model">
-            OpenStack IPv4 Neutron uses &ldquo;floating IPv4
-            addresses&rdquo; &ndash; global or public IPv4 addresses and
-            Network Address Translation - to enable remote resources to
-            connect to tenant private network endpoints. Tenant end points can
-            connect out to remote resources through an &ldquo;External Default
-            Gateway&rdquo;. Both of these depend on <xref
-            target="RFC2391">NAPT (DNAT/SNAT)</xref> to ensure that IPv4 end
-            points are able communicate and at the same time ensure tenant
-            isolation.
+A common requirement is that tenants have the use of some form of
+private address space. In an IPv6 network, a Unique local IPv6 unicast
+address {{?RFC4193}} may be used to accomplish this. In this case,
+however, the addresses will need to be explicitly assigned to physical
+or virtual machines used by the tenant, perhaps using DHCP or YANG,
+where a standard IPv6 address could be allocated using SLAAC, DHCPv6,
+or other technologies.
 
-            If IPv6 is deployed in a data center, there are fundamentally
-            three ways a tenant can interact with IPv4 peers: <list
-                style="symbols">
-                it can run existing IPv4 OpenStack technology in parallel
-                with the IPv6 deployment, meaning that IPv4 is present in the
-                data center as well, or
+The value of this is that the distinction between a Global Address and
+a Unique Local Address is a corner case in the data center; a ULA will
+not generally be useful when communicating outside the data center,
+but within the data center it is rational. Tenants have no routing
+information or other awareness of the prefix. This is not intended for
+use behind a NAPT; resources that need accessibility to or from
+resources outside the tenant, and especially outside the data center,
+need global addresses.
 
-                it can translate or encapsulate IPv4 to IPv6, leaving the
-                data center IPv6-only.
-              </list>
+#### Multicast domains {: #multicast}
 
-            If the intention of the data center operator is to give each
-            system in the data center a separate global address, It can
-            translate an incoming IPv4 address to an internal IPv6 address,
-            and have the application see the client or peer as a remote IPv6
-            system. This would be as described in <xref
-            target="I-D.ietf-v6ops-siit-dc"/>.
+Multicast capability is a capability enjoyed by some groups of
+resources, that enables them to send a single message and have it
+delivered to multiple destinations roughly simultaneously. At the link
+layer, this means sending a message once that is received by a
+specified set of recipient resources using hardware capabilities. IP
+multicast can be implemented on a LAN as specified in {{?RFC4291}},
+and can also cross multiple subnets directly, using routing protocols
+such as Protocol Independent Multicast {{?RFC4601}} {{?RFC4602}}
+{{?RFC4604}} {{?RFC4605}} {{?RFC4607}}. In IPv6, the model would be
+that when a group of resources is created with a multicast capability,
+it is allocated one or more source-specific transient group addresses
+as defined in section 2.7 of that RFC.
 
-            If the intention of the data center operator is to give each
-            system in the data center a separate global address, but the
-            application is uses IPv4-only APIs and therefore cannot
-            communicate using IPv6, It can translate an incoming IPv4 address
-            to an internal IPv6 address, and translate it back in the vSwitch,
-            so that the VM is presented with what appears to be an end-to-end
-            IPv4 packet. This is described in <xref
-            target="I-D.ietf-v6ops-siit-dc"/>.
+#### IPv4 interaction model {: #ipv4}
 
-            In the event that A+P IPv4 address multiplexing is in view, the
-            vSwitch can also implement the mapping of Address and Port using
-            either <xref target="I-D.ietf-softwire-map"> Encapsulation
-            (MAP)</xref> or <xref target="I-D.ietf-softwire-map-t">
-            Translation (MAP-T)</xref>.
+OpenStack IPv4 Neutron uses *floating IPv4 addresses* -- global or
+public IPv4 addresses and Network Address Translation - to enable
+remote resources to connect to tenant private network
+endpoints. Tenant end points can connect out to remote resources
+through an *External Default Gateway*. Both of these depend on NAPT
+(DNAT/SNAT) {{?RFC2391}} to ensure that IPv4 end points are able
+communicate and at the same time ensure tenant isolation.
 
-            Running the standard IPv4 OpenStack model and this IPv6 model
-            in parallel is complex, if for no other reason than that there are
-            two fundamental models in use, one with various encapsulations
-            hiding overlapping address space and one with non-overlapping
-            address space.
+If IPv6 is deployed in a data center, there are fundamentally three
+ways a tenant can interact with IPv4 peers:
 
-            To simplify the network, as noted in <xref target="approach"/>,
-            we suggest that the data center be internally IPv6-only, and IPv4
-            be translated or encapsulated to IPv6 at the data center edge. The
-            advantage is that it enables IPv4 access while that remains in
-            use, and as IPv6 takes over, it reduces the impact of vestigial
-            support for IPv4.
+* it can run existing IPv4 OpenStack technology in parallel with the
+  IPv6 deployment, meaning that IPv4 is present in the data center as
+  well, or
 
-            Both translation models in have IPv4 traffic come to an <xref
-            target="RFC6145">translator</xref><xref target="RFC6146"/> having
-            a pre-configured translation, resulting in an IPv6 packet
-            indistinguishable from the packet the remote resource might have
-            sent had it been IPv6-capable, with one exception. The IPv6
-            destination address is that of the endpoint (the same address
-            advertised in a AAAA record), but the source address is an <xref
-            target="RFC6052">IPv4-Embedded IPv6 Address</xref> with the IPv4
-            address of the sender embedded in a prefix used by the
-            translator.
+* it can translate or encapsulate IPv4 to IPv6, leaving the data
+  center IPv6-only.
+  
+If the intention of the data center operator is to give each system in
+the data center a separate global address, It can translate an
+incoming IPv4 address to an internal IPv6 address, and have the
+application see the client or peer as a remote IPv6 system. This would
+be as described in {{!I-D.ietf-v6ops-siit-dc}}.
 
-            Access to external IPv4 resources is provided in the same way:
-            an <xref target="RFC6147">DNS64</xref> server is implemented that
-            contains AAAA records with an <xref target="RFC6052">IPv4-Embedded
-            IPv6 Address</xref> with the IPv4 address of the remote resource
-            embedded in a prefix used by the translator.
+If the intention of the data center operator is to give each system in
+the data center a separate global address, but the application is uses
+IPv4-only APIs and therefore cannot communicate using IPv6, It can
+translate an incoming IPv4 address to an internal IPv6 address, and
+translate it back in the vSwitch, so that the VM is presented with
+what appears to be an end-to-end IPv4 packet. This is described in
+{{!I-D.ietf-v6ops-siit-dc}}.
 
-            This follows the <xref target="RFC6144">Framework for IPv4/IPv6
-            Translation</xref>, making the internal IPv4 address a floating IP
+In the event that A+P IPv4 address multiplexing is in view, the
+vSwitch can also implement the mapping of Address and Port using
+either encapsulation (MAP) {{!I-D.ietf-softwire-map}} or translation
+(MAP-T) {{!I-D.ietf-softwire-map-t}}.
+
+Running the standard IPv4 OpenStack model and this IPv6 model in
+parallel is complex, if for no other reason than that there are two
+fundamental models in use, one with various encapsulations hiding
+overlapping address space and one with non-overlapping address space.
+
+To simplify the network, as noted in {{#approach}}, we suggest that
+the data center be internally IPv6-only, and IPv4 be translated or
+encapsulated to IPv6 at the data center edge. The advantage is that it
+enables IPv4 access while that remains in use, and as IPv6 takes over,
+it reduces the impact of vestigial support for IPv4.
+
+Both translation models in have IPv4 traffic come to a translator
+{{!RFC6145}} {{!RFC6146}} having a pre-configured translation,
+resulting in an IPv6 packet indistinguishable from the packet the
+remote resource might have sent had it been IPv6-capable, with one
+exception. The IPv6 destination address is that of the endpoint (the
+same address advertised in a AAAA record), but the source address is
+an IPv4-embeded IPv6 address {{!RFC6052}} with the IPv4 address of the
+sender embedded in a prefix used by the translator.
+
+Access to external IPv4 resources is provided in the same way:
+a DNS64 {{!RFC6147}} server is implemented that
+contains AAAA records with an IPv4-embeded IPv6 address {{!RFC6052}}
+with the IPv4 address of the remote resource
+embedded in a prefix used by the translator.
+
+This follows the Framework for IPv4/IPv6 translation {{?RFC6144}}
+making the internal IPv4 address a floating IP
             address attached to an internal IPv6 address, and the external
             'dial-out' address indistinguishable from a native IPv6
             address.
-          </section>
 
-          <section title="Legacy IPv4 OpenStack">
-            The other possible model, applicable to IPv4-only devices, is
-            to run a legacy OpenStack environment inside IPv6 tunnels. This
+#### Legacy IPv4 OpenStack
+
+The other possible model, applicable to IPv4-only devices, is
+to run a legacy OpenStack environment inside IPv6 tunnels. This
             preserves the data center IPv6-only, and enables IPv4-only
             applications, notably those whose licenses tie them to IPv4
             addresses, to run. However, it adds significant overhead in terms
             of encapsulation size and network management complexity.
-          </section>
-        </section>
 
-        <section anchor="dc"
-                 title="Use of Global Addresses by the Data Center">
-          Every rack and physical host requires an IP prefix that is
-          reachable by the OpenStack operator. This will normally be a global
+### Use of Global Addresses by the data center {: #dc}
+
+Every rack and physical host requires an IP prefix that is
+reachable by the OpenStack operator. This will normally be a global
           IPv6 unicast address. For scalability purposes, as isolation is
           handled separately, this is normally the same prefix as is used by
           tenants in the rack.
-        </section>
-      </section>
 
-      <section anchor="security-isolation"
-               title="Inter-tenant security services">
-        In this model, the a label is used to identify a set of virtual or
-        physical systems under common ownership and administration that are
+## Inter-tenant security services {: #security-isolation}
+
+In this model, the a label is used to identify a set of virtual or
+physical systems under common ownership and administration that are
         authorized to communicate freely among themselves - a tenant. Tenants
         are not generally authorized to communicate with each other, but
         interactions between specified tenants may be authorized, and specific
         systems may be authorized to communicate generally.
 
-        The fundamental premise is that the vSwitch can determine whether a
-        VM is authorized to send or receive a given message. It does so by
+The fundamental premise is that the vSwitch can determine whether a
+VM is authorized to send or receive a given message. It does so by
         finding the label in a message being sent or received and comparing it
         to a locally-held authorization policy. This policy would indicate
         that the VM is permitted to send or receive messages containing one of
@@ -621,88 +586,83 @@ single tenant up to many thousands of tenants.
         address, as this type of policy would be specific to an IPv6
         prefix.
 
-        A set of possible choices that were considered is to be found in
-        <xref target="label-appendix"/>. The key questions are a list of
-        considerations, presented in no particular order: <list
-            style="symbols">
-            In what way does the approach the IPv6 Path MTU?
+A set of possible choices that were considered is to be found in {{#label-appendix}}.
+The key questions are a list of
+        considerations, presented in no particular order: 
 
-            How does the address come into being?
+* In what way does the approach the IPv6 Path MTU?
 
-            What security implications apply? For example, how hard would
-            it be for a VM to spoof the source address or attack a random
-            destination?
+* How does the address come into being?
 
-            What is the service offered? Can, for example, policy be
-            applied at <list style="symbols">
-                The sender of a datagram?
+* What security implications apply? For example, how hard would
+  it be for a VM to spoof the source address or attack a random
+  destination?
 
-                The receiver of a datagram?
+* What is the service offered? Can, for example, policy be
+applied at
 
-                An arbitrary point between the sender and receiver?
+    + The sender of a datagram?
 
-                At the data center edge, on arriving or departing traffic
-                other data centers?
+	+ The receiver of a datagram?
 
-                At the data center edge, on arriving or departing traffic
-                random locations?
-              </list>
+	+ An arbitrary point between the sender and receiver?
 
-            In what way does the approach the IPv6 Path MTU?
-          </list>
-      </section>
+	+ At the data center edge, on arriving or departing traffic
+	  other data centers?
 
-      <section anchor="ipv6-isolation"
-               title="IPv6 Tenant Isolation using the Label">
-        Neutron today already implements a form of <xref
-        target="RFC2827">Network Ingress Filtering</xref>. It prevents the VM
+	+ At the data center edge, on arriving or departing traffic
+	  random locations?
+
+* In what way does the approach the IPv6 Path MTU?
+
+## IPv6 tenant isolation using the label {: #ipv6-isolation}
+
+Neutron today already implements a form of <xref
+Network ingress filtering {{?RFC2827}}.  It prevents the VM
         from emitting traffic with an unauthorized MAC, IPv4, or IPv6 source
         address.
 
-        In addition to this, in this model Neutron prevents the VM from
-        transmitting a network packet with an unauthorized label value. The VM
+In addition to this, in this model Neutron prevents the VM from
+transmitting a network packet with an unauthorized label value. The VM
         MAY be configured with and authorized to use one of a short list of
         authorized label values, as opposed to simply having its choice
         overridden; in that case, Neutron verifies the value and overwrites
         one not in the list.
 
-        When a hypervisor is about to deliver an IPv6 packet to a VM, it
-        checks the label value against a list of values that the VM is
+When a hypervisor is about to deliver an IPv6 packet to a VM, it
+checks the label value against a list of values that the VM is
         permitted to receive. If it contains an unauthorized value, the
         hypervisor discards the packet rather than deliver it. If the Flow
         Label is in use, Neutron zeros the label prior to delivery.
 
-        The intention is to hide the label value from malware potentially
-        found in the VM, and enable the label to be used as a form of first
+The intention is to hide the label value from malware potentially
+found in the VM, and enable the label to be used as a form of first
         and last hop security. This provides basic tenant isolation, if the
         label is assigned as a tenant identifier, and may be used more
         creatively such as to identify a network management application as
         separate from a managed resource.
-      </section>
 
-      <section anchor="routing" title="Isolation in Routing">
-        This concept has the weakness that if a packet is not dropped at
-        its source, it is dropped at its destination. It would be preferable
+## Isolation in routing {: #routing}
+
+This concept has the weakness that if a packet is not dropped at
+its source, it is dropped at its destination. It would be preferable
         for the packet to be dropped in flight, such as at the top-of-rack
         switch or an aggregation router.
 
-        Concepts discussed in <xref
-        target="I-D.baker-ipv6-isis-dst-flowlabel-routing">IS-IS LSP
-        Extendibility</xref><xref target="RFC5120"/><xref target="RFC5308"/>
-        and <xref target="I-D.baker-ipv6-ospf-dst-flowlabel-routing">OSPFv3
-        LSA Extendibility</xref> <xref
-        target="I-D.ietf-ospf-ospfv3-lsa-extend"/><xref target="RFC5340"/> may
-        be used to isolate tenants in the routing of the data center backbone.
-        This is not strictly necessary, if <xref target="ipv6-isolation"/> is
-        uniformly and correctly implemented. It does, however, present a
+Concepts discussed in 
+{{!I-D.baker-ipv6-isis-dst-flowlabel-routing}}, {{!RFC5120}},
+{{!RFC5308}}, {{!I-D.baker-ipv6-ospf-dst-flowlabel-routing}},
+{{!RFC5340}}, and {{!I-D.ietf-ospf-ospfv3-lsa-extend}} may be be used
+to isolate tenants in the routing of the data center backbone.
+This is not strictly necessary, if {{#ipv6-isolation}} is
+    uniformly and correctly implemented. It does, however, present a
         second defense against misconfiguration, as the filter becomes
         ubiquitous in the data center and as scalable as routing.
-      </section>
-    </section>
 
-    <section anchor="bcp38" title="BCP 38 Ingress Filtering">
-      As noted in <xref target="ipv6-isolation"/>, Neutron today implements
-      a form of <xref target="RFC2827">Network Ingress Filtering</xref>. It
+# {{BCP 38}} ingress filtering {: #bcp38}
+
+As noted in {{#ipv6-isolation}}, Neutron today implements
+a form of network ingress filtering {{?RFC2827}}. It
       prevents the VM from emitting traffic with an unauthorized MAC, IPv4, or
       IPv6 source address.
 
