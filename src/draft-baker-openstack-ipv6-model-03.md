@@ -100,11 +100,11 @@ and operations.</t> </abstract>
 
 --- middle
 
-# Introduction {: #introduction}
+# Introduction {#introduction}
 
 OpenStack, and its issues.
 
-## What is OpenStack? {: #projects}
+## What is OpenStack? {#projects}
 
 OpenStack is a cloud computing orchestration solution developed using
 an open source community process. It consists of a collection of
@@ -155,7 +155,7 @@ tenants a layer 3 based network alternative.
 OpenStack uses Layer 3 and Layer 2 Linux utilities on hosts to provide
 protection against IP/MAC spoofing and ARP poisoning.
 
-## OpenStack Scaling Issues {: #openstack-issues}
+## OpenStack Scaling Issues {#openstack-issues}
 
 One of the fundamental requirements of OpenStack Networking (Neutron)
 is to provide scalable, isolated tenant networks. Today this is
@@ -193,11 +193,11 @@ that some large content providers, notably Google and <xref
 target="FaceBook-IPv6">Facebook</xref>, are going in exactly this
 direction.
      
-# Requirements {: #require}
+# Requirements {#require}
 
 In this section, we attempt to list critical requirements.
 
-## Design approach {: #approach}
+## Design approach {#approach}
 
 As a design approach, we presume an IPv6-only data center in a world
 that might have IPv4 or IPv6 clients outside of it. This design
@@ -220,7 +220,7 @@ technologies . However, all the details of the underlying technology
 and implementation details are completely transparent to the tenant
 itself.
 
-## Multiple Data Centers {: #multicenter}
+## Multiple Data Centers {#multicenter}
 
 A common requirement in network and data center operations is
 reliability, serviceability, and maintainability of their operations
@@ -230,7 +230,7 @@ implies multiple and at times duplicate data centers, and tenants
 stretched or able to be readily moved or recreated across multiple
 data centers.
 
-## Large Data Centers {: #large}
+## Large Data Centers {#large}
 
 Microsoft Azure {{Microsoft-Azure}} has purchased a 100 acre piece of
 land for the construction of a single data center.  In terms of
@@ -242,18 +242,18 @@ easily exhausts the 16M available RFC 1918 private addresses
 (i.e. 10.0.0.0/8) and explains the recent efforts by webscale cloud
 providers to deploy IPv6 throughout their new datacenters.
 
-## Multi-tenancy {: #multitenant}
+## Multi-tenancy {#multitenant}
 
 While it is possible that a single tenant would require a 100 acre
 data center, it would be unusual. In most such data centers, one would
 expect a large number of tenants.
 
-## Isolation {: #isolation}
+## Isolation {#isolation}
 
 Isolation is required between tenants, and at times between tenants
 hierarchically related to larger tenants.
 
-### Inter-tenant isolation {: #interisolation}
+### Inter-tenant isolation {#interisolation}
 
 A *tenant* is defined as a set of resources under common
 administrative control. It may be appropriate for tenants to
@@ -262,7 +262,7 @@ relationships among their owners or operators. However, unless
 specified otherwise, tenants are intended to operate as if they were
 on their own company's premises and be isolated from one another.
 
-### Intra-tenant isolation {: #intraisolation}
+### Intra-tenant isolation {#intraisolation}
 
 There are often security compartments within a corporate network, just
 as there are security barriers between companies. As a result, there
@@ -270,14 +270,14 @@ is a recursive isolation requirement: it must be possible to isolate
 an identified part of a tenant (which we also think of as a tenant)
 from another part of the same tenant.
 
-## Operational simplicity {: #requirement5}
+## Operational simplicity {#requirement5}
 
 To the extent possible (and, for operators, the concept will bring a
 smile), operation of a multi-location multi-tenant data center, and
 the design of an application that runs in one, should be simple and
 uncoupled.
 
-As discussed in <xref target="RFC3439"/>, this requires that the
+As discussed in {{?RFC3439}}, this requires that the
 operational model required to support a tenant with only two physical
 machines, or virtual machines in the same physical chassis, should be
 the same as that required to support a tenant running a million
@@ -285,19 +285,19 @@ machines in a federated multiple data center application.
 Additionally, this same operational model should scale from running a
 single tenant up to many thousands of tenants.
 
-## Address space {: #requirement8}
+## Address space {#requirement8}
 
-As described in <xref target="projects"/>, currently, an OpenStack
+As described in {{projects}}, currently, an OpenStack
 tenant is required to specify a Subnet's CIDR prefix for IP address
 allocation. With this proposal, this is no longer required.
 
-## Data center federation {: #requirement9}
+## Data center federation {#requirement9}
 
 It must be possible to extend the architecture across multiple data
 centers. These data centers may be operated by distinct entities, with
 security policies that apply to their interconnection.
 
-## Path MTU issues {: #pmtu}
+## Path MTU issues {#pmtu}
 
 An issue in virtualized data center architectures is Path MTU
 discovery {{?RFC1981}} implementation.  Implementing Path MTU requires
@@ -306,9 +306,9 @@ router or middleware to the indicated host, which is in this case
 virtual and potentially hidden within a tunnel. This is a special case
 of the issues raised in {{?RFC2923}}.
 
-# Models {: #models}
+# Models {#models}
 
-## Configuration model {: #configuration}
+## Configuration model {#configuration}
 
 In the OpenStack model, the cloud computing user, or tenant, is
 building something Edward Yourdon might call a 'structured design' for
@@ -336,7 +336,7 @@ are usable with it. With the exception of network security functions,
 no network devices need to be specified or configured to provide
 connectivity.
 
-## Data center model {: #addressing}
+## Data center model {#addressing}
 
 The premises of the routing and addressing models are that
 
@@ -391,7 +391,7 @@ such as those that consider each rack to be in a 'row' and in a
   +-----------+
 ~~~~
 
-### Tenant address model {: #tenant}
+### Tenant address model {#tenant}
 
 Tenant resources need to be told, by configuration or naming, the
 addresses of resources they communicate with. This is true regardless
@@ -433,7 +433,7 @@ addresses of the other resources with which it communicates. They are
 IPv6 addresses, and the data center takes care to ensure that
 inappropriate communications do not take place.
 
-#### Use of Global Unicast Addresses by tenants {: #gua-tenant}
+#### Use of Global Unicast Addresses by tenants {#gua-tenant}
 
 A unicast address in an IP network identifies a topological location,
 by association with an IP prefix (which might be for a subnet or any
@@ -445,7 +445,7 @@ and that the physical and virtual machines located in that rack have
 addresses in that subnet. This is the same prefix that is used by the
 datacenter administrator.  </section>
 
-#### Unique local addresses {: #ula}
+#### Unique local addresses {#ula}
 
 A common requirement is that tenants have the use of some form of
 private address space. In an IPv6 network, a Unique local IPv6 unicast
@@ -464,7 +464,7 @@ use behind a NAPT; resources that need accessibility to or from
 resources outside the tenant, and especially outside the data center,
 need global addresses.
 
-#### Multicast domains {: #multicast}
+#### Multicast domains {#multicast}
 
 Multicast capability is a capability enjoyed by some groups of
 resources, that enables them to send a single message and have it
@@ -479,7 +479,7 @@ that when a group of resources is created with a multicast capability,
 it is allocated one or more source-specific transient group addresses
 as defined in section 2.7 of that RFC.
 
-#### IPv4 interaction model {: #ipv4}
+#### IPv4 interaction model {#ipv4}
 
 OpenStack IPv4 Neutron uses *floating IPv4 addresses* -- global or
 public IPv4 addresses and Network Address Translation - to enable
@@ -559,7 +559,7 @@ to run a legacy OpenStack environment inside IPv6 tunnels. This
             addresses, to run. However, it adds significant overhead in terms
             of encapsulation size and network management complexity.
 
-### Use of Global Addresses by the data center {: #dc}
+### Use of Global Addresses by the data center {#dc}
 
 Every rack and physical host requires an IP prefix that is
 reachable by the OpenStack operator. This will normally be a global
@@ -567,7 +567,7 @@ reachable by the OpenStack operator. This will normally be a global
           handled separately, this is normally the same prefix as is used by
           tenants in the rack.
 
-## Inter-tenant security services {: #security-isolation}
+## Inter-tenant security services {#security-isolation}
 
 In this model, the a label is used to identify a set of virtual or
 physical systems under common ownership and administration that are
@@ -615,7 +615,7 @@ applied at
 
 * In what way does the approach the IPv6 Path MTU?
 
-## IPv6 tenant isolation using the label {: #ipv6-isolation}
+## IPv6 tenant isolation using the label {#ipv6-isolation}
 
 Neutron today already implements a form of <xref
 Network ingress filtering {{?RFC2827}}.  It prevents the VM
@@ -642,7 +642,7 @@ found in the VM, and enable the label to be used as a form of first
         creatively such as to identify a network management application as
         separate from a managed resource.
 
-## Isolation in routing {: #routing}
+## Isolation in routing {#routing}
 
 This concept has the weakness that if a packet is not dropped at
 its source, it is dropped at its destination. It would be preferable
@@ -659,231 +659,229 @@ This is not strictly necessary, if {{#ipv6-isolation}} is
         second defense against misconfiguration, as the filter becomes
         ubiquitous in the data center and as scalable as routing.
 
-# {{BCP 38}} ingress filtering {: #bcp38}
+# {{BCP 38}} ingress filtering {#bcp38}
 
 As noted in {{#ipv6-isolation}}, Neutron today implements
 a form of network ingress filtering {{?RFC2827}}. It
       prevents the VM from emitting traffic with an unauthorized MAC, IPv4, or
       IPv6 source address.
 
-      In IPv6, this is readily handled when the address or addresses used
-      by a VM are selected by the OpenStack operator. It may then configure a
+In IPv6, this is readily handled when the address or addresses used
+by a VM are selected by the OpenStack operator. It may then configure a
       per-VM filter with the addresses it has chosen, following logic similar
-      to the <xref target="I-D.ietf-savi-dhcp">Source Address Validation
-      Solution for DHCP</xref> or <xref target="RFC7219">SEND</xref>. This is
-      also true of <xref target="RFC4862">IPv6 Stateless Address
-      Autoconfiguration (SLAAC)</xref> when the MAC address is known and not
+      to the Source Address Validation Solution for DHCP {{I-D.ietf-savi-dhcp}}
+      or SEND {{RFC7219}}. This is
+      also true of Stateless Address Autoconfiguration (SLAAC) {{RFC4862}}
+      when the MAC address is known and not
       shared.
 
-      However, when SLAAC is in use and either the MAC address is unknown
-      or SLAAC's <xref target="RFC4941">Privacy Extensions </xref><xref
-      target="RFC7217"/>, are in use, Neutron will need to implement the
-      provisions of <xref target="RFC6620">FCFS SAVI: First-Come, First-Served
-      Source Address Validation</xref> in order to learn the addresses that a
+However, when SLAAC is in use and either the MAC address is unknown
+or SLAAC's privacy extensions {{RFC4941}} {{RFC7217}}
+      are in use, Neutron will need to implement the
+      provisions of FCFS SAVI {{RFC6620}}
+      in order to learn the addresses that a
       VM is using and include them in the per-VM filter.
-    </section>
 
-    <section title="Moving virtual machines">
-      This design supports these kinds of required layer 2 networks with
-      the additional use of a layer 2 over layer 3 encapsulation and tunneling
-      protocol, such as <xref target="RFC7348">VXLAN</xref>. The important
+# Moving virtual machines
+
+This design supports these kinds of required layer 2 networks with
+the additional use of a layer 2 over layer 3 encapsulation and tunneling
+      protocol, such as VXLAN {{RFC7348}}. The important
       point here being that these overlays are used to address specific tenant
       network requirements and NOT deployed to remove the scalability
       limitations of OpenStack networking.
 
-      There are at least three ways VM movement can be accomplished: <list
-          style="symbols">
-          Recreation of the VM
+There are at least three ways VM movement can be accomplished:
 
-          VLAN Modification
+* Recreation of the VM
 
-          Live Migration of a Running Virtual Machine
-        </list>
+* VLAN Modification
 
-      <section anchor="motion-new-vm" title="Recreation of the VM">
-        The simplest and most reliable is to <list style="numbers">
-            Create a new VM in the new location,
+* Live Migration of a Running Virtual Machine
 
-            Add its address to the DNS Resource Record for the name,
-            allowing new references to the name to send transactions
+## Recreation of the VM {#motion-new-vm}
+
+The simplest and most reliable is to
+
+1. Create a new VM in the new location,
+
+1. Add its address to the DNS Resource Record for the name,
+   allowing new references to the name to send transactions
             there,
 
-            Remove the old address from the DNS Resource Record (including
-            the SIIT translation, if one exists), ending the use of the old VM
+1. Remove the old address from the DNS Resource Record (including
+   the SIIT translation, if one exists), ending the use of the old VM
             for new transactions,
 
-            Wait for the period of the DNS Resource Record's lifetime
-            (including the SIIT translation, if one exists), as it will get
+1. Wait for the period of the DNS Resource Record's lifetime
+   (including the SIIT translation, if one exists), as it will get
             new requests throughout that interval,
 
-            Wait for the for the old VM to finish any outstanding
-            transactions, and then
+1. Wait for the for the old VM to finish any outstanding
+   transactions, and then
 
-            Kill the old VM.
-          </list>
+1. Kill the old VM.
 
-        This is obviously not movement of an existing VM, but preservation
-        of the same number and function of VMs by creation of a new VM and
+This is obviously not movement of an existing VM, but preservation
+of the same number and function of VMs by creation of a new VM and
         killing the old.
-      </section>
 
-      <section anchor="vmotion"
-               title="Live Migration of a Running Virtual Machine">
-        At
-        http://blogs.vmware.com/vsphere/2011/02/vmotion-whats-going-on-under-the-covers.html,
-        VMWare describes its capability, called vMotion, in the following
-        terms: <list style="numbers">
-            Shadow VM created on the destination host.
+## Live migration of a running virtual machine {#vmotion}
 
-            Copy each memory page from the source to the destination via
-            the vMotion network. This is known as preCopy.
+At [http://blogs.vmware.com/vsphere/2011/02/vmotion-whats-going-on-under-the-covers.html],
+VMWare describes its capability, called vMotion, in the following
+terms:
 
-            Perform another pass over the VM's memory, copying any pages
-            that changed during the last preCopy iteration.
+1. Shadow VM created on the destination host.
 
-            Continue this iterative memory copying until no changed pages
-            (outstanding to be-copied pages) remain or 100 seconds elapse.
+1. Copy each memory page from the source to the destination via
+   the vMotion network. This is known as preCopy.
 
-            Stun the VM on the source and resume it on the destination.
-          </list>
+1. Perform another pass over the VM's memory, copying any pages
+   that changed during the last preCopy iteration.
 
-        In a native-address environment, we add three steps:<list
-            style="numbers">
-            Shadow VM created on the destination host.
+1. Continue this iterative memory copying until no changed pages
+   (outstanding to be-copied pages) remain or 100 seconds elapse.
 
-            Copy each memory page from the source to the destination via
-            the vMotion network. This is known as preCopy.
+1. Stun the VM on the source and resume it on the destination.
 
-            Perform another pass over the VM's memory, copying any pages
-            that changed during the last preCopy iteration.
+In a native-address environment, we add three steps:
 
-            Continue this iterative memory copying until no changed pages
-            (outstanding to be-copied pages) remain or 100 seconds elapse.
+1. Shadow VM created on the destination host.
 
-            Stitch routing for the old address.
+1. Copy each memory page from the source to the destination via
+   the vMotion network. This is known as preCopy.
 
-            Stun the VM on the source and resume it on the destination.
+1. Perform another pass over the VM's memory, copying any pages
+   that changed during the last preCopy iteration.
 
-            Renumber the VM as instructed in <xref target="RFC4192"/>.
+1. Continue this iterative memory copying until no changed pages
+   (outstanding to be-copied pages) remain or 100 seconds elapse.
 
-            Unstitch routing for the old address.
-          </list>
+1. Stitch routing for the old address.
 
-        If the VM is moved within the same subnet (which usually implies
-        the same rack), there is no stitching or renumbering apart from
+1. Stun the VM on the source and resume it on the destination.
+
+1. Renumber the VM as instructed in <xref target="RFC4192"/>.
+
+1. Unstitch routing for the old address.
+
+
+If the VM is moved within the same subnet (which usually implies
+the same rack), there is no stitching or renumbering apart from
         ensuring that the MAC address moves with the VM. When the VM moves to
         a different subnet, however, we need to restitch routing, at least
-        temporarily. This obviously calls for some definitions. <list
-            style="hanging">
-            <t hangText="Stitching Routing:">The VM is potentially in
-            communication with two sets of peers: VMs in the same subnet, and
-            VMs in different subnets. <list style="symbols">
+        temporarily. This obviously calls for some definitions. 
+
+Stitching Routing
+: The VM is potentially in
+	communication with two sets of peers: VMs in the same subnet, and
+	VMs in different subnets. <list style="symbols">
                 The router in the new subnet is instructed to advertise a
                 host route (/128) to the moved VM, and to install a static
                 route to the old address with the VM's address in the new
                 subnet as its next hop address. Traffic from VMs from other
                 subnets will now follow the host route to the VM in its new
                 location.
-
-                The router in the old subnet is instructed to direct LAN
-                traffic to the VM's MAC Address to its IPv6 forwarding logic.
-                Traffic from other VMs in the old subnet will now follow the
+	The router in the old subnet is instructed to direct LAN
+	traffic to the VM's MAC Address to its IPv6 forwarding logic.
+	Traffic from other VMs in the old subnet will now follow the
                 host route to the moved VM.
-              </list>
+    
 
-            <t hangText="Renumbering:">This step is optional, but is good
-            hygiene if the VM will be there a while. If the VM will reside in
-            its new location only temporarily, it can be skipped. <vspace
-            blankLines="1"/> Note that every IPv6 address, unlike an IPv4
+Renumbering
+: This step is optional, but is good
+	hygiene if the VM will be there a while. If the VM will reside in
+    its new location only temporarily, it can be skipped.
+	Note that every IPv6 address, unlike an IPv4
             address, has a lifetime. At least in theory, when the lifetime
             expires, neighbor relationships with the address must be extended
-            or the address removed from the system. The <xref
-            target="RFC4861">Neighbor Discovery</xref> process in the subnet
+            or the address removed from the system. The Neighbor
+	Discovery {{RFC4861}} 
+	process in the subnet
             router will periodically emit a Router Advertisement; the VM will
             gain an IPv6 address in the new subnet at that time if not
-            earlier. As described in <xref target="RFC4192"/>, DNS should be
+            earlier. As described in {{RFC4192}}, DNS should be
             changed to report the new address instead of the old. The DNS
             lifetime and any ambient sessions using the old address are now
             allowed to expire. That this point, any new sessions will be using
-            the new address, and the old is vestigial. <vspace
-            blankLines="1"/> Waiting for sessions using the address to expire
+            the new address, and the old is vestigial.
+            Waiting for sessions using the address to expire
             can take an arbitrarily long interval, because the session
             generally has no knowledge of the lifetime of the IPv6
             address.
 
-            <t hangText="Unstitching Routing:">This is the reverse process of
-            stitching. If the VM is renumbered, when the old address becomes
+Unstitching Routing
+: This is the reverse process of
+	stitching. If the VM is renumbered, when the old address becomes
             vestigial, the address will be discarded by the VM; if the VM is
             subsequently taken out of service, it has the same effect. At that
             point, the host route is withdrawn, and the MAC address in the old
             subnet router's tables is removed.
-          </list>
-      </section>
-    </section>
 
-    <section anchor="implications" title="OpenStack implications">
-      <section anchor="config-implications" title="Configuration implications">
-        <list style="numbers">
-            Neutron MUST be configured with a pre-determined default label
-            value for each tenant virtual network <xref
-            target="ipv6-isolation"/>.
+# OpenStack implications {#implications}
 
-            Neutron MAY be configured with a set of authorized label values
-            for each tenant virtual network <xref
-            target="ipv6-isolation"/>.
+## Configuration implications {#config-implications}
 
-            A virtual tenant network MAY be configured with a set of
-            authorized label values <xref target="ipv6-isolation"/>.
+1. Neutron MUST be configured with a pre-determined default label
+   value for each tenant virtual network {{ipv6-isolation}}.
+   
+1. Neutron MAY be configured with a set of authorized label values
+   for each tenant virtual network {{pv6-isolation}}.
 
-            Neutron MUST be configured with one or more label values per
-            virtual tenant network that the network is permitted to receive
-            <xref target="ipv6-isolation"/>.
-          </list>
-      </section>
+1. A virtual tenant network MAY be configured with a set of
+   authorized label values {{ipv6-isolation}}.
 
-      <section anchor="vSwitch-implications" title="vSwitch implications">
-        On messages transmitted by a virtual machine <list style="hanging">
-            <t hangText="Label Correctness:">As described in <xref
-            target="security-isolation"/>, ensure that the label in the packet
+1. Neutron MUST be configured with one or more label values per
+   virtual tenant network that the network is permitted to receive
+            {{ipv6-isolation}}.
+
+## vSwitch implications {#vSwitch-implications}
+
+On messages transmitted by a virtual machine
+
+Label Correctness
+: As described in
+	{{security-isolation}}, ensure that the label in the packet
             is one that the VM is authorized to use. Exactly what label is in
             view is a deferred, and potentially configurable, option. Again
             Depending on configuration, the vSwitch may overwrite whatever
             value is there, or may ratify that the value there is as specified
             in a VM-specific list.
 
-            <t hangText="Source Address Validation:">As described in <xref
-            target="bcp38"/>, force the source address to be among those the
+Source Address Validation
+: As described in {{BCP38}},
+	force the source address to be among those the
             VM is authorized to use. The VM may simultaneously be authorized
             to use several addresses.
 
-            <t hangText="Destination Address Validation:">OpenStack for IPv4
-            permits a NAT translation, called a 'floating IP address', to
+Destination Address Validation
+: OpenStack for IPv4
+	permits a NAT translation, called a 'floating IP address', to
             enable a VM to communicate outside the domain; without that, it
             cannot. For IPv6, the destination address should be permitted by
             some access list, which may permit all addresses, or addresses
             matching one or more CIDR prefixes such as permitted multicast
             addresses, and the prefix of the data center.
-          </list>
 
-        On messages received for delivery to a virtual machine <list
-            style="hanging">
-            <t hangText="Label Authorization:">As described in <xref
-            target="ipv6-isolation"/>, the vSwitch only delivers a packet to a
+On messages received for delivery to a virtual machine
+
+Label Authorization
+: As described in {{ipv6-isolation}}, 
+	the vSwitch only delivers a packet to a
             VM if the VM is authorized to receive it. The VM may have been
             authorized to receive several such labels.
-          </list>
 
-        Each approach in the appendix discusses filtering.
-      </section>
-    </section>
+Each approach in the appendix discusses filtering.
 
-    <section anchor="IANA" title="IANA Considerations">
-      This document does not ask IANA to do anything.
-    </section>
+# IANA Considerations {#iana}
 
-    <section anchor="Security" title="Security Considerations">
-      In <xref target="isolation"/> and <xref
-      target="security-isolation"/>, this specification considers inter-tenant
+This document does not ask IANA to do anything.
+
+# Security Considerations {#Security}
+
+In {{isolation}} and {{security-isolation}}
+this specification considers inter-tenant
       and intra-tenant network isolation. It is intended to contribute to the
       security of a network, much like encapsulation in a maze of tunnels or
       VLANs might, but without the complexities and overhead of the management
@@ -895,180 +893,26 @@ a form of network ingress filtering {{?RFC2827}}. It
       firewall based on the concepts of role-based access control; if it can
       be readily determined that a sender is not authorized to communicate
       with a receiver, such a transmission is prevented.
-    </section>
 
-    <section anchor="Privacy" title="Privacy Considerations">
-      This specification places no personally identifying information in an
-      unencrypted part of a packet.
-    </section>
+# Privacy Considerations {#Privacy}
 
-    <section anchor="Acknowledgements" title="Acknowledgements">
-      This document grew out of a discussion among the authors and
-      contributors.
-    </section>
+This specification places no personally identifying information in an
+unencrypted part of a packet.
 
-    <section anchor="Contributors" title="Contributors">
-      <figure anchor="a">
-        <artwork align="left"><![CDATA[
+# Acknowledgements {#Acknowledgements}
 
-Puneet Konghot Cisco Systems San Jose, California 95134 USA Email:
-pkonghot@cisco.com
+This document grew out of a discussion among the authors and
+contributors.
 
-Shannon McFarland Cisco Systems Boulder, Colorado 80301 USA Email:
-shmcfarl@cisco.com ]]\></artwork>
-</figure>
-    </section>
-  
-</middle>
+# Contributors {#Contributors}
 
-<back> <!-- references split to informative and normative -->
+> Puneet Konghot Cisco Systems San Jose, California 95134 USA Email:
+> pkonghot@cisco.com
 
-    <references title="Normative References">
-      <?rfc include='reference.RFC.2119' ?>
+> Shannon McFarland Cisco Systems Boulder, Colorado 80301 USA Email:
+> shmcfarl@cisco.com ]]\></artwork>
 
-      <?rfc include='reference.RFC.2460' ?>
-    </references>
-
-    <references title="Informative References">
-      <reference anchor="UCC">
-        <front>
-          <title>Towards Cloud, Service and Tenant Classification for Cloud
-          Computing</title>
-
-          <author fullname="Sebastian Jeuk" initials="S." surname="Jeuk">
-            <organization/>
-          </author>
-
-          <author fullname="Jakub Szefer" initials="J." surname="Szefer">
-            <organization/>
-          </author>
-
-          <author fullname="Shi Zhou" initials="S." surname="Zhou">
-            <organization/>
-          </author>
-
-          <date month="May" year="2014"/>
-        </front>
-
-        <seriesInfo name="IEEE Xplore Digital Library:"
-                    value="Cluster, Cloud and Grid Computing (CCGrid), 2014 14th IEEE/ACM International Symposium"/>
-
-        <format target="http://ieeexplore.ieee.org/xpls/icp.jsp?arnumber=6846532"
-                type="HTML"/>
-      </reference>
-
-
-      <reference anchor="FaceBook-IPv6">
-        <front>
-          <title>Facebook Is Close to Having an IPv6-only Data Center
-          http://blog.ipspace.net/2014/03/facebook-is-close-to-having-ipv6-only.html</title>
-
-          <author fullname="I. Pepelnjak" initials="I." surname="Pepelnjak">
-            <organization>Internetworking perspectives by Ivan
-            Pepelnjak</organization>
-          </author>
-
-          <date month="March" year="2014"/>
-        </front>
-
-        <format target="http://blog.ipspace.net/2014/03/facebook-is-close-to-having-ipv6-only.html"
-                type="HTML"/>
-      </reference>
-
-      <?rfc include="reference.I-D.ietf-6man-default-iids" ?>
-
-      <?rfc include='reference.I-D.baker-ipv6-isis-dst-flowlabel-routing' ?>
-
-      <?rfc include='reference.I-D.baker-ipv6-ospf-dst-flowlabel-routing' ?>
-
-      <?rfc include="reference.I-D.gont-v6ops-ipv6-ehs-in-real-world" ?>
-
-      <?rfc include='reference.I-D.ietf-ospf-ospfv3-lsa-extend' ?>
-
-      <?rfc include='reference.I-D.ietf-savi-dhcp' ?>
-
-      <?rfc include='reference.I-D.ietf-v6ops-siit-dc' ?>
-
-      <?rfc include='reference.I-D.previdi-6man-segment-routing-header' ?>
-
-      <?rfc include="reference.I-D.ietf-v6ops-siit-dc-2xlat" ?>
-
-      <?rfc include="reference.I-D.ietf-softwire-map" ?>
-
-      <?rfc include="reference.I-D.ietf-softwire-map-t" ?>
-
-      <?rfc include='reference.RFC.1918' ?>
-
-      <?rfc include='reference.RFC.1981' ?>
-
-      <?rfc include='reference.RFC.2205' ?>
-
-      <?rfc include='reference.RFC.2391' ?>
-
-      <?rfc include='reference.RFC.2710' ?>
-
-      <?rfc include='reference.RFC.2827' ?>
-
-      <?rfc include='reference.RFC.2923' ?>
-
-      <?rfc include='reference.RFC.3439' ?>
-
-      <?rfc include='reference.RFC.3697' ?>
-
-      <?rfc include='reference.RFC.4192' ?>
-
-      <?rfc include='reference.RFC.4193' ?>
-
-      <?rfc include='reference.RFC.4291' ?>
-
-      <?rfc include='reference.RFC.4443' ?>
-
-      <?rfc include='reference.RFC.4601' ?>
-
-      <?rfc include='reference.RFC.4602' ?>
-
-      <?rfc include='reference.RFC.4604' ?>
-
-      <?rfc include='reference.RFC.4605' ?>
-
-      <?rfc include='reference.RFC.4607' ?>
-
-      <?rfc include='reference.RFC.4861' ?>
-
-      <?rfc include='reference.RFC.4862' ?>
-
-      <?rfc include='reference.RFC.4941' ?>
-
-      <?rfc include='reference.RFC.5120' ?>
-
-      <?rfc include='reference.RFC.5308' ?>
-
-      <?rfc include='reference.RFC.5340' ?>
-
-      <?rfc include='reference.RFC.5548' ?>
-
-      <?rfc include='reference.RFC.5673' ?>
-
-      <?rfc include='reference.RFC.6052' ?>
-
-      <?rfc include='reference.RFC.6144' ?>
-
-      <?rfc include='reference.RFC.6145' ?>
-
-      <?rfc include='reference.RFC.6146' ?>
-
-      <?rfc include='reference.RFC.6147' ?>
-
-      <?rfc include='reference.RFC.6437' ?>
-
-      <?rfc include='reference.RFC.6620' ?>
-
-      <?rfc include='reference.RFC.7217' ?>
-
-      <?rfc include='reference.RFC.7219' ?>
-
-      <?rfc include='reference.RFC.7348' ?>
-    </references>
+--- back
 
     <section anchor="log" title="Change Log">
       <list style="hanging">
