@@ -1325,31 +1325,30 @@ The model here suggests using the Policy List described in the
         in this case it would be a 128 bit number identifying the tenant or
         other set of communicating nodes.
 
-        <section title="Metaconsiderations">
-          <section title="Service offered">
-            To Be Supplied
-          </section>
+### Metaconsiderations
 
-          <section title="Pros and Cons">
-            <section title="The case in favor of this approach">
-              To Be Supplied
-            </section>
+#### Service offered
 
-            <section title="The case against">
-              To Be Supplied
-            </section>
-          </section>
+To Be Supplied
 
-          <section title="Filtering considerations">
-            To Be Supplied
-          </section>
-        </section>
-      </section>
+#### Pros and Cons
 
-      <section anchor="B-label-IID"
-               title="RFC 4291 Interface Identifier (IID)">
-        The approach starts from the observation that Openstack assigns the
-        MAC address used by a VM, and can assign it according to any algorithm
+##### The case in favor of this approach
+
+To Be Supplied
+
+##### The case against
+
+To Be Supplied
+
+#### Filtering considerations
+
+To Be Supplied
+
+## {{RFC4291}} Interface Identifier (IID) {#B-label-IID}
+
+The approach starts from the observation that Openstack assigns the
+MAC address used by a VM, and can assign it according to any algorithm
         it chooses. A desire has been expressed to put the tenant identifier
         into the IPv6 address. This would put it into the IID in that address
         without modifying the VM OS or the virtual switch.
@@ -1561,9 +1560,9 @@ system number within LAN | 24 bit OpenStack | | | Tenant Identifier |
         </section>
       </section>
 
-      <section anchor="B-5-label-Privacy-Address"
-               title="Modified IID using modified Privacy Extension">
-        This variant reflects and builds on the <xref target="RFC4291">IPv6
+## Modified IID using modified Privacy Extension {#B-5-label-Privacy-Address}
+
+This variant reflects and builds on the <xref target="RFC4291">IPv6
         Addressing Architecture</xref> <xref target="RFC4862">Stateless
         Address Autoconfiguration</xref>, and the associated <xref
         target="RFC4941">Privacy Extensions</xref>. The address format is
@@ -1586,28 +1585,6 @@ system number within LAN | 24 bit OpenStack | | | Tenant Identifier |
             a filter to prevent FCFS SAVI from learning addresses that have
             the wrong Tenant ID.
           </list>
-
-        <section title="Metaconsiderations">
-          <section title="Service offered">
-            To Be Supplied
-          </section>
-
-          <section title="Pros and Cons">
-            <section title="The case in favor of this approach">
-              To Be Supplied
-            </section>
-
-            <section title="The case against">
-              To Be Supplied
-            </section>
-          </section>
-
-          <section title="Filtering considerations">
-            To Be Supplied
-          </section>
-        </section>
-      </section>
-    </section>
 
 ### Metaconsiderations
 
