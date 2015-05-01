@@ -77,13 +77,17 @@ author:
 		email: gsalguei@cisco.com
 	
 informative:
-  Microsoft-Azure:
-    title: [Report: Microsoft Buys 100 Acres of Iowa land for Data Center](http://www.datacenterknowledge.com/archives/2014/08/01/report-microsoft-buys-100-acres-iowa-land-data-center/) 
-	author:
-	  ins: Y. Sverdlik
-	  name: Y. Sverdlik
-	  org: Data Center Knowledge
-	date: 2014-08
+	Microsoft-Azure:
+		title: [Report: Microsoft Buys 100 Acres of Iowa land for Data Center](http://www.datacenterknowledge.com/archives/2014/08/01/report-microsoft-buys-100-acres-iowa-land-data-center/) 
+			author:
+				ins: Y. Sverdlik
+				name: Y. Sverdlik
+				org: Data Center Knowledge
+				date: 2014-08
+
+	UCC:
+		title: Towards Cloud, Service and Tenant Classification for
+			Cloud Computing
 
 --- abstract
 
@@ -914,25 +918,24 @@ contributors.
 
 --- back
 
-    <section anchor="log" title="Change Log">
-      <list style="hanging">
-          <t hangText="Initial Version:">October 2014
+# Change Log {#log}
 
-          <t hangText="First update:">January 2015
-        </list>
-    </section>
+Initial Version
+: October 2014
 
-    <section anchor="label-appendix" title="Alternative Labels considered">
-      Several different approaches have been proposed to labeling packets.
-      The one we are prototyping first is <xref target="B-label-IID"/>.
+First update
+: January 2015
 
-      A use case that is primary in our thinking is shown in xref
-      target="use-case-1"/&gt;.
+# Alternative Labels considered {#label-appendix}
 
-      <figure anchor="use-case-1"
-              title="Multi-site Multi-administration data center application">
-        <artwork align="center"><![CDATA[
+Several different approaches have been proposed to labeling packets.
+The one we are prototyping first is {{B-label-IID}}.
 
+A use case that is primary in our thinking is shown in
+{{use-case-1}}.
+
+~~~~
+	
                        ,---------.
                      ,'Tenant A's `.
                     (  Home Network )
@@ -940,26 +943,33 @@ contributors.
                        `----+----'
                             |  2001:db8:3::/48
                    ,--------+--------.
+Data Center       (   "the Internet"  )   Data Center
+2001:db8:1::/48    `-----+------+----'    2001:db8:2::/48
+            ,-----.     /        \     ,-----.
+          ,'       `.  /          \  ,'       `.
+         /           \/            \/           \
+        /  ,-------.  \            /  ,-------.  \
+       / ,'Tenant A `. \          / ,'Tenant A `. \
+      / (  0xA12345   ) \        / (  0xC12345   ) \
+     ;   `.         ,'   :      ;   `.         ,'   :
+     |     `-------'     |      |     `-------'     |
+     |                   |      |                   |
+     |     ,-------.     |      |     ,-------.     |
+     :   ,'Tenant B `.   ;      :   ,'Tenant C `.   ;
+      \ (  0xB12345   ) /        \ (  0xA12345   ) /
+       \ `.         ,' /          \ `.         ,' /
+        \  `-------'  /            \  `-------'  /
+         \           /              \           /
+          `.       ,'                `.       ,'
+            '-----'                    '-----' 
 
-Data Center ( "the Internet" ) Data Center 2001:db8:1::/48
-`-----+------+----'    2001:db8:2::/48             ,-----.     /        \     ,-----.           ,'`.
-/   ,'
-`.          /           \/            \/           \         /  ,-------.  \            /  ,-------.  \        / ,'Tenant A`.
-  / ,'Tenant A
-`. \       / (  0xA12345   ) \        / (  0xC12345   ) \      ;`. ,' :
-; `.         ,'   :      |`-------' | |
-`-------'     |      |                   |      |                   |      |     ,-------.     |      |     ,-------.     |      :   ,'Tenant B`.
-; : ,'Tenant C
-`.   ;       \ (  0xB12345   ) /        \ (  0xA12345   ) /        \`.
-,' /  `.         ,' /         \`-------' /  
-`-------'  /          \           /              \           /`. ,' \`.
-,' '-----' '-----'
+	
+~~~~
+{: #use-case-1 title="Multi-site Multi-administration data center application}
 
-    ]]></artwork>
-      </figure>
 
-      In this use case, there exist two data centers that one might presume
-      are operated by different entities. The two data centers use separate
+In this use case, there exist two data centers that one might presume
+are operated by different entities. The two data centers use separate
       address spaces, 2001:db8:1::/48 and 2001:db8:2::/48. One tenant (which
       is to say, a set of systems, virtual or physical, that normally
       communicate with each other), Tenant A, is spread across the two data
@@ -971,84 +981,88 @@ Data Center ( "the Internet" ) Data Center 2001:db8:1::/48
       "home site" that is authorized to communicate with its data center
       systems.
 
-      From the perspective of communication management, therefore, to
-      connect Tenant A to itself and deny all other communications, we need
-      four filter rules: <list style="symbols">
-          Permit messages from/to 2001:db8:1::/48 with tenant ID
-          0xA12345,
+From the perspective of communication management, therefore, to
+connect Tenant A to itself and deny all other communications, we need
+four filter rules:
 
-          Permit messages from/to 2001:db8:2::/48 with tenant ID
-          0xC12345,
+1. Permit messages from/to 2001:db8:1::/48 with tenant ID
+   0xA12345,
 
-          Permit messages from/to 2001:db8:3::/48
+1. Permit messages from/to 2001:db8:2::/48 with tenant ID
+   0xC12345,
 
-          Deny everything else
-        </list>
+1. Permit messages from/to 2001:db8:3::/48
 
-      Ideally, one would like to apply those rules to the destination
-      address at the sender of a packet, and the source address at the
+1. Deny everything else
+
+Ideally, one would like to apply those rules to the destination
+address at the sender of a packet, and the source address at the
       receiver of a packet. And one would like to do so in a manner that
       minimizes the possibility of disruptive packet filtering such as
       discussed in <xref target="I-D.gont-v6ops-ipv6-ehs-in-real-world"/>.
 
-      In addition, one wants a BCP-38 filter, ensuring that packets sent by
-      a system (virtual or physical) uses only one of the source addresses it
+In addition, one wants a {{BCP38}} filter, ensuring that packets sent by
+a system (virtual or physical) uses only one of the source addresses it
       is supposed to be using.
 
-      <section anchor="B-label-2460" title="IPv6 Flow Label">
-        The IPv6 flow label may be used to identify a tenant or part of a
+## IPv6 Flow Label {#B-label-2460}
+
+The IPv6 flow label may be
+used to identify a tenant or part of a
         tenant, and to facilitate access control based on the flow label
         value. The flow label is a flat 20 bits, facilitating the designation
         of 2^20 (1,048,576) tenants without regard to their location.
         1,048,576 is less than infinity, but compared to current data centers
         is large, and much simpler to manage.
 
-        Note that this usage differs from the current <xref
-        target="RFC6437">IPv6 Flow Label Specification</xref>. It also differs
-        from the use of a flow label recommended by the <xref
-        target="RFC2460">IPv6 Specification</xref>, and the respective usages
-        of the flow label in the <xref target="RFC2205">Resource ReSerVation
-        Protocol</xref> and the previous <xref target="RFC3697">IPv6 Flow
-        Label Specification</xref>, and the projected usage in <xref
-        target="RFC5548">Low-Power and Lossy Networks</xref><xref
-        target="RFC5673"/>. Within a target domain, the usage may be specified
+Note that this usage differs from the current IPv6 Flow Label
+Specification {{!RFC6437}}.
+        It also differs
+        from the use of a flow label recommended by the
+        IPv6 Specification {{!RFC2460}}, and the respective usages
+        of the flow label in the {{!RFC2205}} (Resource ReSerVation
+        Protocol and the previous IPv6 Flow Label Specification {{!RFC3698}},
+        and the projected usage in Low-Power and Lossy Networks
+		{{!RFC5548}} {{!RFC5673}}.
+        Within a target domain, the usage may be specified
         by the domain. That is the viewpoint taken in this specification.
 
-        <section title="Metaconsiderations">
-          <section title="Service offered">
-            To Be Supplied
-          </section>
+### Metaconsiderations
 
-          <section title="Pros and Cons">
-            <section title="The case in favor of this approach">
-              To Be Supplied
-            </section>
+#### Service offered
 
-            <section title="The case against">
-              To Be Supplied
-            </section>
-          </section>
+To Be Supplied
 
-          <section title="Filtering considerations">
-            To Be Supplied
-          </section>
-        </section>
-      </section>
+#### Pros and Cons
 
-      <section anchor="B-label-federated" title="Federated Identity">
-        <section title="Introduction">
-          In the course of developing draft-baker-ipv6-openstack-model, it
-          was determined that a way was needed to encode a federated identity
+##### The case in favor of this approach
+
+To Be Supplied
+
+##### The case against
+
+To Be Supplied
+
+#### Filtering considerations
+
+To Be Supplied
+
+## Federated Identity {#B-label-federated}
+
+### Introduction
+
+In the course of developing {{I.D-baker-ipv6-openstack-model}}, it
+was determined that a way was needed to encode a federated identity
           for use in Role-Based Access Control. This appendix describes an
-          <xref target="RFC2460">IPv6</xref> option that could be carried in
+          IPv6{{!RFC2460}} option that could be carried in
           the Hop-by-Hop or Destination Options Header. The format of an
           option is defined in section 4.2 of that document, and the
           Hop-by-Hop and Destination Options are defined in sections 4.3 and
           4.6 of that document respectively.
 
-          A 'Federated Identity', in the words of the Wikipedia, 'is the
-          means of linking an electronic identity and attributes, stored
-          across multiple distinct identity management systems.' In this
+A 'Federated Identity', in the words of the Wikipedia, 'is the
+means of linking an electronic identity and attributes, stored
+across multiple distinct identity management systems.' In this
           context, it is a fairly weak form of that; it is intended for quick
           interpretation in an access list at the Internet layer as opposed to
           deep analysis for login or other security purposes at the
@@ -1061,8 +1075,8 @@ Data Center ( "the Internet" ) Data Center 2001:db8:1::/48
           defined in a hierarchical fashion, for flexibility and
           scalability.
 
-          'Role-Based Access Control', in this context, applies to groups
-          of virtual or physical hosts, not individuals. In the simplest case,
+'Role-Based Access Control', in this context, applies to groups
+of virtual or physical hosts, not individuals. In the simplest case,
           the several tenants of a multi-tenant data center might be
           identified, and authorized to communicate only with other systems
           within the same 'tenant' or with identified systems in other tenants
@@ -1078,19 +1092,10 @@ Data Center ( "the Internet" ) Data Center 2001:db8:1::/48
           system filters traffic it receives to limit itself to a specific set
           of authorized communicants.
 
-          <!--
-    <section title='Requirements Language'>
-      The key words 'MUST', 'MUST NOT', 'REQUIRED', 'SHALL', 'SHALL NOT',
-      'SHOULD', 'SHOULD NOT', 'RECOMMENDED', 'MAY', and 'OPTIONAL' in this
-      document are to be interpreted as described in <xref
-      target='RFC2119'></xref>.
-    </section>
-    -->
-        </section>
+### Federated identity option {#B-sect2}
 
-        <section anchor="B-sect2" title="Federated identity Option">
-          The option is defined as a sequence of numbers that identify
-          relevant parties hierarchically. The specific semantics (as in, what
+The option is defined as a sequence of numbers that identify
+relevant parties hierarchically. The specific semantics (as in, what
           number identifies what party) are beyond the scope of this
           specification, but they may be interpreted as being successively
           more specific; as shown in <xref target="B-hierarchical"/>, the
@@ -1106,206 +1111,215 @@ Data Center ( "the Internet" ) Data Center 2001:db8:1::/48
           are federated, the identifier might need to identify the data
           center, the client, and the structure of the client.
 
-          <figure anchor="B-hierarchical"
-                  title="Use case: Identifying authorized communicatants in an RBAC environment">
-            <artwork align="center"><![CDATA[
+~~~~
                    _.----------------------.
            _.----''                         `------.
       ,--''                                         `---.
+   ,-' DataCenter      .---------------------.           `-.
+ ,'    Company #2,---''      Unauthorized     `----.        `.
+;              ,' ,-----+-----.        ,--+--------.`.        :
+|             (  ( Department 1)--//--( Department 2) )       |
+;              `. `-----+----+'        `-----------','        |
+ `.              `----. |     X Company A     _.---'        ,'
+   '-.                 A|------X------------''           ,-'
+      `---.            u|       X                   _.--'
+           `------.    t|        X          _.----''
+                   `---h|---------X-------''
+                       o|          X
+                   _.--r+-----------X------.
+           _.----''    i|            X      `------.
+      ,--''            z|             X             `---.
+   ,-' DataCenter      e|--------------X-----.           `-.
+ ,'    Company #2,---''d|               X     `----.        `.
+;              ,' ,-----+-----.        ,-+---------.`.        :
+|             (  ( Department 1)      ( Department 2) )       |
+;              `. `-----------'        `-----------','        |
+ `.              `----.     Company A         _.---'        ,'
+   '-.                 `--------------------''           ,-'
+      `---.                                         _.--'
+           `------.                         _.----''
+                   `----------------------''
+~~~~
+{: #B-hierarchical title="Use case: Identifying authorized communicatants in an RBAC environment"}
 
-,-' DataCenter .---------------------.
-`-.  ,'    Company #2,---''      Unauthorized`----.
-`. ;              ,' ,-----+-----.        ,--+--------.`. : | ( (
-Department 1)--//--( Department 2) ) | ; `.`-----+----+'
-`-----------','        |`.
-`----. |     X Company A     _.---'        ,'    '-.                 A|------X------------''           ,-'`---.
-u| X *.--'
-`------.    t|        X          _.----''`---h|---------X-------'' o| X
-*.--r+-----------X------. *.----'' i| X
-`------.       ,--''            z|             X`---. ,-' DataCenter
-e|--------------X-----.
-`-.  ,'    Company #2,---''d|               X`----.
-`. ;              ,' ,-----+-----.        ,-+---------.`. : | ( (
-Department 1) ( Department 2) ) | ; `.`-----------'
-`-----------','        |`.
-`----.     Company A         _.---'        ,'    '-.`--------------------''
-,-' `---.                                         _.--'`------. *.----''
-\`----------------------'' ]]\></artwork>
-</figure>
+#### Option Format {#B-format}
 
-          <section anchor="B-format" title="Option Format">
-            A number (<xref target="B-number"/>) is represented as a base
-            128 number whose coefficients are stored in the lower 7 bits of a
+A number {{B-number}} is represented as a base
+128 number whose coefficients are stored in the lower 7 bits of a
             string of bytes. The upper bit of each byte is zero, except in the
             final byte, in which case it is 1. The most significant
             coefficient of a non-zero number is never zero.
 
             <figure anchor="B-number" title="Sample numbers">
               <artwork align="center"><![CDATA[
+~~~~
+8 = 8*128^0
++-+------+
+|1|    8 |
++-+------+
 
-8 = 8\*128\^0 +-+------+ |1| 8 | +-+------+
-
-987 = 7*128\^1 + 91*128\^0 +-+------+-+------+ |0| 7 |1| 91 |
+987 = 7*128^1 + 91*128^0
++-+------+-+------+
+|0|    7 |1|   91 |
 +-+------+-+------+
 
-121393 = 7*128\^2 + 52*128\^1 + 49\*128\^0 +-+------+-+------+-+------+
-|0| 7 |0| 52 |1| 49 | +-+------+-+------+-+------+ ]]\></artwork>
-</figure>
+121393 = 7*128^2 + 52*128^1 + 49*128^0
++-+------+-+------+-+------+
+|0|    7 |0|   52 |1|   49 |
++-+------+-+------+-+------+
+~~~~
+{: #B-number title="Sample numbers"}
 
-            The identifier {8, 987, 121393} looks like
+The identifier {8, 987, 121393} looks like
 
             <figure anchor="B-identifier" title="">
               <artwork align="center"><![CDATA[
-
-+-------+-------+-+-----+-+-----+-+-----+-+-----+-+-----+-+-----+ | type
-| len=6 |1| 8 |0| 7 |1| 91 |0| 7 |0| 52 |1| 49 |
+~~~~
 +-------+-------+-+-----+-+-----+-+-----+-+-----+-+-----+-+-----+
-]]\></artwork>
-</figure>
+| type  | len=6 |1|   8 |0|   7 |1|  91 |0|   7 |0|  52 |1|  49 |
++-------+-------+-+-----+-+-----+-+-----+-+-----+-+-----+-+-----+
+~~~~
+{: #B-identifier}
 
-            <section anchor="B-destopt"
-                     title="Use in the Destination Options Header">
-              In an environment in which the validation of the option only
-              occurs in the receiving system or its hypervisor, this option is
+##### Use in the Destination Options Header {#B-destopt}
+
+In an environment in which the validation of the option only
+occurs in the receiving system or its hypervisor, this option is
               best placed in the Destination Options Header.
-            </section>
 
-            <section anchor="B-hopbyhop" title="Use in the Hop-by-Hop Header">
-              In an environment in which the validation of the option
-              occurs in transit, such as in a firewall or other router, this
+##### Use in the Hop-by-Hop Header {#B-hopbyhop}
+
+In an environment in which the validation of the option
+occurs in transit, such as in a firewall or other router, this
               option is best placed in the Hop-by-Hop Header.
-            </section>
-          </section>
-        </section>
 
-        <section title="Metaconsiderations">
-          <section title="Service offered">
-            To Be Supplied
-          </section>
+### Metaconsiderations {#Metaconsiderations}
 
-          <section title="Pros and Cons">
-            <section title="The case in favor of this approach">
-              To Be Supplied
-            </section>
+#### Service offered
 
-            <section title="The case against">
-              To Be Supplied
-            </section>
-          </section>
+To Be Supplied
 
-          <section title="Filtering considerations">
-            To Be Supplied
-          </section>
-        </section>
-      </section>
+#### Pros and Cons
 
-      <section anchor="Appendix_UCC" title="Universal Cloud Classification">
-        <section anchor="UCC_Intro" title="Introduction">
-          Cloud environments suffer from ambiguity in identifying their
-          services and tenants. Traffic from different cloud providers cannot
+##### The case in favor of this approach
+
+To Be Supplied
+
+##### The case against
+
+To Be Supplied
+
+### Filtering considerations
+
+To Be Supplied
+
+## Universal Cloud Classification {#Appendix_UCC}
+
+### Introduction {#UCC_Intro}
+
+Cloud environments suffer from ambiguity in identifying their
+services and tenants. Traffic from different cloud providers cannot
           be distinguished easily on the Internet. Filters are simply not able
           to obtain the provider, service and tenant identities from network
           packets without leveraging other more latency intense inspection
           methods. This appendix describes the Universal Cloud Classification
-          (UCC) <xref target="UCC"/> approach as a way to identify cloud
+          (UCC) {{UCC}} approach as a way to identify cloud
           providers, their services and tenants on the network layer. It
           introduces a Cloud-ID, Service-ID and Tenant-ID. The IDs are
           incorporated into an IPv6 extension header and can be used for
           different use-cases both within and outside a Cloud Environment. The
-          format of the IDs and their characteristics are defined in <xref
-          target="UCC_Options"/> of the document and the extension header is
-          defined in <xref target="UCC_Extensions_Header"/>.
+          format of the IDs and their characteristics are defined in
+          {{UCC_Options}} of the document and the extension header is
+          defined in {{UCC_Extensions_Header}}.
 
-          Applications and users are defined in many different ways in
-          cloud environments, therefore ambiguity is multifold:<list
-              style="numbers">
-              The first ambiguity is described by how a service is defined
-              in cloud environments. Here, an application within a Cloud
-              Provider is called a service. However, the cloud providers
+Applications and users are defined in many different ways in
+cloud environments, therefore ambiguity is multifold:
+
+1. The first ambiguity is described by how a service is defined
+   in cloud environments. Here, an application within a Cloud
+   Provider is called a service. However, the cloud providers
               network can not distinguish services from services run on top of
               other services. Distinguishing sub-services hosted by a service
               becomes critical when applying network services to specific
               sub-services.
 
-              Secondly, a tenant in a cloud provider can have different
-              meanings. Here, tenant is used to define a consumer of a cloud
+1. Secondly, a tenant in a cloud provider can have different
+   meanings. Here, tenant is used to define a consumer of a cloud
               service. At the same time a service run on top of another
               service can be considered a tenant of that particular service.
               These ambiguities make it extremely difficult to uniquely
               identify services and their tenants in cloud environments. This
               multi-layered service and tenant relationship is one of the most
               complex tasks to handle using existing technologies.
-            </list>
 
-          A service can be defined as a group of entities offering a
-          specific function to a tenant within a Cloud Provider.
-        </section>
+A service can be defined as a group of entities offering a
+specific function to a tenant within a Cloud Provider.
 
-        <section anchor="UCC_Options"
-                 title="Universal Cloud Classification Options">
-          Three IDs are defined that classify a Tenant specific to the
-          service used within a certain Cloud Provider. The Cloud-ID,
+### Universal Cloud Classification Options {{UCC_Options}}
+
+Three IDs are defined that classify a Tenant specific to the
+service used within a certain Cloud Provider. The Cloud-ID,
           Service-ID and Tenant-ID are defined hierarchically and support
           service-stacking. The IDs are based on the 'Digital Object
           Identifier' scheme and support incorporating metadata per ID. The ID
           can be of variable length but Cloud-ID, Service-ID and Tenant-ID are
           proposed within a 4 byte, 6 byte and 6 byte tuple respectively.
 
-          <section anchor="UCC_Cloud_ID" title="Cloud ID">
-            The Cloud ID is a globally unique ID that is managed by a
+#### Cloud ID {#UCC_Cloud_ID}
+
+The Cloud ID is a
+globally unique ID that is managed by a
             registrar similar to DNS. It is 4 bytes in sizes and defined with
             a 10 bit location part and a 22 bit provider ID.
-          </section>
 
-          <section anchor="UCC_Service_ID" title="Service ID">
-            The Service ID is used to identify a service both within and
-            outside a cloud environment. It is a 6 byte long ID that is
+#### Service ID {#UCC_Service_ID}
+
+The Service ID is used to identify a service both within and
+outside a cloud environment. It is a 6 byte long ID that is
             separated into several sub-IDs defining the data center, service
             and an option field. The Data Center location is defined by 8
             bits, the Service is 32 bits long and the Option field provides
             another 8 bits. The option bits can be used to incorporate
             information used for en-route or destination tasks.
-          </section>
 
-          <section anchor="UCC_Tenant_ID" title="Tenant ID">
-            The Tenant-ID is classifying consumers (tenants) of Cloud
-            Services. It is a 6 byte long ID that is defined and managed by
+#### Tenant ID {#UCC_Tenant_ID}
+
+The Tenant-ID is classifying consumers (tenants) of Cloud
+Services. It is a 6 byte long ID that is defined and managed by
             the Cloud Provider. Similar to the Service-ID the Tenant-ID
             incorporates metadata specific to that tenant. The MetaData field
             is of variable length and can be defined by the Cloud Provider as
             needed.
-          </section>
-        </section>
 
-        <section anchor="UCC_Extensions_Header" title="UCC Extension Header">
-          The UCC proposal <xref target="UCC"/> defines an IPv6 hop-by-hop
-          extension header to incorporate the Cloud-ID, Service-ID and
+### UCC Extension Header {#UCC_Extensions_Header}
+
+The UCC proposal {{{UCC}} defines an IPv6 hop-by-hop
+extension header to incorporate the Cloud-ID, Service-ID and
           Tenant-ID. Each ID area also includes bits to define enroute
           behavior for devices understanding/not-understanding the newly
           defined hop-by-hop extension header. This is useful for legacy
           devices on the Internet to avoid drops the packet but forward it
           without processing the added IPv6 extension header. <figure
-              anchor="UCCheader" title="UCC IPv6 hop-by-hop extension header">
-              <artwork align="center"><![CDATA[
 
-0 8 16 24 32 40 48 56 64
-+-------+-------+-------+-------+-------+-------+-------+-------+ | FLAG
-| SIZE | CLOUD-ID | FLAG | SIZE |
-+-------+-------+-------+-------+-------+-------+-------+-------+ |
-SERVICE-ID | FLAG | SIZE |
-+-------+-------+-------+-------+-------+-------+-------+-------+ |
-TENANT-ID | +-------+-------+-------+-------+-------+-------+
-]]\></artwork>
-</figure> 
+~~~~
+0       8       16      24      32      40      48      56      64
++-------+-------+-------+-------+-------+-------+-------+-------+
+| FLAG  |  SIZE |    CLOUD-ID                   |  FLAG | SIZE  |
++-------+-------+-------+-------+-------+-------+-------+-------+
+|                    SERVICE-ID                 |  FLAG | SIZE  |
++-------+-------+-------+-------+-------+-------+-------+-------+
+|                    TENANT-ID                  |
++-------+-------+-------+-------+-------+-------+
+~~~~
+{: #UCCheader title="UCC IPv6 hop-by-hop extension header"}
+
 The overall extension header size is 22 bytes.
-</section>
-      </section>
 
-      <section anchor="B-label-segment-routing"
-               title="Policy List in Segment Routing Header">
-        The model here suggests using the Policy List described in the
-        <xref target="I-D.previdi-6man-segment-routing-header">IPv6 Segment
-        Routing Header</xref>. Technically, it would violate that
+
+## Policy List in Segment Routing Header {#B-label-segment-routing}
+
+The model here suggests using the Policy List described in the
+{{I-D.previdi-6man-segment-routing-header}}. Technically, it would violate that
         specification, as the Policy List is described as containing a set of
         optional addresses representing specific nodes in the SR path, where
         in this case it would be a 128 bit number identifying the tenant or
@@ -1595,4 +1609,23 @@ system number within LAN | 24 bit OpenStack | | | Tenant Identifier |
       </section>
     </section>
 
-</back> </rfc>
+### Metaconsiderations
+
+#### Service offered
+
+To Be Supplied
+
+#### Pros and Cons
+
+##### The case in favor of this approach
+
+To Be Supplied
+
+##### The case against
+
+To Be Supplied
+
+#### Filtering considerations
+
+To Be Supplied
+
