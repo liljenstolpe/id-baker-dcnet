@@ -1353,15 +1353,16 @@ MAC address used by a VM, and can assign it according to any algorithm
         into the IPv6 address. This would put it into the IID in that address
         without modifying the VM OS or the virtual switch.
 
-        <section anchor="address-format" title="Address Format">
-          The proposed address format is identical to the IPv6 <xref
-          target="RFC4291">EUI-48 based Address</xref>, and is derived from
-          the MAC address space specified in <xref
-          target="RFC4862">SLAAC</xref>. However, the MAC address provided by
+### Address Format {#address-format}
+
+The proposed address format is identical to the IPv6 EUI-48 {{RFC4291}}
+and is derived from
+the MAC address space specified in SLAAC {{RFC4862}}
+However, the MAC address provided by
           the OpenStack Controller differs from an IEEE 802.3 MAC Address.
 
-          Walking through the details, an IEEE 802.3 MAC Address (<xref
-          target="MAC"/>) consists of two single bit fields, a 22 bit
+Walking through the details, an IEEE 802.3 MAC Address {{MAC}}
+consists of two single bit fields, a 22 bit
           Organizationally Unique Identifier (OUI), and a serial number or
           other NIC-specific identifier. The intention is to create a globally
           unique address, so that the NIC may be used on any LAN in the world
@@ -1371,94 +1372,108 @@ MAC address used by a VM, and can assign it according to any algorithm
                   title="Ethernet MAC Address as specified by IEEE 802.3">
             <artwork align="center"><![CDATA[
 
-0 8 16 24 32 40 +-------+-------+-------+-------+-------+-------+
-|Organizationally Unique| NIC Specific Number | | Identifier (OUI) | |
-+-------+-------+-------+-------+-------+-------+ AA |+---
-0=Unicast/1=Multicast +---- 1=Local/0=Global ]]\></artwork>
-</figure>
+~~~~
+ 0       8       16      24      32      40
++-------+-------+-------+-------+-------+-------+
+|Organizationally Unique|  NIC Specific Number  |
+| Identifier (OUI)      |                       |
++-------+-------+-------+-------+-------+-------+
+      AA
+      |+--- 0=Unicast/1=Multicast
+      +---- 1=Local/0=Global
+~~~~
+{: #MAC title="Ethernet MAC Address as specified by IEEE 802.3"}
 
-          <xref target="RFC4291"/> describes a transformation from that
-          address (which it refers to as an EUI-48 address) to the IID of an
-          IPv6 Address (<xref target="addr4291"/>).
+{{RFC4291}} describes a transformation from that
+address (which it refers to as an EUI-48 address) to the IID of an
+          IPv6 Address {{addr4291}}.
 
           <figure anchor="addr4291" title="RFC 4291 IPv6 Address">
-            <artwork align="center"><![CDATA[
-
-0 8 16 24 32 40 48 56
+          <artwork align="center"><![CDATA[
+		  
+~~~~
+0       8       16      24      32      40      48      56
 +-------+-------+-------+-------+-------+-------+-------+-------+
-|Organizationally Unique| Fixed Value | NIC Specific Number | |
-Identifier (OUI) | | |
-+-------+-------+-------+-------+-------+-------+-------+-------+ AA
-|+--- Reserved +---- 0=Local/1=Global ]]\></artwork>
-</figure>
+|Organizationally Unique| Fixed Value   |  NIC Specific Number  |
+| Identifier (OUI)      |               |                       |
++-------+-------+-------+-------+-------+-------+-------+-------+
+      AA
+      |+--- Reserved
+      +---- 0=Local/1=Global
+~~~~
+{: #addr4291 title="RFC 4291 IPv6 Address"}
 
-          OpenStack today specifies a local IEEE 802.3 address (bit 6 is
-          one). IPv6 addresses are either installed using DHCP or derived from
+OpenStack today specifies a local IEEE 802.3 address (bit 6 is
+one). IPv6 addresses are either installed using DHCP or derived from
           the MAC address via SLAAC.
 
-          One could imagine the MAC address used in an OpenStack
-          environment including both a tenant identifier and a system number
+One could imagine the MAC address used in an OpenStack
+environment including both a tenant identifier and a system number
           on a LAN. If the tenant identifier is 24 bits (it could be longer or
           shorter, but for this document it is treated as 24 bits), as in
           common in VxLAN and QinQ implementations, that would allow for a 22
           bit system number, plus two magic bits specifying a locally defined
-          unicast address, as shown in <xref target="TenantMAC"/>.
+          unicast address, as shown in {{TenantMAC}}.
           Alternatively, the first byte could be some specified values such as
           0xFA (as is common with current OpenStack implementations), followed
           by a 16 bit system number within the subnet.
 
-          <figure anchor="TenantMAC"
-                  title="Ethernet MAC Address as installed by OpenStack">
-            <artwork align="center"><![CDATA[
+ ~~~~
+ 0       8       16      24      32      40    47
++-------+-------+-------+-------+-------+-------+
+|System Number within   | Openstack Tenant      |
+|    LAN                | Identifier            |
++-------+-------+-------+-------+-------+-------+
+      AA
+      |+--- 0=Unicast/1=Multicast
+      +---- 1=Local/0=Global
+ ~~~~
+{: #TenantMAC title="Ethernet MAC Address as installed by OpenStack"}
 
-0 8 16 24 32 40 47 +-------+-------+-------+-------+-------+-------+
-|System Number within | Openstack Tenant | | LAN | Identifier |
-+-------+-------+-------+-------+-------+-------+ AA |+---
-0=Unicast/1=Multicast +---- 1=Local/0=Global ]]\></artwork>
-</figure>
-
-          After being passed through SLAAC, that results in an IID that
-          contains the Tenant ID in bits 48..63, has bit 6 zero as a
+After being passed through SLAAC, that results in an IID that
+contains the Tenant ID in bits 48..63, has bit 6 zero as a
           locally-specified unicast address, and a 22 bit system number, as in
-          <xref target="SLAACIPv6"/>.
+          {{SLAACIPv6}}.
 
-          <figure anchor="SLAACIPv6"
-                  title="RFC 4291 IPv6 IID Derived from OpenStack MAC Address">
-            <artwork align="center"><![CDATA[
-
-0 8 16 24 32 40 48 56 63
+~~~~
+ 0       8       16      24      32      40      48      56    63
 +-------+-------+-------+-------+-------+-------+-------+-------+
-|system number within | Fixed Value | 24 bit OpenStack | | LAN | |
-Tenant Identifier |
-+-------+-------+-------+-------+-------+-------+-------+-------+ AA
-|+--- Reserved +---- 0=Local/1=Global ]]\></artwork>
-</figure>
+|system number within   | Fixed Value   |  24 bit OpenStack     |
+| LAN                   |               |  Tenant Identifier    |
++-------+-------+-------+-------+-------+-------+-------+-------+
+      AA
+      |+--- Reserved
+      +---- 0=Local/1=Global
+~~~~
+{: #SLAACIPv6 title="RFC 4291 IPv6 IID Derived from OpenStack MAC Address}
 
-          More generally, if SLAAC is not in use and addresses are conveyed
-          using DHCPv6 or another technology, the IID would be as described in
-          <xref target="TenantIPv6"/>.
+More generally, if SLAAC is not in use and addresses are conveyed
+using DHCPv6 or another technology, the IID would be as described in
+{{TenantIPv6}}.
 
-          <figure anchor="TenantIPv6" title="Generalized Tenant IID">
-            <artwork align="center"><![CDATA[
+~~~~
+0       8       16      24      32      40      48      56    63
++-------+-------+-------+-------+-------+-------+-------+-------+
+|        system number within LAN       |  24 bit OpenStack     |
+|                                       |  Tenant Identifier    |
++-------+-------+-------+-------+-------+-------+-------+-------+
+      AA
+      |+--- Reserved
+      +---- 0=Local/1=Global
+~~~~
+{: #TennantIPv6 title="Generalized Tenant IID"}
 
-0 8 16 24 32 40 48 56 63
-+-------+-------+-------+-------+-------+-------+-------+-------+ |
-system number within LAN | 24 bit OpenStack | | | Tenant Identifier |
-+-------+-------+-------+-------+-------+-------+-------+-------+ AA
-|+--- Reserved +---- 0=Local/1=Global ]]\></artwork>
-</figure>
-
-          As noted, the Tenant Identifier might be longer or shorter in a
-          given implementation. Specifically in <xref target="TenantIPv6"/>, a
+As noted, the Tenant Identifier might be longer or shorter in a
+given implementation. Specifically in {{TenantIPv6}}, a
           32 bit Tenant ID would occupy bit positions 32..63, and a 16 bit
           Tenant ID would occupy positions 48..63.
 
-          Following the same model, IPv6 Multicast Addresses can be
-          associated with a tenant identifier by placing the tenant identifier
+Following the same model, IPv6 Multicast Addresses can be
+associated with a tenant identifier by placing the tenant identifier
           in the same set of bits and using the remaining bits of the
-          Multicast Group ID as the ID within the tenant as show in <xref
-          target="TenantMulticast"/>. Flags and scope are as specified in
-          <xref target="RFC4291"/> section 2.7. To avoid clashes with
+          Multicast Group ID as the ID within the tenant as show in
+          {{TenantMulticast}}. Flags and scope are as specified in
+          {{RFC4291}} section 2.7. To avoid clashes with
           multicast addresses specified in ibid 2.7.1 and future allocations,
           The Tenant Group ID MUST NOT be zero.
 
@@ -1466,125 +1481,125 @@ system number within LAN | 24 bit OpenStack | | | Tenant Identifier |
                   title="RFC 4291 Multicast Address with Tenant ID">
             <artwork align="center"><![CDATA[
 
-| 8 | 4 | 4 | 88 bits 24 bits | +------
--+----+----+-----------------------------+---------------+
-|11111111|flgs|scop| Tenant Group ID | Tenant ID |
+~~~~
 +--------+----+----+-----------------------------+---------------+
-]]\></artwork>
-</figure>
-        </section>
+|   8    |  4 |  4 |           88 bits           |   24 bits     |
++--------+----+----+-----------------------------+---------------+
+|11111111|flgs|scop|        Tenant Group ID      |  Tenant ID    |
++--------+----+----+-----------------------------+---------------+
+~~~~
+{: #TenantMulticast title="RFC 4291 Multicast Address with Tenant ID"}
 
-        <section title="Metaconsiderations">
-          <section title="Service offered">
-            The fundamental service offered in this model is that the key
-            policy parameter, the Tenant ID, is encoded in every datagram for
+
+### Metaconsiderations
+
+#### Service offered
+
+The fundamental service offered in this model is that the key
+policy parameter, the Tenant ID, is encoded in every datagram for
             both sender and receiver, and can therefore be tested by sender,
             receiver, or any other party. It is secure in the sense that it
             cannot be directly spoofed; in the sender vSwitch, the vSwitch
             prevents the sender from sending another address as discussed in
-            <xref target="bcp38"/>, and if the recipient address is a randomly
+            {{BCP38}}, and if the recipient address is a randomly
             chosen address, even if it meets inter-tenant communication
             policy, there is unlikely to be a matching destination to deliver
             it to. Where this breaks down is if a valid and acceptable
             destination is discovered and used; that is the argument for
             further protection via TLS.
-          </section>
 
-          <section title="Pros and Cons">
-            <section title="The case in favor of this approach">
-              The case in favor of this approach consists of several
-              observations: <list style="symbols">
-                  Many Cisco customers are using and prefer SLAAC for IPv6
-                  clients in OpenStack environments.
+#### Pros and Cons
 
-                  It is easy to configure this IID from the Neutron
-                  Controller without modifying the VM, or it even knowing it
-                  happened.
+##### The case in favor of this approach
 
-                  From a security perspective, the tenant ID cannot be
-                  spoofed per se; the sender of a message is not permitted to
-                  send a message from the wrong address or to an unauthorized
-                  address.
+The case in favor of this approach consists of several
+observations: 
 
-                  Since it requires no extension headers or other
-                  encapsulations, it has no impact on Path MTU.
+* Many Cisco customers are using and prefer SLAAC for IPv6
+  clients in OpenStack environments.
 
-                  Filters can be applied anywhere, and notably at the
-                  sender and the receiver of a message.
-                </list>
-            </section>
+* It is easy to configure this IID from the Neutron
+  Controller without modifying the VM, or it even knowing it
+  happened.
 
-            <section title="The case against">
-              In <xref target="I-D.ietf-6man-default-iids"/>, the IETF is
-              moving toward deprecating <xref target="RFC4291"/>'s Modified
-              EUI-64 IID.
-            </section>
-          </section>
+* From a security perspective, the tenant ID cannot be
+  spoofed per se; the sender of a message is not permitted to
+  send a message from the wrong address or to an unauthorized
+  address.
 
-          <section title="Filtering considerations">
-            In this model, the vSwitch needs, for each VM it manages, two
-            access control lists: <list style="symbols">
-                Zero or more {IPv6 prefix, tenant ID} pairs; these may be
-                read as 'if the IPv6 prefix matches {prefix}, the IID contains
-                a tenant ID, and it may be {tenant ID}.'
+* Since it requires no extension headers or other
+  encapsulations, it has no impact on Path MTU.
 
-                Zero or more IPv6 prefixes that the VM is authorized to
-                communicate without regard to tenant ID.
-              </list>
+* Filters can be applied anywhere, and notably at the
+  sender and the receiver of a message.
 
-            Generally speaking, one would expect at least one of those
-            three lists to contain an entry - at minimum, the VM would be
+##### The case against
+
+In {{I-D.ietf-6man-default-iids}}, the IETF is
+moving toward deprecating {{RFC4291}}'s Modified
+EUI-64 IID.
+
+#### Filtering considerations
+
+In this model, the vSwitch needs, for each VM it manages, two
+access control lists:
+
+* Zero or more {IPv6 prefix, tenant ID} pairs; these may be
+  read as 'if the IPv6 prefix matches {prefix}, the IID contains
+  a tenant ID, and it may be {tenant ID}.'
+
+* Zero or more IPv6 prefixes that the VM is authorized to
+  communicate without regard to tenant ID.
+
+Generally speaking, one would expect at least one of those
+three lists to contain an entry - at minimum, the VM would be
             authorized to communicate with ::/0, which is to say 'anyone'.
 
-            Among the generic IPv6 prefixes that may be communicated with,
-            there may be zero or more <xref target="RFC6052">IPv4-embedded
-            IPv6 prefix</xref> prefixes that the VM is permitted to
-            communicate with. For example, if the <xref
-            target="I-D.ietf-v6ops-siit-dc"/> translation prefix is
+Among the generic IPv6 prefixes that may be communicated with,
+there may be zero or more {{RFC6052}} IPv4-embedded
+            IPv6 prefix prefixes that the VM is permitted to
+            communicate with. For example, if the 
+            {{I-D.ietf-v6ops-siit-dc}} translation prefix is
             2001:db8:0:1::/96, and the enterprise is using 192.0.2.0/24 as its
             IPv4 address, the filter would contain the prefix
             2001:db8:0:1:0:0:c000:0200/120.
 
-            Note that the lists may also include multicast prefixes as
-            specified in <xref target="address-format"/>, such as
+Note that the lists may also include multicast prefixes as
+specified in {{address-format}}, such as
             locally-scoped multicast ff01::/104 or locally-scoped multicast
             within the tenant {ff01::/16, tenant id} . While these access
             lists are applied in both directions (as a sender, what prefixes
             may the destination address contain, and as a receiver, what
             prefixes may the source address contain), only the destination
             address may contain multicast addresses. For multicast, therefore,
-            the vSwitch should filter <xref target="RFC2710">Multicast
-            Listener Discovery</xref> using the multicast subset, permitting
+            the vSwitch should filter {{RFC2710}} Multicast
+            Listener Discovery using the multicast subset, permitting
             the VM to only join relevant multicast groups.
-          </section>
-        </section>
-      </section>
 
 ## Modified IID using modified Privacy Extension {#B-5-label-Privacy-Address}
 
-This variant reflects and builds on the <xref target="RFC4291">IPv6
-        Addressing Architecture</xref> <xref target="RFC4862">Stateless
-        Address Autoconfiguration</xref>, and the associated <xref
-        target="RFC4941">Privacy Extensions</xref>. The address format is
-        identical to that of <xref target="B-label-IID"/>, with the exception
-        that The 'System Number within the LAN' is a random number determined
+This variant reflects and builds on the {{RFC4291}} IPv6
+Addressing Architecture, {{RFC4862}} Stateless
+Address Autoconfiguration, and the associated 
+{{RFC4941}} Privacy Extensions. The address format is
+identical to that of {{B-label-IID}}, with the exception
+that The 'System Number within the LAN' is a random number determined
         by the host rather than being specified by the controller.
 
-        It does have implications, however. It will require <list
-            style="symbols">
-            a modification to <xref target="RFC4941"/> to have the host
-            include the Tenant ID in the IID,
+It does have implications, however. It will require
 
-            a means to inform the host of the Tenant ID,
+* a modification to {{RFC4941}} to have the host
+  include the Tenant ID in the IID,
 
-            a means to inform the vSwitch of the Tenant ID,
+* a means to inform the host of the Tenant ID,
 
-            a the vSwitch to follow <xref target="RFC6620">FCFS SAVI</xref>
-            to learn the addresses being used by the host, and
+* a means to inform the vSwitch of the Tenant ID,
 
-            a filter to prevent FCFS SAVI from learning addresses that have
-            the wrong Tenant ID.
-          </list>
+* a the vSwitch to follow <xref target="RFC6620">FCFS SAVI</xref>
+  to learn the addresses being used by the host, and
+
+* a filter to prevent FCFS SAVI from learning addresses that have
+  the wrong Tenant ID.
 
 ### Metaconsiderations
 
