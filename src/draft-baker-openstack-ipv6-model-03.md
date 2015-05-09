@@ -550,45 +550,45 @@ embedded in a prefix used by the translator.
 
 This follows the Framework for IPv4/IPv6 translation {{?RFC6144}}
 making the internal IPv4 address a floating IP
-            address attached to an internal IPv6 address, and the external
-            'dial-out' address indistinguishable from a native IPv6
-            address.
+address attached to an internal IPv6 address, and the external
+'dial-out' address indistinguishable from a native IPv6
+address.
 
 #### Legacy IPv4 OpenStack
 
 The other possible model, applicable to IPv4-only devices, is
 to run a legacy OpenStack environment inside IPv6 tunnels. This
-            preserves the data center IPv6-only, and enables IPv4-only
-            applications, notably those whose licenses tie them to IPv4
-            addresses, to run. However, it adds significant overhead in terms
-            of encapsulation size and network management complexity.
+preserves the data center IPv6-only, and enables IPv4-only
+applications, notably those whose licenses tie them to IPv4
+addresses, to run. However, it adds significant overhead in terms
+of encapsulation size and network management complexity.
 
 ### Use of Global Addresses by the data center {#dc}
 
 Every rack and physical host requires an IP prefix that is
 reachable by the OpenStack operator. This will normally be a global
-          IPv6 unicast address. For scalability purposes, as isolation is
-          handled separately, this is normally the same prefix as is used by
-          tenants in the rack.
+IPv6 unicast address. For scalability purposes, as isolation is
+handled separately, this is normally the same prefix as is used by
+tenants in the rack.
 
 ## Inter-tenant security services {#security-isolation}
 
 In this model, the a label is used to identify a set of virtual or
 physical systems under common ownership and administration that are
-        authorized to communicate freely among themselves - a tenant. Tenants
-        are not generally authorized to communicate with each other, but
-        interactions between specified tenants may be authorized, and specific
-        systems may be authorized to communicate generally.
+authorized to communicate freely among themselves - a tenant. Tenants
+are not generally authorized to communicate with each other, but
+interactions between specified tenants may be authorized, and specific
+systems may be authorized to communicate generally.
 
 The fundamental premise is that the vSwitch can determine whether a
 VM is authorized to send or receive a given message. It does so by
-        finding the label in a message being sent or received and comparing it
-        to a locally-held authorization policy. This policy would indicate
-        that the VM is permitted to send or receive messages containing one of
-        a small list of labels. In the case of a label contained in the IID of
-        an IPv6 address, it would also need to verify the prefix used in the
-        address, as this type of policy would be specific to an IPv6
-        prefix.
+finding the label in a message being sent or received and comparing it
+to a locally-held authorization policy. This policy would indicate
+that the VM is permitted to send or receive messages containing one of
+a small list of labels. In the case of a label contained in the IID of
+an IPv6 address, it would also need to verify the prefix used in the
+address, as this type of policy would be specific to an IPv6
+prefix.
 
 A set of possible choices that were considered is to be found in {{#label-appendix}}.
 The key questions are a list of
@@ -623,35 +623,35 @@ applied at
 
 Neutron today already implements a form of <xref
 Network ingress filtering {{?RFC2827}}.  It prevents the VM
-        from emitting traffic with an unauthorized MAC, IPv4, or IPv6 source
-        address.
+from emitting traffic with an unauthorized MAC, IPv4, or IPv6 source
+address.
 
 In addition to this, in this model Neutron prevents the VM from
 transmitting a network packet with an unauthorized label value. The VM
-        MAY be configured with and authorized to use one of a short list of
-        authorized label values, as opposed to simply having its choice
-        overridden; in that case, Neutron verifies the value and overwrites
-        one not in the list.
+MAY be configured with and authorized to use one of a short list of
+authorized label values, as opposed to simply having its choice
+overridden; in that case, Neutron verifies the value and overwrites
+one not in the list.
 
 When a hypervisor is about to deliver an IPv6 packet to a VM, it
 checks the label value against a list of values that the VM is
-        permitted to receive. If it contains an unauthorized value, the
-        hypervisor discards the packet rather than deliver it. If the Flow
-        Label is in use, Neutron zeros the label prior to delivery.
+permitted to receive. If it contains an unauthorized value, the
+hypervisor discards the packet rather than deliver it. If the Flow
+Label is in use, Neutron zeros the label prior to delivery.
 
 The intention is to hide the label value from malware potentially
 found in the VM, and enable the label to be used as a form of first
-        and last hop security. This provides basic tenant isolation, if the
-        label is assigned as a tenant identifier, and may be used more
-        creatively such as to identify a network management application as
-        separate from a managed resource.
+and last hop security. This provides basic tenant isolation, if the
+label is assigned as a tenant identifier, and may be used more
+creatively such as to identify a network management application as
+separate from a managed resource.
 
 ## Isolation in routing {#routing}
 
 This concept has the weakness that if a packet is not dropped at
 its source, it is dropped at its destination. It would be preferable
-        for the packet to be dropped in flight, such as at the top-of-rack
-        switch or an aggregation router.
+for the packet to be dropped in flight, such as at the top-of-rack
+switch or an aggregation router.
 
 Concepts discussed in 
 {{!I-D.baker-ipv6-isis-dst-flowlabel-routing}}, {{!RFC5120}},
@@ -659,41 +659,41 @@ Concepts discussed in
 {{!RFC5340}}, and {{!I-D.ietf-ospf-ospfv3-lsa-extend}} may be be used
 to isolate tenants in the routing of the data center backbone.
 This is not strictly necessary, if {{#ipv6-isolation}} is
-    uniformly and correctly implemented. It does, however, present a
-        second defense against misconfiguration, as the filter becomes
-        ubiquitous in the data center and as scalable as routing.
+uniformly and correctly implemented. It does, however, present a
+second defense against misconfiguration, as the filter becomes
+ubiquitous in the data center and as scalable as routing.
 
 # {{BCP 38}} ingress filtering {#bcp38}
 
 As noted in {{#ipv6-isolation}}, Neutron today implements
 a form of network ingress filtering {{?RFC2827}}. It
-      prevents the VM from emitting traffic with an unauthorized MAC, IPv4, or
-      IPv6 source address.
+prevents the VM from emitting traffic with an unauthorized MAC, IPv4, or
+IPv6 source address.
 
 In IPv6, this is readily handled when the address or addresses used
 by a VM are selected by the OpenStack operator. It may then configure a
-      per-VM filter with the addresses it has chosen, following logic similar
-      to the Source Address Validation Solution for DHCP {{I-D.ietf-savi-dhcp}}
-      or SEND {{RFC7219}}. This is
-      also true of Stateless Address Autoconfiguration (SLAAC) {{RFC4862}}
-      when the MAC address is known and not
-      shared.
+per-VM filter with the addresses it has chosen, following logic similar
+to the Source Address Validation Solution for DHCP {{I-D.ietf-savi-dhcp}}
+or SEND {{RFC7219}}. This is
+also true of Stateless Address Autoconfiguration (SLAAC) {{RFC4862}}
+when the MAC address is known and not
+shared.
 
 However, when SLAAC is in use and either the MAC address is unknown
 or SLAAC's privacy extensions {{RFC4941}} {{RFC7217}}
-      are in use, Neutron will need to implement the
-      provisions of FCFS SAVI {{RFC6620}}
-      in order to learn the addresses that a
-      VM is using and include them in the per-VM filter.
+are in use, Neutron will need to implement the
+provisions of FCFS SAVI {{RFC6620}}
+in order to learn the addresses that a
+VM is using and include them in the per-VM filter.
 
 # Moving virtual machines
 
 This design supports these kinds of required layer 2 networks with
 the additional use of a layer 2 over layer 3 encapsulation and tunneling
-      protocol, such as VXLAN {{RFC7348}}. The important
-      point here being that these overlays are used to address specific tenant
-      network requirements and NOT deployed to remove the scalability
-      limitations of OpenStack networking.
+protocol, such as VXLAN {{RFC7348}}. The important
+point here being that these overlays are used to address specific tenant
+network requirements and NOT deployed to remove the scalability
+limitations of OpenStack networking.
 
 There are at least three ways VM movement can be accomplished:
 
@@ -711,15 +711,15 @@ The simplest and most reliable is to
 
 1. Add its address to the DNS Resource Record for the name,
    allowing new references to the name to send transactions
-            there,
+   there,
 
 1. Remove the old address from the DNS Resource Record (including
    the SIIT translation, if one exists), ending the use of the old VM
-            for new transactions,
+   for new transactions,
 
 1. Wait for the period of the DNS Resource Record's lifetime
    (including the SIIT translation, if one exists), as it will get
-            new requests throughout that interval,
+   new requests throughout that interval,
 
 1. Wait for the for the old VM to finish any outstanding
    transactions, and then
@@ -728,7 +728,7 @@ The simplest and most reliable is to
 
 This is obviously not movement of an existing VM, but preservation
 of the same number and function of VMs by creation of a new VM and
-        killing the old.
+killing the old.
 
 ## Live migration of a running virtual machine {#vmotion}
 
@@ -773,24 +773,24 @@ In a native-address environment, we add three steps:
 
 If the VM is moved within the same subnet (which usually implies
 the same rack), there is no stitching or renumbering apart from
-        ensuring that the MAC address moves with the VM. When the VM moves to
-        a different subnet, however, we need to restitch routing, at least
-        temporarily. This obviously calls for some definitions. 
+ensuring that the MAC address moves with the VM. When the VM moves to
+a different subnet, however, we need to restitch routing, at least
+temporarily. This obviously calls for some definitions. 
 
 Stitching Routing
 : The VM is potentially in
 	communication with two sets of peers: VMs in the same subnet, and
 	VMs in different subnets. <list style="symbols">
-                The router in the new subnet is instructed to advertise a
-                host route (/128) to the moved VM, and to install a static
-                route to the old address with the VM's address in the new
-                subnet as its next hop address. Traffic from VMs from other
-                subnets will now follow the host route to the VM in its new
-                location.
+	The router in the new subnet is instructed to advertise a
+	host route (/128) to the moved VM, and to install a static
+	route to the old address with the VM's address in the new
+	subnet as its next hop address. Traffic from VMs from other
+	subnets will now follow the host route to the VM in its new
+	location.
 	The router in the old subnet is instructed to direct LAN
 	traffic to the VM's MAC Address to its IPv6 forwarding logic.
 	Traffic from other VMs in the old subnet will now follow the
-                host route to the moved VM.
+	host route to the moved VM.
     
 
 Renumbering
@@ -798,30 +798,30 @@ Renumbering
 	hygiene if the VM will be there a while. If the VM will reside in
     its new location only temporarily, it can be skipped.
 	Note that every IPv6 address, unlike an IPv4
-            address, has a lifetime. At least in theory, when the lifetime
-            expires, neighbor relationships with the address must be extended
-            or the address removed from the system. The Neighbor
+	address, has a lifetime. At least in theory, when the lifetime
+	expires, neighbor relationships with the address must be extended
+	or the address removed from the system. The Neighbor
 	Discovery {{RFC4861}} 
 	process in the subnet
-            router will periodically emit a Router Advertisement; the VM will
-            gain an IPv6 address in the new subnet at that time if not
-            earlier. As described in {{RFC4192}}, DNS should be
-            changed to report the new address instead of the old. The DNS
-            lifetime and any ambient sessions using the old address are now
-            allowed to expire. That this point, any new sessions will be using
-            the new address, and the old is vestigial.
-            Waiting for sessions using the address to expire
-            can take an arbitrarily long interval, because the session
-            generally has no knowledge of the lifetime of the IPv6
-            address.
+	router will periodically emit a Router Advertisement; the VM will
+	gain an IPv6 address in the new subnet at that time if not
+	earlier. As described in {{RFC4192}}, DNS should be
+	changed to report the new address instead of the old. The DNS
+	lifetime and any ambient sessions using the old address are now
+	allowed to expire. That this point, any new sessions will be using
+	the new address, and the old is vestigial.
+	Waiting for sessions using the address to expire
+	can take an arbitrarily long interval, because the session
+	generally has no knowledge of the lifetime of the IPv6
+	address.
 
 Unstitching Routing
 : This is the reverse process of
 	stitching. If the VM is renumbered, when the old address becomes
-            vestigial, the address will be discarded by the VM; if the VM is
-            subsequently taken out of service, it has the same effect. At that
-            point, the host route is withdrawn, and the MAC address in the old
-            subnet router's tables is removed.
+	vestigial, the address will be discarded by the VM; if the VM is
+	subsequently taken out of service, it has the same effect. At that
+	point, the host route is withdrawn, and the MAC address in the old
+	subnet router's tables is removed.
 
 # OpenStack implications {#implications}
 
@@ -838,7 +838,7 @@ Unstitching Routing
 
 1. Neutron MUST be configured with one or more label values per
    virtual tenant network that the network is permitted to receive
-            {{ipv6-isolation}}.
+   {{ipv6-isolation}}.
 
 ## vSwitch implications {#vSwitch-implications}
 
@@ -847,34 +847,34 @@ On messages transmitted by a virtual machine
 Label Correctness
 : As described in
 	{{security-isolation}}, ensure that the label in the packet
-            is one that the VM is authorized to use. Exactly what label is in
-            view is a deferred, and potentially configurable, option. Again
-            Depending on configuration, the vSwitch may overwrite whatever
-            value is there, or may ratify that the value there is as specified
-            in a VM-specific list.
+	is one that the VM is authorized to use. Exactly what label is in
+	view is a deferred, and potentially configurable, option. Again
+	Depending on configuration, the vSwitch may overwrite whatever
+	value is there, or may ratify that the value there is as specified
+	in a VM-specific list.
 
 Source Address Validation
 : As described in {{BCP38}},
 	force the source address to be among those the
-            VM is authorized to use. The VM may simultaneously be authorized
-            to use several addresses.
+	VM is authorized to use. The VM may simultaneously be authorized
+	to use several addresses.
 
 Destination Address Validation
 : OpenStack for IPv4
 	permits a NAT translation, called a 'floating IP address', to
-            enable a VM to communicate outside the domain; without that, it
-            cannot. For IPv6, the destination address should be permitted by
-            some access list, which may permit all addresses, or addresses
-            matching one or more CIDR prefixes such as permitted multicast
-            addresses, and the prefix of the data center.
+	enable a VM to communicate outside the domain; without that, it
+	cannot. For IPv6, the destination address should be permitted by
+	some access list, which may permit all addresses, or addresses
+	matching one or more CIDR prefixes such as permitted multicast
+	addresses, and the prefix of the data center.
 
 On messages received for delivery to a virtual machine
 
 Label Authorization
 : As described in {{ipv6-isolation}}, 
 	the vSwitch only delivers a packet to a
-            VM if the VM is authorized to receive it. The VM may have been
-            authorized to receive several such labels.
+    VM if the VM is authorized to receive it. The VM may have been
+	authorized to receive several such labels.
 
 Each approach in the appendix discusses filtering.
 
@@ -886,17 +886,17 @@ This document does not ask IANA to do anything.
 
 In {{isolation}} and {{security-isolation}}
 this specification considers inter-tenant
-      and intra-tenant network isolation. It is intended to contribute to the
-      security of a network, much like encapsulation in a maze of tunnels or
-      VLANs might, but without the complexities and overhead of the management
-      of such resources. This does not replace the use of IPSec, SSH, or TLS
-      encryption or the use authentication technologies; if these would be
-      appropriate in an on-premises corporate data center, they remain
-      appropriate in a multi-tenant data center regardless of the isolation
-      technology. However, one can think of this as a simple inter-tenant
-      firewall based on the concepts of role-based access control; if it can
-      be readily determined that a sender is not authorized to communicate
-      with a receiver, such a transmission is prevented.
+and intra-tenant network isolation. It is intended to contribute to the
+security of a network, much like encapsulation in a maze of tunnels or
+VLANs might, but without the complexities and overhead of the management
+of such resources. This does not replace the use of IPSec, SSH, or TLS
+encryption or the use authentication technologies; if these would be
+appropriate in an on-premises corporate data center, they remain
+appropriate in a multi-tenant data center regardless of the isolation
+technology. However, one can think of this as a simple inter-tenant
+firewall based on the concepts of role-based access control; if it can
+be readily determined that a sender is not authorized to communicate
+with a receiver, such a transmission is prevented.
 
 # Privacy Considerations {#Privacy}
 
@@ -970,16 +970,16 @@ Data Center       (   "the Internet"  )   Data Center
 
 In this use case, there exist two data centers that one might presume
 are operated by different entities. The two data centers use separate
-      address spaces, 2001:db8:1::/48 and 2001:db8:2::/48. One tenant (which
-      is to say, a set of systems, virtual or physical, that normally
-      communicate with each other), Tenant A, is spread across the two data
-      centers, and has a different Tenant ID in each of them. One
-      administration has an additional tenant, Tenant B, and the other also
-      has an additional tenant, Tenant C. For the sake of amusement, we
-      presume that Tenant C, in the right data center, has the same tenant ID
-      as Tenant A uses in the left data center. Additionally, Tenant A has a
-      "home site" that is authorized to communicate with its data center
-      systems.
+address spaces, 2001:db8:1::/48 and 2001:db8:2::/48. One tenant (which
+is to say, a set of systems, virtual or physical, that normally
+communicate with each other), Tenant A, is spread across the two data
+centers, and has a different Tenant ID in each of them. One
+administration has an additional tenant, Tenant B, and the other also
+has an additional tenant, Tenant C. For the sake of amusement, we
+presume that Tenant C, in the right data center, has the same tenant ID
+as Tenant A uses in the left data center. Additionally, Tenant A has a
+"home site" that is authorized to communicate with its data center
+systems.
 
 From the perspective of communication management, therefore, to
 connect Tenant A to itself and deny all other communications, we need
@@ -997,35 +997,35 @@ four filter rules:
 
 Ideally, one would like to apply those rules to the destination
 address at the sender of a packet, and the source address at the
-      receiver of a packet. And one would like to do so in a manner that
-      minimizes the possibility of disruptive packet filtering such as
-      discussed in <xref target="I-D.gont-v6ops-ipv6-ehs-in-real-world"/>.
+receiver of a packet. And one would like to do so in a manner that
+minimizes the possibility of disruptive packet filtering such as
+discussed in <xref target="I-D.gont-v6ops-ipv6-ehs-in-real-world"/>.
 
 In addition, one wants a {{BCP38}} filter, ensuring that packets sent by
 a system (virtual or physical) uses only one of the source addresses it
-      is supposed to be using.
+is supposed to be using.
 
 ## IPv6 Flow Label {#B-label-2460}
 
 The IPv6 flow label may be
 used to identify a tenant or part of a
-        tenant, and to facilitate access control based on the flow label
-        value. The flow label is a flat 20 bits, facilitating the designation
-        of 2^20 (1,048,576) tenants without regard to their location.
-        1,048,576 is less than infinity, but compared to current data centers
-        is large, and much simpler to manage.
+tenant, and to facilitate access control based on the flow label
+value. The flow label is a flat 20 bits, facilitating the designation
+of 2^20 (1,048,576) tenants without regard to their location.
+1,048,576 is less than infinity, but compared to current data centers
+is large, and much simpler to manage.
 
 Note that this usage differs from the current IPv6 Flow Label
 Specification {{!RFC6437}}.
-        It also differs
-        from the use of a flow label recommended by the
-        IPv6 Specification {{!RFC2460}}, and the respective usages
-        of the flow label in the {{!RFC2205}} (Resource ReSerVation
-        Protocol and the previous IPv6 Flow Label Specification {{!RFC3698}},
-        and the projected usage in Low-Power and Lossy Networks
-		{{!RFC5548}} {{!RFC5673}}.
-        Within a target domain, the usage may be specified
-        by the domain. That is the viewpoint taken in this specification.
+It also differs
+from the use of a flow label recommended by the
+IPv6 Specification {{!RFC2460}}, and the respective usages
+of the flow label in the {{!RFC2205}} (Resource ReSerVation
+Protocol and the previous IPv6 Flow Label Specification {{!RFC3698}},
+and the projected usage in Low-Power and Lossy Networks
+{{!RFC5548}} {{!RFC5673}}.
+Within a target domain, the usage may be specified
+by the domain. That is the viewpoint taken in this specification.
 
 ### Metaconsiderations
 
@@ -1053,63 +1053,63 @@ To Be Supplied
 
 In the course of developing {{I.D-baker-ipv6-openstack-model}}, it
 was determined that a way was needed to encode a federated identity
-          for use in Role-Based Access Control. This appendix describes an
-          IPv6{{!RFC2460}} option that could be carried in
-          the Hop-by-Hop or Destination Options Header. The format of an
-          option is defined in section 4.2 of that document, and the
-          Hop-by-Hop and Destination Options are defined in sections 4.3 and
-          4.6 of that document respectively.
+for use in Role-Based Access Control. This appendix describes an
+IPv6{{!RFC2460}} option that could be carried in
+the Hop-by-Hop or Destination Options Header. The format of an
+option is defined in section 4.2 of that document, and the
+Hop-by-Hop and Destination Options are defined in sections 4.3 and
+4.6 of that document respectively.
 
 A 'Federated Identity', in the words of the Wikipedia, 'is the
 means of linking an electronic identity and attributes, stored
 across multiple distinct identity management systems.' In this
-          context, it is a fairly weak form of that; it is intended for quick
-          interpretation in an access list at the Internet layer as opposed to
-          deep analysis for login or other security purposes at the
-          application layer, and rather than identifying an individual or a
-          system, it identifies a set of systems whose members are authorized
-          to communicate freely among themselves and may also be authorized to
-          communicate with other identified sets of systems. Either two
-          systems are authorized to communicate or they are not, and
-          unauthorized traffic can be summarily discarded. The identifier is
-          defined in a hierarchical fashion, for flexibility and
-          scalability.
+context, it is a fairly weak form of that; it is intended for quick
+interpretation in an access list at the Internet layer as opposed to
+deep analysis for login or other security purposes at the
+application layer, and rather than identifying an individual or a
+system, it identifies a set of systems whose members are authorized
+to communicate freely among themselves and may also be authorized to
+communicate with other identified sets of systems. Either two
+systems are authorized to communicate or they are not, and
+unauthorized traffic can be summarily discarded. The identifier is
+defined in a hierarchical fashion, for flexibility and
+scalability.
 
 'Role-Based Access Control', in this context, applies to groups
 of virtual or physical hosts, not individuals. In the simplest case,
-          the several tenants of a multi-tenant data center might be
-          identified, and authorized to communicate only with other systems
-          within the same 'tenant' or with identified systems in other tenants
-          that manage external access. One could imagine a company purchasing
-          cloud services from multiple data center operators, and as a result
-          wanting to identify the systems in its tenant in one cloud service
-          as being authorized to communicate with the systems its tenant of
-          the other. One could further imagine a given department within that
-          company being authorized to speak only with itself and an identified
-          set of other departments within the same company. To that end, when
-          a datagram is sent, it is tagged with the federated identify of the
-          sender (e.g., {datacenter, client, department}), and the receiving
-          system filters traffic it receives to limit itself to a specific set
-          of authorized communicants.
+the several tenants of a multi-tenant data center might be
+identified, and authorized to communicate only with other systems
+within the same 'tenant' or with identified systems in other tenants
+that manage external access. One could imagine a company purchasing
+cloud services from multiple data center operators, and as a result
+wanting to identify the systems in its tenant in one cloud service
+as being authorized to communicate with the systems its tenant of
+the other. One could further imagine a given department within that
+company being authorized to speak only with itself and an identified
+set of other departments within the same company. To that end, when
+a datagram is sent, it is tagged with the federated identify of the
+sender (e.g., {datacenter, client, department}), and the receiving
+system filters traffic it receives to limit itself to a specific set
+of authorized communicants.
 
 ### Federated identity option {#B-sect2}
 
 The option is defined as a sequence of numbers that identify
 relevant parties hierarchically. The specific semantics (as in, what
-          number identifies what party) are beyond the scope of this
-          specification, but they may be interpreted as being successively
-          more specific; as shown in <xref target="B-hierarchical"/>, the
-          first might identify a cloud operator, the second, if present, might
-          identify a client of that operator, and the third, if present, might
-          identify a subset of that client's systems. In an application
-          entirely used by Company A, there might be only one number, and it
-          would identify sets of systems important to Company A such as
-          business units. If Company A uses the services of a multi-tenant
-          data center #1, it might require that there be two numbers,
-          identifying Company A and its internal structure. If Company A uses
-          the services of both multi-tenant data centers #1 and #2, and they
-          are federated, the identifier might need to identify the data
-          center, the client, and the structure of the client.
+number identifies what party) are beyond the scope of this
+specification, but they may be interpreted as being successively
+more specific; as shown in <xref target="B-hierarchical"/>, the
+first might identify a cloud operator, the second, if present, might
+identify a client of that operator, and the third, if present, might
+identify a subset of that client's systems. In an application
+entirely used by Company A, there might be only one number, and it
+would identify sets of systems important to Company A such as
+business units. If Company A uses the services of a multi-tenant
+data center #1, it might require that there be two numbers,
+identifying Company A and its internal structure. If Company A uses
+the services of both multi-tenant data centers #1 and #2, and they
+are federated, the identifier might need to identify the data
+center, the client, and the structure of the client.
 
 ~~~~
                    _.----------------------.
@@ -1146,12 +1146,10 @@ relevant parties hierarchically. The specific semantics (as in, what
 
 A number {{B-number}} is represented as a base
 128 number whose coefficients are stored in the lower 7 bits of a
-            string of bytes. The upper bit of each byte is zero, except in the
-            final byte, in which case it is 1. The most significant
-            coefficient of a non-zero number is never zero.
+string of bytes. The upper bit of each byte is zero, except in the
+final byte, in which case it is 1. The most significant
+coefficient of a non-zero number is never zero.
 
-            <figure anchor="B-number" title="Sample numbers">
-              <artwork align="center"><![CDATA[
 ~~~~
 8 = 8*128^0
 +-+------+
@@ -1172,8 +1170,6 @@ A number {{B-number}} is represented as a base
 
 The identifier {8, 987, 121393} looks like
 
-            <figure anchor="B-identifier" title="">
-              <artwork align="center"><![CDATA[
 ~~~~
 +-------+-------+-+-----+-+-----+-+-----+-+-----+-+-----+-+-----+
 | type  | len=6 |1|   8 |0|   7 |1|  91 |0|   7 |0|  52 |1|  49 |
@@ -1185,13 +1181,13 @@ The identifier {8, 987, 121393} looks like
 
 In an environment in which the validation of the option only
 occurs in the receiving system or its hypervisor, this option is
-              best placed in the Destination Options Header.
+best placed in the Destination Options Header.
 
 ##### Use in the Hop-by-Hop Header {#B-hopbyhop}
 
 In an environment in which the validation of the option
 occurs in transit, such as in a firewall or other router, this
-              option is best placed in the Hop-by-Hop Header.
+option is best placed in the Hop-by-Hop Header.
 
 ### Metaconsiderations {#Metaconsiderations}
 
@@ -1219,18 +1215,18 @@ To Be Supplied
 
 Cloud environments suffer from ambiguity in identifying their
 services and tenants. Traffic from different cloud providers cannot
-          be distinguished easily on the Internet. Filters are simply not able
-          to obtain the provider, service and tenant identities from network
-          packets without leveraging other more latency intense inspection
-          methods. This appendix describes the Universal Cloud Classification
-          (UCC) {{UCC}} approach as a way to identify cloud
-          providers, their services and tenants on the network layer. It
-          introduces a Cloud-ID, Service-ID and Tenant-ID. The IDs are
-          incorporated into an IPv6 extension header and can be used for
-          different use-cases both within and outside a Cloud Environment. The
-          format of the IDs and their characteristics are defined in
-          {{UCC_Options}} of the document and the extension header is
-          defined in {{UCC_Extensions_Header}}.
+be distinguished easily on the Internet. Filters are simply not able
+to obtain the provider, service and tenant identities from network
+packets without leveraging other more latency intense inspection
+methods. This appendix describes the Universal Cloud Classification
+(UCC) {{UCC}} approach as a way to identify cloud
+providers, their services and tenants on the network layer. It
+introduces a Cloud-ID, Service-ID and Tenant-ID. The IDs are
+incorporated into an IPv6 extension header and can be used for
+different use-cases both within and outside a Cloud Environment. The
+format of the IDs and their characteristics are defined in
+{{UCC-Options}} of the document and the extension header is
+defined in {{UCC-Extensions-Header}}.
 
 Applications and users are defined in many different ways in
 cloud environments, therefore ambiguity is multifold:
@@ -1238,68 +1234,68 @@ cloud environments, therefore ambiguity is multifold:
 1. The first ambiguity is described by how a service is defined
    in cloud environments. Here, an application within a Cloud
    Provider is called a service. However, the cloud providers
-              network can not distinguish services from services run on top of
-              other services. Distinguishing sub-services hosted by a service
-              becomes critical when applying network services to specific
-              sub-services.
+   network can not distinguish services from services run on top of
+   other services. Distinguishing sub-services hosted by a service
+   becomes critical when applying network services to specific
+   sub-services.
 
 1. Secondly, a tenant in a cloud provider can have different
    meanings. Here, tenant is used to define a consumer of a cloud
-              service. At the same time a service run on top of another
-              service can be considered a tenant of that particular service.
-              These ambiguities make it extremely difficult to uniquely
-              identify services and their tenants in cloud environments. This
-              multi-layered service and tenant relationship is one of the most
-              complex tasks to handle using existing technologies.
+   service. At the same time a service run on top of another
+   service can be considered a tenant of that particular service.
+   These ambiguities make it extremely difficult to uniquely
+   identify services and their tenants in cloud environments. This
+   multi-layered service and tenant relationship is one of the most
+   complex tasks to handle using existing technologies.
 
 A service can be defined as a group of entities offering a
 specific function to a tenant within a Cloud Provider.
 
-### Universal Cloud Classification Options {{UCC_Options}}
+### Universal Cloud Classification Options {{UCC-Options}}
 
 Three IDs are defined that classify a Tenant specific to the
 service used within a certain Cloud Provider. The Cloud-ID,
-          Service-ID and Tenant-ID are defined hierarchically and support
-          service-stacking. The IDs are based on the 'Digital Object
-          Identifier' scheme and support incorporating metadata per ID. The ID
-          can be of variable length but Cloud-ID, Service-ID and Tenant-ID are
-          proposed within a 4 byte, 6 byte and 6 byte tuple respectively.
+Service-ID and Tenant-ID are defined hierarchically and support
+service-stacking. The IDs are based on the 'Digital Object
+Identifier' scheme and support incorporating metadata per ID. The ID
+can be of variable length but Cloud-ID, Service-ID and Tenant-ID are
+proposed within a 4 byte, 6 byte and 6 byte tuple respectively.
 
-#### Cloud ID {#UCC_Cloud_ID}
+#### Cloud ID {#UCC-Cloud-ID}
 
 The Cloud ID is a
 globally unique ID that is managed by a
-            registrar similar to DNS. It is 4 bytes in sizes and defined with
-            a 10 bit location part and a 22 bit provider ID.
+registrar similar to DNS. It is 4 bytes in sizes and defined with
+a 10 bit location part and a 22 bit provider ID.
 
-#### Service ID {#UCC_Service_ID}
+#### Service ID {#UCC-Service-ID}
 
 The Service ID is used to identify a service both within and
 outside a cloud environment. It is a 6 byte long ID that is
-            separated into several sub-IDs defining the data center, service
-            and an option field. The Data Center location is defined by 8
-            bits, the Service is 32 bits long and the Option field provides
-            another 8 bits. The option bits can be used to incorporate
-            information used for en-route or destination tasks.
+separated into several sub-IDs defining the data center, service
+and an option field. The Data Center location is defined by 8
+bits, the Service is 32 bits long and the Option field provides
+another 8 bits. The option bits can be used to incorporate
+information used for en-route or destination tasks.
 
-#### Tenant ID {#UCC_Tenant_ID}
+#### Tenant ID {#UCC-Tenant-ID}
 
 The Tenant-ID is classifying consumers (tenants) of Cloud
 Services. It is a 6 byte long ID that is defined and managed by
-            the Cloud Provider. Similar to the Service-ID the Tenant-ID
-            incorporates metadata specific to that tenant. The MetaData field
-            is of variable length and can be defined by the Cloud Provider as
-            needed.
+the Cloud Provider. Similar to the Service-ID the Tenant-ID
+incorporates metadata specific to that tenant. The MetaData field
+is of variable length and can be defined by the Cloud Provider as
+needed.
 
-### UCC Extension Header {#UCC_Extensions_Header}
+### UCC Extension Header {#UCC-Extensions-Header}
 
 The UCC proposal {{{UCC}} defines an IPv6 hop-by-hop
 extension header to incorporate the Cloud-ID, Service-ID and
-          Tenant-ID. Each ID area also includes bits to define enroute
-          behavior for devices understanding/not-understanding the newly
-          defined hop-by-hop extension header. This is useful for legacy
-          devices on the Internet to avoid drops the packet but forward it
-          without processing the added IPv6 extension header. <figure
+Tenant-ID. Each ID area also includes bits to define enroute
+behavior for devices understanding/not-understanding the newly
+defined hop-by-hop extension header. This is useful for legacy
+devices on the Internet to avoid drops the packet but forward it
+without processing the added IPv6 extension header. <figure
 
 ~~~~
 0       8       16      24      32      40      48      56      64
@@ -1320,10 +1316,10 @@ The overall extension header size is 22 bytes.
 
 The model here suggests using the Policy List described in the
 {{I-D.previdi-6man-segment-routing-header}}. Technically, it would violate that
-        specification, as the Policy List is described as containing a set of
-        optional addresses representing specific nodes in the SR path, where
-        in this case it would be a 128 bit number identifying the tenant or
-        other set of communicating nodes.
+specification, as the Policy List is described as containing a set of
+optional addresses representing specific nodes in the SR path, where
+in this case it would be a 128 bit number identifying the tenant or
+other set of communicating nodes.
 
 ### Metaconsiderations
 
@@ -1349,9 +1345,9 @@ To Be Supplied
 
 The approach starts from the observation that Openstack assigns the
 MAC address used by a VM, and can assign it according to any algorithm
-        it chooses. A desire has been expressed to put the tenant identifier
-        into the IPv6 address. This would put it into the IID in that address
-        without modifying the VM OS or the virtual switch.
+it chooses. A desire has been expressed to put the tenant identifier
+into the IPv6 address. This would put it into the IID in that address
+without modifying the VM OS or the virtual switch.
 
 ### Address Format {#address-format}
 
@@ -1359,18 +1355,14 @@ The proposed address format is identical to the IPv6 EUI-48 {{RFC4291}}
 and is derived from
 the MAC address space specified in SLAAC {{RFC4862}}
 However, the MAC address provided by
-          the OpenStack Controller differs from an IEEE 802.3 MAC Address.
+the OpenStack Controller differs from an IEEE 802.3 MAC Address.
 
 Walking through the details, an IEEE 802.3 MAC Address {{MAC}}
 consists of two single bit fields, a 22 bit
-          Organizationally Unique Identifier (OUI), and a serial number or
-          other NIC-specific identifier. The intention is to create a globally
-          unique address, so that the NIC may be used on any LAN in the world
-          without colliding with other addresses.
-
-          <figure anchor="MAC"
-                  title="Ethernet MAC Address as specified by IEEE 802.3">
-            <artwork align="center"><![CDATA[
+Organizationally Unique Identifier (OUI), and a serial number or
+other NIC-specific identifier. The intention is to create a globally
+unique address, so that the NIC may be used on any LAN in the world
+without colliding with other addresses.
 
 ~~~~
  0       8       16      24      32      40
@@ -1386,11 +1378,8 @@ consists of two single bit fields, a 22 bit
 
 {{RFC4291}} describes a transformation from that
 address (which it refers to as an EUI-48 address) to the IID of an
-          IPv6 Address {{addr4291}}.
+IPv6 Address {{addr4291}}.
 
-          <figure anchor="addr4291" title="RFC 4291 IPv6 Address">
-          <artwork align="center"><![CDATA[
-		  
 ~~~~
 0       8       16      24      32      40      48      56
 +-------+-------+-------+-------+-------+-------+-------+-------+
@@ -1405,20 +1394,20 @@ address (which it refers to as an EUI-48 address) to the IID of an
 
 OpenStack today specifies a local IEEE 802.3 address (bit 6 is
 one). IPv6 addresses are either installed using DHCP or derived from
-          the MAC address via SLAAC.
+the MAC address via SLAAC.
 
 One could imagine the MAC address used in an OpenStack
 environment including both a tenant identifier and a system number
-          on a LAN. If the tenant identifier is 24 bits (it could be longer or
-          shorter, but for this document it is treated as 24 bits), as in
-          common in VxLAN and QinQ implementations, that would allow for a 22
-          bit system number, plus two magic bits specifying a locally defined
-          unicast address, as shown in {{TenantMAC}}.
-          Alternatively, the first byte could be some specified values such as
-          0xFA (as is common with current OpenStack implementations), followed
-          by a 16 bit system number within the subnet.
+on a LAN. If the tenant identifier is 24 bits (it could be longer or
+shorter, but for this document it is treated as 24 bits), as in
+common in VxLAN and QinQ implementations, that would allow for a 22
+bit system number, plus two magic bits specifying a locally defined
+unicast address, as shown in {{TenantMAC}}.
+Alternatively, the first byte could be some specified values such as
+0xFA (as is common with current OpenStack implementations), followed
+by a 16 bit system number within the subnet.
 
- ~~~~
+~~~~
  0       8       16      24      32      40    47
 +-------+-------+-------+-------+-------+-------+
 |System Number within   | Openstack Tenant      |
@@ -1427,7 +1416,7 @@ environment including both a tenant identifier and a system number
       AA
       |+--- 0=Unicast/1=Multicast
       +---- 1=Local/0=Global
- ~~~~
+~~~~
 {: #TenantMAC title="Ethernet MAC Address as installed by OpenStack"}
 
 After being passed through SLAAC, that results in an IID that
@@ -1463,23 +1452,18 @@ using DHCPv6 or another technology, the IID would be as described in
 ~~~~
 {: #TennantIPv6 title="Generalized Tenant IID"}
 
-As noted, the Tenant Identifier might be longer or shorter in a
-given implementation. Specifically in {{TenantIPv6}}, a
-          32 bit Tenant ID would occupy bit positions 32..63, and a 16 bit
-          Tenant ID would occupy positions 48..63.
+As noted, the Tenant Identifier might be longer or shorter in a given implementation.
+Specifically in {{TenantIPv6}}, a 32 bit Tenant ID would occupy bit positions 32..63,
+and a 16 bit Tenant ID would occupy positions 48..63.
 
 Following the same model, IPv6 Multicast Addresses can be
 associated with a tenant identifier by placing the tenant identifier
-          in the same set of bits and using the remaining bits of the
-          Multicast Group ID as the ID within the tenant as show in
-          {{TenantMulticast}}. Flags and scope are as specified in
-          {{RFC4291}} section 2.7. To avoid clashes with
-          multicast addresses specified in ibid 2.7.1 and future allocations,
-          The Tenant Group ID MUST NOT be zero.
-
-          <figure anchor="TenantMulticast"
-                  title="RFC 4291 Multicast Address with Tenant ID">
-            <artwork align="center"><![CDATA[
+in the same set of bits and using the remaining bits of the
+Multicast Group ID as the ID within the tenant as show in
+{{TenantMulticast}}. Flags and scope are as specified in
+{{RFC4291}} section 2.7. To avoid clashes with
+multicast addresses specified in ibid 2.7.1 and future allocations,
+The Tenant Group ID MUST NOT be zero.
 
 ~~~~
 +--------+----+----+-----------------------------+---------------+
@@ -1495,18 +1479,17 @@ associated with a tenant identifier by placing the tenant identifier
 
 #### Service offered
 
-The fundamental service offered in this model is that the key
-policy parameter, the Tenant ID, is encoded in every datagram for
-            both sender and receiver, and can therefore be tested by sender,
-            receiver, or any other party. It is secure in the sense that it
-            cannot be directly spoofed; in the sender vSwitch, the vSwitch
-            prevents the sender from sending another address as discussed in
-            {{BCP38}}, and if the recipient address is a randomly
-            chosen address, even if it meets inter-tenant communication
-            policy, there is unlikely to be a matching destination to deliver
-            it to. Where this breaks down is if a valid and acceptable
-            destination is discovered and used; that is the argument for
-            further protection via TLS.
+The fundamental service offered in this model is that the
+key policy parameter, the Tenant ID, is encoded in every datagram
+for both sender and receiver, and can therefore be tested by sender,
+receiver, or any other party. It is secure in the sense that it cannot
+be directly spoofed; in the sender vSwitch, the vSwitch prevents
+the sender from sending another address as discussed in {{BCP38}},
+and if the recipient address is a randomly chosen address, even if
+it meets inter-tenant communication policy, there is unlikely to
+be a matching destination to deliver it to. Where this breaks down
+is if a valid and acceptable destination is discovered and used;
+that is the argument for further protection via TLS.
 
 #### Pros and Cons
 
@@ -1553,28 +1536,28 @@ access control lists:
 
 Generally speaking, one would expect at least one of those
 three lists to contain an entry - at minimum, the VM would be
-            authorized to communicate with ::/0, which is to say 'anyone'.
+authorized to communicate with ::/0, which is to say 'anyone'.
 
 Among the generic IPv6 prefixes that may be communicated with,
 there may be zero or more {{RFC6052}} IPv4-embedded
-            IPv6 prefix prefixes that the VM is permitted to
-            communicate with. For example, if the 
-            {{I-D.ietf-v6ops-siit-dc}} translation prefix is
-            2001:db8:0:1::/96, and the enterprise is using 192.0.2.0/24 as its
-            IPv4 address, the filter would contain the prefix
-            2001:db8:0:1:0:0:c000:0200/120.
+IPv6 prefix prefixes that the VM is permitted to
+communicate with. For example, if the 
+{{I-D.ietf-v6ops-siit-dc}} translation prefix is
+2001:db8:0:1::/96, and the enterprise is using 192.0.2.0/24 as its
+IPv4 address, the filter would contain the prefix
+2001:db8:0:1:0:0:c000:0200/120.
 
 Note that the lists may also include multicast prefixes as
 specified in {{address-format}}, such as
-            locally-scoped multicast ff01::/104 or locally-scoped multicast
-            within the tenant {ff01::/16, tenant id} . While these access
-            lists are applied in both directions (as a sender, what prefixes
-            may the destination address contain, and as a receiver, what
-            prefixes may the source address contain), only the destination
-            address may contain multicast addresses. For multicast, therefore,
-            the vSwitch should filter {{RFC2710}} Multicast
-            Listener Discovery using the multicast subset, permitting
-            the VM to only join relevant multicast groups.
+locally-scoped multicast ff01::/104 or locally-scoped multicast
+within the tenant {ff01::/16, tenant id} . While these access
+lists are applied in both directions (as a sender, what prefixes
+may the destination address contain, and as a receiver, what
+prefixes may the source address contain), only the destination
+address may contain multicast addresses. For multicast, therefore,
+the vSwitch should filter {{RFC2710}} Multicast
+Listener Discovery using the multicast subset, permitting
+the VM to only join relevant multicast groups.
 
 ## Modified IID using modified Privacy Extension {#B-5-label-Privacy-Address}
 
@@ -1584,7 +1567,7 @@ Address Autoconfiguration, and the associated
 {{RFC4941}} Privacy Extensions. The address format is
 identical to that of {{B-label-IID}}, with the exception
 that The 'System Number within the LAN' is a random number determined
-        by the host rather than being specified by the controller.
+by the host rather than being specified by the controller.
 
 It does have implications, however. It will require
 
@@ -1621,3 +1604,6 @@ To Be Supplied
 
 To Be Supplied
 
+
+<!--  LocalWords:  ReSerVation
+ -->
